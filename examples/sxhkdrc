@@ -1,0 +1,15 @@
+
+super + Escape
+    echo "reload config" > /tmp/custard.fifo
+
+super + Return
+    urxvt
+
+super + {_,ctrl + ,alt + }{Up,Down,Left,Right}
+    echo "{move,grow,shrink} window {up,down,left,right}" > /tmp/custard.fifo
+
+super + {_,shift + ,ctrl +,alt +}{1-9,0}
+    echo "{go to,send to,attach,detach} workspace {1-9,10}" > /tmp/custard.fifo
+
+super + w
+    echo "close window" > /tmp/custard.fifo
