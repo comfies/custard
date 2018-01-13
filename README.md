@@ -7,6 +7,8 @@ custard is based on subtle, 2bwm, swm, and howm. Some of the codebase was based 
 
 # Installation
 
+custard depends on XCB to be installed. Check your distros repository for the XCB package.
+
 ```
 $ git clone https://github.com/Sweets/custard.git
 $ cd custard
