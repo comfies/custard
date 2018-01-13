@@ -9,18 +9,18 @@ MANPREFIX?=$(PREFIX)/share/man
 
 all: $(TARGET)
 
-$(TARGET): workspace/src/main.cpp
+$(TARGET): src/main.cpp
 	mkdir -p workspace/build
-	$(CC) workspace/src/main.cpp $(CFLAGS) -o workspace/build/$(TARGET)
+	$(CC) src/main.cpp $(CFLAGS) -o build/$(TARGET)
 
 install: $(TARGET)
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
-	mkdir -p workspace/build
-	install workspace/build/$(TARGET) $(DESTDIR)$(PREFIX)/bin/$(TARGET)
+	mkdir -p build
+	install build/$(TARGET) $(DESTDIR)$(PREFIX)/bin/$(TARGET)
 	chmod 755 $(DESTDIR)$(PREFIX)/bin/$(TARGET)
-	install workspace/man/custard.man $(DESTDIR)$(MANPREFIX)/man1/custard.1
+	install man/custard.man $(DESTDIR)$(MANPREFIX)/man1/custard.1
 	chmod 644 $(DESTDIR)$(MANPREFIX)/man1/custard.1
 
 clean:
-	$(RM) workspace/build/$(TARGET)
+	$(RM) build/$(TARGET)
 
