@@ -24,6 +24,8 @@ urxvt &
 custard
 ```
 
+As for a hotkey daemon, you can refer to `examples/sxhkdrc` for usage with sxhkd (which is the hot key daemon that I both use and recommend).
+
 # Managing Windows
 
 custard manages windows via commands from a named pipe/FIFO. For the purposes of this README, understand that "named pipe" is synonymous with "FIFO", as they will be referred to as FIFOs here.
