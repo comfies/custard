@@ -22,7 +22,7 @@ namespace Configuration {
     unsigned int screen_margin_left = 0;
     unsigned int screen_margin_right = 0;
 
-    unsigned int workspaces = 1;
+    unsigned int workspaces = 2;
 
     /* End user config */
 
