@@ -3,6 +3,8 @@ custard window manager
 
 custard (stylized in all lowercase letters) is a stacking/floating window manager for X.Org. It arranges windows on a grid, i.e. there is a virtual grid on the screen, windows are positioned by X and Y coordinates, as well as sized over X and Y coordinates.
 
+custard is based on subtle, 2bwm, swm, and howm. Some of the codebase was based off of code from the various projects listed, and as such, thanks, and credit where due to the credits of said projects.
+
 # Installation
 
 ```
@@ -25,6 +27,8 @@ custard
 ```
 
 As for a hotkey daemon, you can refer to `examples/sxhkdrc` for usage with sxhkd (which is the hot key daemon that I both use and recommend).
+
+For configuration, see CONFIGURATION, or refer to `examples/.Xresources`.
 
 # Managing Windows
 
