@@ -96,4 +96,4 @@ custard is configured via the X resource manager, i.e., the Xresources file.
 
 `custard.margin_right` - How many pixels to offset the grid from the right of the screen by. Default value is `0`.
 
-`custard.workspaces` - How many workspaces custard should create during initialization.
+`custard.workspaces` - How many workspaces custard should create during initialization. Default value is `2`.
