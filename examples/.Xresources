@@ -1,0 +1,19 @@
+custard.rows: 2
+custard.columns: 3
+
+custard.border_type: None
+custard.border_size: 0
+
+custard.focused_color: #FFFFFF
+custard.unfocused_color: #676767
+custard.background_color: #000000
+custard.invert_colors: False
+
+custard.margin: 0
+
+custard.margin_top: 0
+custard.margin_bottom: 0
+custard.margin_left: 0
+custard.margin_right: 0
+
+custard.workspaces: 2
