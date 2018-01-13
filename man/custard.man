@@ -1,0 +1,124 @@
+.TH CUSTARD 1 "2018-01-14" "1.1" "Custard WM"
+.SH NAME
+custard \- A window manager
+.SH DESCRIPTION
+.B custard
+is a floating window manager written over the XCB library based on 2bwm, howm, swm, and subtle. Window size and location are relative to a grid on the screen. It is configured via the X resource manager.
+.SH CONFIGURATION
+.I custard.rows
+\- Sets the number of rows for the grid. Default value is 2.
+
+.I custard.columns
+\- Sets the number of columns for the grid. Default value is 3.
+
+.I custard.border_type
+\- Sets the type of border for windows. Valid types are "Triple", "Double", "Single", or "None". Default value is None.
+
+.I custard.border_size
+\- Sets the border size for windows. If border size is 0, border_type is implied to be None. For border types Double and Triple, all borders are of border_size. Default value is 0.
+
+.I custard.focused_color
+\- Sets the focused color for the borders. Valid colors are in hexadecimal notation (#rrggbb). Default value is #FFFFFF.
+
+.I custard.unfocused_color
+\- Sets the unfocused color for the borders. Valid colors are in hexadecimal notation (#rrggbb). Default value is #676767.
+
+.I custard.background_color
+\- Sets the background color for the borders of type Double and Triple. Valid colors are in hexadecimal notation (#rrggbb). Default value is #000000.
+
+.I custard.invert_colors
+\- Switches border colors. Varies based on type. If border_type is Single, the focused_color and unfocused_color are swapped. If border_type is set to Double or Triple, the background_color is swapped with the focused_color or unfocused_color, and the focused_color and unfocused_color are swapped for the background_color. Default value is False.
+
+.I custard.margin
+\- Sets the margin between windows on the grid. Default value is 0.
+
+.I custard.margin_top
+\- Offsets the grid by X pixels from the top of the screen. Default value is 0.
+
+.I custard.margin_left
+\- Offsets the grid by X pixels from the left of the screen. Default value is 0.
+
+.I custard.margin_right
+\- Offsets the grid by X pixels from the right of the screen. Default value is 0.
+
+.I custard.margin_bottom
+\- Offsets the grid by X pixels from the bottom of the screen. Default value is 0.
+
+.SH USAGE
+
+custard is controlled by sending commands via the fifo. You can use a hot-key daemon like
+.I sxhkd
+to send said commands.
+
+custard's fifo path is always
+.B /tmp/custard.fifo
+
+.I reload config
+\- Reloads XRM (.Xresources) and repositions windows accordingly.
+
+.I move window up
+\- Moves the focused window up by one grid unit.
+
+.I move window down
+\- Moves the focused window down by one grid unit.
+
+.I move window left
+\- Moves the focused window left by one grid unit.
+
+.I move window right
+\- Moves the focused window right by one grid unit.
+
+.I grow window up
+\- Makes the focused window grow by one grid unit upwards.
+
+.I grow window down
+\- Makes the focused window grow by one grid unit downwards.
+
+.I grow window left
+\- Makes the focused window grow by one grid unit to the left.
+
+.I grow window right
+\- Makes the focused window grow by one grid unit to the right.
+
+.I shrink window up
+\- Makes the focused window shrink one grid unit upwards.
+
+.I shrink window down
+\- Makes the focused window shrink one grid unit downwards.
+
+.I shrink window left
+\- Makes the focused window shrink one grid unit to the left.
+
+.I shrink window right
+\- Makes the focused window shrink one grid unit to the right.
+
+.I close window
+\- Closes the focused window.
+
+.I go to workspace N
+\- Goes to the Nth workspace, unmapping every other workspace.
+
+.I send to workspace N
+\- Sends the focused window to the Nth workspace.
+
+.I attach workspace N
+\- Maps the Nth workspace. Read WORKSPACE ATTACHING for information on attaching a workspace.
+
+.I detach workspace N
+\- Unmaps the Nth workspace. Read WORKSPACE ATTACHING for information on detaching a workspace.
+
+.SH USAGE EXAMPLE
+
+To move a window up by a single grid unit, execute the following command.
+
+    echo "move window up" > /tmp/custard.fifo
+
+Commands that can be sent to the FIFO and that will be parsed by custard are specified in USAGE.
+
+.SH WORKSPACE ATTACHING
+
+custard has a feature called "workspace attaching" that somewhat resembles that of groups. By attaching a workspace (see USAGE), you map windows in that workspace to the screen. This allows for greater and more efficient multitasking. You can also detach a workspace, which will make the windows that are managed by the workspace in question unmap.
+
+You can also go to these workspaces without attaching or detaching others. If there are any attached workspaces, they will be detached from the screen before mapping the workspace which you are going to.
+
+You may also send windows between workspaces. When sending windows between workspaces, the workspace you are sending the window to does not have to be attached to or detached from the screen.
