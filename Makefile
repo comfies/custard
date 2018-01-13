@@ -10,7 +10,7 @@ MANPREFIX?=$(PREFIX)/share/man
 all: $(TARGET)
 
 $(TARGET): src/main.cpp
-	mkdir -p workspace/build
+	mkdir -p build
 	$(CC) src/main.cpp $(CFLAGS) -o build/$(TARGET)
 
 install: $(TARGET)
