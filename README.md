@@ -15,6 +15,8 @@ git clone git://anongit.freedesktop.org/xcb/util-wm
 git clone git://github.com/Airblader/xcb-util-xrm
 ```
 
+To install custard after the above dependencies have been met, run the following.
+
 ```
 $ git clone https://github.com/Sweets/custard.git
 $ cd custard
