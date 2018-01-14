@@ -181,6 +181,7 @@ void Window::resize(unsigned int* data)
     );
 
     this->center_cursor();
+    this->raise(); // Raising shouldn't be needed in the case of a resize, but just in case I guess
 }
 
 void Window::resize(short unsigned int height, short unsigned int width)
@@ -211,6 +212,7 @@ void Window::move(unsigned int* data)
     );
 
     this->center_cursor();
+    this->raise();
 }
 
 void Window::move(short unsigned int x, short unsigned int y)
