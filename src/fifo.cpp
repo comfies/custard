@@ -54,72 +54,67 @@ void Fifo::start_read_loop(void)
         else
         {
 
-            if (window == NULL)
-            {
-                continue;
-            }
-
-            if (message.find("move window up") != std::string::npos)
+            if (message.find("move window up") != std::string::npos && window != NULL)
             {
                 window->move_up();
                 update_screen = true;
             }
-            else if (message.find("move window down") != std::string::npos)
+            else if (message.find("move window down") != std::string::npos && window != NULL)
             {
                 window->move_down();
                 update_screen = true;
             }
-            else if (message.find("move window left") != std::string::npos)
+            else if (message.find("move window left") != std::string::npos && window != NULL)
             {
                 window->move_left();
                 update_screen = true;
             }
-            else if (message.find("move window right") != std::string::npos)
+            else if (message.find("move window right") != std::string::npos && window != NULL)
             {
                 window->move_right();
                 update_screen = true;
             }
-            else if (message.find("grow window up") != std::string::npos)
+            else if (message.find("grow window up") != std::string::npos && window != NULL)
             {
                 window->grow_up();
                 update_screen = true;
             }
-            else if (message.find("grow window down") != std::string::npos)
+            else if (message.find("grow window down") != std::string::npos && window != NULL)
             {
                 window->grow_down();
                 update_screen = true;
             }
-            else if (message.find("grow window left") != std::string::npos)
+            else if (message.find("grow window left") != std::string::npos && window != NULL)
             {
                 window->grow_left();
                 update_screen = true;
             }
-            else if (message.find("grow window right") != std::string::npos)
+            else if (message.find("grow window right") != std::string::npos && window != NULL)
             {
                 window->grow_right();
                 update_screen = true;
             }
-            else if (message.find("shrink window up") != std::string::npos)
+            else if (message.find("shrink window up") != std::string::npos && window != NULL)
             {
                 window->shrink_up();
                 update_screen = true;
             }
-            else if (message.find("shrink window down") != std::string::npos)
+            else if (message.find("shrink window down") != std::string::npos && window != NULL)
             {
                 window->shrink_down();
                 update_screen = true;
             }
-            else if (message.find("shrink window left") != std::string::npos)
+            else if (message.find("shrink window left") != std::string::npos && window != NULL)
             {
                 window->shrink_left();
                 update_screen = true;
             }
-            else if (message.find("shrink window right") != std::string::npos)
+            else if (message.find("shrink window right") != std::string::npos && window != NULL)
             {
                 window->shrink_right();
                 update_screen = true;
             }
-            else if (message.find("close window") != std::string::npos)
+            else if (message.find("close window") != std::string::npos && window != NULL)
             {
                 window->close();
                 // No need to set `update_screen` here, Window::close calls custard::xcb_connection->flush
@@ -150,7 +145,7 @@ void Fifo::start_read_loop(void)
                         custard::go_to_workspace(nth_workspace);
                         update_screen = true;
                     }
-                    else if (action == "send to")
+                    else if (action == "send to" && window != NULL)
                     {
                         custard::send_focused_window_to_workspace(nth_workspace);
                         update_screen = true;
