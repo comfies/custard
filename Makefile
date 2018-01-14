@@ -1,7 +1,7 @@
 
 CC=g++
 
-CFLAGS = -lxcb -lxcb-ewmh -lxcb-xrm -lpthread
+CFLAGS = -std=c++14 -lxcb -lxcb-ewmh -lxcb-xrm -lpthread
 
 TARGET = custard
 PREFIX?=/usr/local
