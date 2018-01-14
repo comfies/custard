@@ -181,15 +181,12 @@ namespace custard {
         for (unsigned int index = 0; index < workspaces.size(); index++)
         {
             non_target = workspaces.at(index);
-            if (non_target == workspace)
-            {
-                workspace->map();
-            }
-            else
+            if (non_target != workspace)
             {
                 non_target->unmap();
             }
         }
+        workspace->map();
         current_workspace = workspace;
 
         xcb_ewmh_set_current_desktop(
