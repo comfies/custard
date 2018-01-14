@@ -5,6 +5,13 @@ custard (stylized in all lowercase letters) is a stacking/floating window manage
 
 custard is based on subtle, 2bwm, swm, and howm. Some of the codebase was based off of code from the various projects listed, and as such, thanks, and credit where due to the creators of said projects.
 
+# Table of Contents
+
+1. [Installation](https://github.com/Sweets/custard/blob/master/README.md#installation)
+2. [Usage](https://github.com/Sweets/custard/blob/master/README.md#usage)
+3. [Managing Windows](https://github.com/Sweets/custard/blob/master/README.md#managing-windows)
+4. [Configuration](https://github.com/Sweets/custard/blob/master/README.md#configuration)
+
 # Installation
 
 custard depends on XCB to run. Specifically, libxcb, xcb-util-wm, and xcb-util-xrm. These can be found at https://cgit.freedesktop.org/xcb, with the exception of xcb-util-xrm. **It is recommended that you check your distros repos before cloning from these git repos, especially in the interest of stability.**
