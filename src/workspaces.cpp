@@ -64,6 +64,7 @@ void Workspace::unmap(void)
     for (unsigned int index = 0; index < this->windows.size(); index++)
     {
         this->windows.at(index)->unmap();
+        this->windows.at(index)->set_focus_false();
     }
 
     this->mapped = false;
