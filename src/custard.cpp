@@ -224,29 +224,20 @@ namespace custard {
     {
         Workspace *target_workspace = get_workspace(n); // Target
         Window *window = get_focused_window();
+        Workspace *original_workspace = get_workspace(window); // Original
 
-        if (target_workspace->manages(window))
+        if (target_workspace == original_workspace)
         {
             return;
         }
 
-        Workspace *original_workspace;
-        for (unsigned int index = 0; index < workspaces.size(); index++)
+        if (!target_workspace->is_mapped())
         {
-            original_workspace = workspaces.at(index);
-
-            if (original_workspace->manages(window))
-            {
-                if (!original_workspace->is_mapped())
-                {
-                    window->unmap();
-                }
-                original_workspace->unmanage(window);
-                target_workspace->manage(window);
-
-                return;
-            }
+            window->unmap();
         }
+
+        original_workspace->unmanage(window);
+        target_workspace->manage(window);
     }
 
 }
