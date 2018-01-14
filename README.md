@@ -3,16 +3,16 @@ custard window manager
 
 custard (stylized in all lowercase letters) is a stacking/floating window manager for X.Org. It arranges windows on a grid, i.e. there is a virtual grid on the screen, windows are positioned by X and Y coordinates, as well as sized over X and Y coordinates.
 
-custard is based on subtle, 2bwm, swm, and howm. Some of the codebase was based off of code from the various projects listed, and as such, thanks, and credit where due to the credits of said projects.
+custard is based on subtle, 2bwm, swm, and howm. Some of the codebase was based off of code from the various projects listed, and as such, thanks, and credit where due to the creators of said projects.
 
 # Installation
 
 custard depends on XCB to run. Specifically, libxcb, xcb-util-wm, and xcb-util-xrm. These can be found at https://cgit.freedesktop.org/xcb, with the exception of xcb-util-xrm. **It is recommended that you check your distros repos before cloning from these git repos, especially in the interest of stability.**
 
 ```
-git clone git://anongit.freedesktop.org/xcb/libxcb
-git clone git://anongit.freedesktop.org/xcb/util-wm
-git clone git://github.com/Airblader/xcb-util-xrm
+$ git clone git://anongit.freedesktop.org/xcb/libxcb
+$ git clone git://anongit.freedesktop.org/xcb/util-wm
+$ git clone git://github.com/Airblader/xcb-util-xrm
 ```
 
 To install custard after the above dependencies have been met, run the following.
