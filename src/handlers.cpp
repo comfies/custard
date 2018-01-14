@@ -14,8 +14,9 @@ namespace Handlers {
 
         Window *window = new Window(window_id);
         window->map();
-        window->raise();
         window->focus();
+
+        window->raise();
         window->center_cursor();
 
         custard::windows.push_back(window);
@@ -27,11 +28,21 @@ namespace Handlers {
         xcb_enter_notify_event_t *event;
         event = (xcb_enter_notify_event_t *)custard::generic_event;
 
+        Window *window = NULL;
         xcb_window_t window_id = event->event;
+
+        window = custard::get_focused_window();
+        if (window != NULL)
+        {
+            if (window->get_id() == window_id)
+            {
+                return;
+            }
+        }
 
         for (unsigned int index = 0; index < custard::windows.size(); index++)
         {
-            Window *window = custard::windows.at(index);
+            window = custard::windows.at(index);
             if (window->get_id() == window_id)
             {
                 window->raise();
