@@ -7,7 +7,13 @@ custard is based on subtle, 2bwm, swm, and howm. Some of the codebase was based 
 
 # Installation
 
-custard depends on XCB to be installed. Check your distros repository for the XCB package.
+custard depends on XCB to run. Specifically, libxcb, xcb-util-wm, and xcb-util-xrm. These can be found at https://cgit.freedesktop.org/xcb, with the exception of xcb-util-xrm.
+
+```
+git clone git://anongit.freedesktop.org/xcb/libxcb
+git clone git://anongit.freedesktop.org/xcb/util-wm
+git clone git://github.com/Airblader/xcb-util-xrm
+```
 
 ```
 $ git clone https://github.com/Sweets/custard.git
