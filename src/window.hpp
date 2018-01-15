@@ -8,7 +8,7 @@ class Window {
 
         void focus(void);
         bool is_focused(void);
-        void set_focus_false(void);
+        void set_focus_false(bool = true);
 
         void center_cursor(void);
 
