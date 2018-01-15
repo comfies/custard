@@ -115,17 +115,6 @@ void Window::focus(void)
         return;
     }
 
-    /*
-        TODO: ensure that the window with
-        `focused` set to True is the only
-        one in the workspace
-     */
-
-    for (unsigned int index = 0; index < custard::windows.size(); index++)
-    {
-        custard::windows.at(index)->set_focus_false();
-    }
-
     this->focused = true;
 
     xcb_set_input_focus(
@@ -560,6 +549,9 @@ void Window::update_border_helper_2_3(xcb_rectangle_t *inner_border, unsigned in
 
 void Window::close(void)
 {
+
+
+    this->focused = false;
 
     xcb_kill_client(
         custard::xcb_connection->get_connection(),
