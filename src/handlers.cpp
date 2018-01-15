@@ -50,9 +50,7 @@ namespace Handlers {
 
             if (window->get_id() == window_id)
             {
-                std::cout << "raising canes" << std::endl;
                 window->raise();
-                std::cout << "focusing canes" << std::endl;
                 window->focus();
             }
             else
@@ -69,7 +67,7 @@ namespace Handlers {
 
         xcb_window_t window_id = event->window;
 
-        Window *window;
+        Window *window = NULL;
         for (unsigned int index = 0; index < custard::windows.size(); index++)
         {
             window = custard::windows.at(index);
@@ -77,7 +75,7 @@ namespace Handlers {
             {
                 if (window->is_focused())
                 {
-                    window->set_focus_false();
+                    window->set_focus_false(false);
                 }
 
                 custard::windows.erase(custard::windows.begin() + index);
