@@ -49,6 +49,7 @@ void Workspace::map(void)
     for (unsigned int index = 0; index < this->windows.size(); index++)
     {
         this->windows.at(index)->map();
+        this->windows.at(index)->raise();
     }
 
     this->mapped = true;
