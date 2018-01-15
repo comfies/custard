@@ -132,7 +132,7 @@ bool Window::is_focused(void)
     return this->focused;
 }
 
-void Window::set_focus_false(void)
+void Window::set_focus_false(bool update_borders)
 {
     if (!this->focused)
     {
@@ -141,7 +141,10 @@ void Window::set_focus_false(void)
 
     this->focused = false;
 
-    this->update_borders();
+    if (update_borders)
+    {
+        this->update_borders();
+    }
 }
 
 void Window::center_cursor(void)
