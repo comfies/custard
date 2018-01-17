@@ -42,7 +42,9 @@ It is recommended that first time users put the following in their xinit.
 ```
 urxvt &
 #or your terminal here
-custard
+echo "" > /tmp/custard.log
+custard >> /tmp/custard.log
+# custard various information to STDOUT, useful for debugging.
 ```
 
 As for a hotkey daemon, you can refer to `examples/sxhkdrc` for usage with sxhkd (which is the hot key daemon that I both use and recommend).
