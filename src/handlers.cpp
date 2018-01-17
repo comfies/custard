@@ -59,9 +59,7 @@ namespace Handlers {
             }
             else
             {
-                std::cout << " did you fault here?" << std::endl;
                 window->set_focus_false();
-                std::cout << "maybe not" << std::endl;
             }
         }
     }

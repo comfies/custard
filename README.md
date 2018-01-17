@@ -7,10 +7,10 @@ custard is based on subtle, 2bwm, swm, and howm. Some of the codebase was based 
 
 # Table of Contents
 
-1. [Installation](https://github.com/Sweets/custard/blob/master/README.md#installation)
-2. [Usage](https://github.com/Sweets/custard/blob/master/README.md#usage)
-3. [Managing Windows](https://github.com/Sweets/custard/blob/master/README.md#managing-windows)
-4. [Configuration](https://github.com/Sweets/custard/blob/master/README.md#configuration)
+1. [Installation](#installation)
+2. [Usage](#usage)
+3. [Managing Windows](#managing-windows)
+4. [Configuration](#configuration)
 
 # Installation
 
@@ -31,6 +31,8 @@ $ make
 $ sudo make install
 ```
 
+[To Table of Contents](#table-of-contents)
+
 # Usage
 
 To use custard, simply execute `custard` in xinit. Do note that you will be launched into the window manager without any key bindings or way to bring up a terminal. As long as you can echo out commands to the fifo, you are able to manage windows.
@@ -46,6 +48,8 @@ custard
 As for a hotkey daemon, you can refer to `examples/sxhkdrc` for usage with sxhkd (which is the hot key daemon that I both use and recommend).
 
 For configuration, see CONFIGURATION, or refer to `examples/.Xresources`.
+
+[To Table of Contents](#table-of-contents)
 
 # Managing Windows
 
@@ -87,6 +91,8 @@ To send a command, the "formula" is `echo "command" > /tmp/custard.fifo`. Comman
 
 `detach workspace N` - Detaches the Nth workspace. This hides the workspace specified, if it's not the active workspace.
 
+[To Table of Contents](#table-of-contents)
+
 # Configuration
 
 custard is configured via the X resource manager, i.e., the Xresources file.
@@ -118,3 +124,5 @@ custard is configured via the X resource manager, i.e., the Xresources file.
 `custard.margin_right` - How many pixels to offset the grid from the right of the screen by. Default value is `0`.
 
 `custard.workspaces` - How many workspaces custard should create during initialization. Default value is `2`.
+
+[To Table of Contents](#table-of-contents)
