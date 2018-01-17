@@ -5,6 +5,8 @@ custard \- A window manager
 .B custard
 is a floating window manager written over the XCB library based on 2bwm, howm, swm, and subtle. Window size and location are relative to a grid on the screen. It is configured via the X resource manager.
 .SH CONFIGURATION
+custard is configured via the XRM (X Resource Manager, i.e., your Xresources config). 
+
 .I custard.rows
 \- Sets the number of rows for the grid. Default value is 2.
 
@@ -43,6 +45,32 @@ is a floating window manager written over the XCB library based on 2bwm, howm, s
 
 .I custard.margin_bottom
 \- Offsets the grid by X pixels from the bottom of the screen. Default value is 0.
+
+.I custard.workspaces
+\- Number of workspaces custard initializes when it starts. Default value is 2.
+
+.SH CONFIGURATION EXAMPLE
+
+In ~/.Xresources
+
+    custard.rows: 2
+    custard.columns: 3
+
+    custard.border_type: None
+    custard.border_size: 0
+
+    custard.focused_color: #FFFFFF
+    custard.unfocused_color: #676767
+    custard.background_color: #000000
+    custard.invert_colors: False
+
+    custard.margin: 0
+    custard.margin_top: 0
+    custard.margin_bottom: 0
+    custard.margin_left: 0
+    custard.margin_right: 0
+
+    custard.workspaces: 2
 
 .SH USAGE
 
