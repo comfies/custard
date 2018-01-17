@@ -14,7 +14,17 @@ namespace Handlers {
 
         std::cout << " [handler] Window (" << window_id << ") map request." << std::endl;
 
-        Window *window = new Window(window_id);
+        Window *window = NULL;
+        for (unsigned int index = 0; index < custard::windows.size(); index++)
+        {
+            window = custard::windows.at(index);
+            if (window->get_id() == window_id)
+            {
+                return;
+            }
+        }
+
+        window = new Window(window_id);
         window->map();
         window->focus();
 
