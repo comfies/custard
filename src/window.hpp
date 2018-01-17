@@ -7,9 +7,10 @@ class Window {
         xcb_get_geometry_reply_t* get_geometry(void);
 
         bool is_managed(void);
+        bool is_focused(void);
+        bool is_mapped(void);
 
         void focus(void);
-        bool is_focused(void);
         void set_focus_false(bool = true);
 
         void center_cursor(void);

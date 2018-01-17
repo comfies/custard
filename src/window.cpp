@@ -114,6 +114,16 @@ bool Window::is_managed(void)
     return this->managed;
 }
 
+bool Window::is_focused(void)
+{
+    return this->focused;
+}
+
+bool Window::is_mapped(void)
+{
+    return this->mapped;
+}
+
 void Window::focus(void)
 {
     if (this->focused)
@@ -131,11 +141,6 @@ void Window::focus(void)
     );
 
     this->update_borders();
-}
-
-bool Window::is_focused(void)
-{
-    return this->focused;
 }
 
 void Window::set_focus_false(bool update_borders)
@@ -261,6 +266,14 @@ void Window::update_borders(void)
         return;
     }
 
+    xcb_get_geometry_reply_t *geometry = this->get_geometry();
+
+    if (!geometry)
+    {
+        std::cout << " [window] Window (" << this->id << ") border update stopped; geometry NULL" << std::endl;
+        return;
+    }
+
     unsigned int border_width[1] = {Configuration::border_size * Configuration::border_type};
 
     std::cout << " [window] Window (" << this->id << ") border update" << std::endl;
@@ -375,12 +388,6 @@ void Window::update_border_helper_3(void)
 {
 
     xcb_get_geometry_reply_t *geometry = this->get_geometry();
-
-    if (!geometry)
-    {
-        std::cout << " [window] Window (" << this->id << ") border update stopped; geometry NULL" << std::endl;
-        return;
-    }
 
     short unsigned int width = (short unsigned)geometry->width;
     short unsigned int height = (short unsigned)geometry->height;

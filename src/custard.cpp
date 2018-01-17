@@ -47,7 +47,11 @@ namespace custard {
                 window->map();
 
                 windows.push_back(window);
-                current_workspace->manage(window);
+
+                if (window->is_managed())
+                {
+                    current_workspace->manage(window);
+                }
             }
 
             if (window != NULL)
@@ -146,7 +150,7 @@ namespace custard {
         for (unsigned int index = 0; index < windows.size(); index++)
         {
             window = windows.at(index);
-            if (window->is_focused())
+            if (window->is_focused() && window->is_mapped())
             {
                 return window;
             }
@@ -251,6 +255,10 @@ namespace custard {
         if (!target_workspace->is_mapped())
         {
             window->unmap();
+            if (window->is_focused())
+            {
+                window->set_focus_false(); // Prevents two windows from being focused
+            }
         }
 
         original_workspace->unmanage(window);

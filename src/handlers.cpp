@@ -32,7 +32,11 @@ namespace Handlers {
         window->center_cursor();
 
         custard::windows.push_back(window);
-        custard::current_workspace->manage(window);
+
+        if (window->is_managed())
+        {
+            custard::current_workspace->manage(window);
+        }
     }
 
     static void window_on_hover(void)
@@ -69,7 +73,10 @@ namespace Handlers {
             }
             else
             {
-                window->set_focus_false();
+                if (window->is_mapped())
+                {
+                    window->set_focus_false();
+                }
             }
         }
     }
@@ -95,7 +102,13 @@ namespace Handlers {
                 }
 
                 custard::windows.erase(custard::windows.begin() + index);
-                custard::get_workspace(window)->unmanage(window);
+
+                Workspace *workspace = NULL;
+                workspace = custard::get_workspace(window);
+                if (workspace)
+                {
+                    workspace->unmanage(window);
+                }
                 return;
             }
         }

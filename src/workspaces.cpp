@@ -46,7 +46,8 @@ void Workspace::map(void)
         return;
     }
 
-    Window *window;
+    Window *window = NULL;
+    Window *focused_window = NULL;
     for (unsigned int index = 0; index < this->windows.size(); index++)
     {
         window = this->windows.at(index);
@@ -55,7 +56,18 @@ void Workspace::map(void)
             continue;
         }
         window->map();
-        window->raise();
+
+        if (window->is_focused())
+        {
+            focused_window = window;
+        }
+    }
+
+    if (focused_window)
+    {
+        focused_window->raise();
+        focused_window->center_cursor();
+        focused_window->focus();
     }
 
     this->mapped = true;
@@ -77,7 +89,7 @@ void Workspace::unmap(void)
             continue;
         }
         window->unmap();
-        window->set_focus_false();
+//        window->set_focus_false();
     }
 
     this->mapped = false;
