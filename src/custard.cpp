@@ -111,11 +111,28 @@ namespace custard {
             Configuration::workspaces
         );
 
+        xcb_ewmh_set_current_desktop(
+            ewmh_connection->get_connection(),
+            0,
+            0
+        );
+
         setup_pre_existing_windows();
 
         Handlers::attach_event_handlers();
 
         pthread_create(&fifo_thread, NULL, start_fifo_read_loop, NULL);
+
+        xcb_warp_pointer(
+            xcb_connection->get_connection(),
+            XCB_NONE,
+            ewmh_connection->get_window(),
+            0, 0, 0, 0,
+            xcb_connection->get_screen()->width_in_pixels / 2,
+            xcb_connection->get_screen()->height_in_pixels / 2
+        );
+
+        xcb_connection->flush();
 
         xcb_connection->start_event_loop();
 

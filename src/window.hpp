@@ -6,9 +6,11 @@ class Window {
         xcb_get_window_attributes_reply_t* get_attributes(void);
         xcb_get_geometry_reply_t* get_geometry(void);
 
+        bool is_managed(void);
+
         void focus(void);
         bool is_focused(void);
-        void set_focus_false(void);
+        void set_focus_false(bool = true);
 
         void center_cursor(void);
 

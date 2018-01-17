@@ -12,6 +12,8 @@ namespace Handlers {
 
         xcb_window_t window_id = event->window;
 
+        std::cout << " [handler] Window (" << window_id << ") map request." << std::endl;
+
         Window *window = new Window(window_id);
         window->map();
         window->focus();
@@ -31,8 +33,10 @@ namespace Handlers {
         Window *window = NULL;
         xcb_window_t window_id = event->event;
 
+        std::cout << " [handler] Window (" << window_id << ") hovered" << std::endl;
+
         window = custard::get_focused_window();
-        if (window != NULL)
+        if (window)
         {
             if (window->get_id() == window_id)
             {
@@ -43,11 +47,21 @@ namespace Handlers {
         for (unsigned int index = 0; index < custard::windows.size(); index++)
         {
             window = custard::windows.at(index);
+            if (!window)
+            {
+                continue;
+            }
+
             if (window->get_id() == window_id)
             {
                 window->raise();
                 window->focus();
-                return;
+            }
+            else
+            {
+                std::cout << " did you fault here?" << std::endl;
+                window->set_focus_false();
+                std::cout << "maybe not" << std::endl;
             }
         }
     }
@@ -59,12 +73,19 @@ namespace Handlers {
 
         xcb_window_t window_id = event->window;
 
-        Window *window;
+        std::cout << " [handler] Window (" << window_id << ") destroyed" << std::endl;
+
+        Window *window = NULL;
         for (unsigned int index = 0; index < custard::windows.size(); index++)
         {
             window = custard::windows.at(index);
             if (window->get_id() == window_id)
             {
+                if (window->is_focused())
+                {
+                    window->set_focus_false(false);
+                }
+
                 custard::windows.erase(custard::windows.begin() + index);
                 custard::get_workspace(window)->unmanage(window);
                 return;
@@ -77,7 +98,9 @@ namespace Handlers {
     static void attach_event_handler(int event, auto method)
     {
         if (!handlers[event])
+        {
             handlers[event] = method;
+        }
     }
 
     static void attach_event_handlers(void)

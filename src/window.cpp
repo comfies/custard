@@ -24,7 +24,8 @@ Window::Window(xcb_window_t id)
                 atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_DND ||
                 atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_DOCK ||
                 atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_DESKTOP ||
-                atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_SPLASH)
+                atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_SPLASH ||
+                atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_NOTIFICATION)
             {
                 xcb_ewmh_get_atoms_reply_wipe(&window_type);
 
@@ -108,22 +109,16 @@ xcb_get_geometry_reply_t* Window::get_geometry(void)
     );
 }
 
+bool Window::is_managed(void)
+{
+    return this->managed;
+}
+
 void Window::focus(void)
 {
     if (this->focused)
     {
         return;
-    }
-
-    /*
-        TODO: ensure that the window with
-        `focused` set to True is the only
-        one in the workspace
-     */
-
-    for (unsigned int index = 0; index < custard::windows.size(); index++)
-    {
-        custard::windows.at(index)->set_focus_false();
     }
 
     this->focused = true;
@@ -143,7 +138,7 @@ bool Window::is_focused(void)
     return this->focused;
 }
 
-void Window::set_focus_false(void)
+void Window::set_focus_false(bool update_borders)
 {
     if (!this->focused)
     {
@@ -152,7 +147,10 @@ void Window::set_focus_false(void)
 
     this->focused = false;
 
-    this->update_borders();
+    if (update_borders)
+    {
+        this->update_borders();
+    }
 }
 
 void Window::center_cursor(void)
@@ -265,6 +263,8 @@ void Window::update_borders(void)
 
     unsigned int border_width[1] = {Configuration::border_size * Configuration::border_type};
 
+    std::cout << " [window] Window (" << this->id << ") border update" << std::endl;
+
     xcb_configure_window(
         custard::xcb_connection->get_connection(),
         this->id,
@@ -284,6 +284,8 @@ void Window::update_borders(void)
     {
         this->update_border_helper_3();
     }
+
+    std::cout << " [window] Window (" << this->id << ") border update finished" << std::endl;
 
 }
 
@@ -374,6 +376,12 @@ void Window::update_border_helper_3(void)
 
     xcb_get_geometry_reply_t *geometry = this->get_geometry();
 
+    if (!geometry)
+    {
+        std::cout << " [window] Window (" << this->id << ") border update stopped; geometry NULL" << std::endl;
+        return;
+    }
+
     short unsigned int width = (short unsigned)geometry->width;
     short unsigned int height = (short unsigned)geometry->height;
 
@@ -434,6 +442,8 @@ void Window::update_border_helper_3(void)
 
 void Window::update_border_helper_2_3(xcb_rectangle_t *inner_border, unsigned int inner_border_size)
 {
+
+    std::cout << " [window] Window (" << this->id << ") border update interstitial" << std::endl;
 
     unsigned int data[1] = {Configuration::border_unfocused_color};
     unsigned int background_color[1] = {Configuration::border_background_color};
@@ -560,6 +570,9 @@ void Window::update_border_helper_2_3(xcb_rectangle_t *inner_border, unsigned in
 
 void Window::close(void)
 {
+
+
+    this->focused = false;
 
     xcb_kill_client(
         custard::xcb_connection->get_connection(),

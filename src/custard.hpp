@@ -5,13 +5,13 @@ namespace custard {
     XcbConnection *xcb_connection;
     EwmhConnection *ewmh_connection;
 
-    xcb_generic_event_t *generic_event;
+    xcb_generic_event_t *generic_event = NULL;
     int event_mask = XCB_CW_EVENT_MASK;
 
     std::vector<Window*> windows;
 
     std::vector<Workspace*> workspaces;
-    Workspace *current_workspace;
+    Workspace *current_workspace = NULL;
 
     pthread_t fifo_thread;
 
