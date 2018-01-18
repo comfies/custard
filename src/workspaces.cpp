@@ -63,6 +63,11 @@ void Workspace::map(void)
         }
     }
 
+    if (!focused_window && this->num_managed_windows() > 0)
+    {
+        focused_window = window;
+    }
+
     if (focused_window)
     {
         focused_window->raise();

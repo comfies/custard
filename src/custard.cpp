@@ -208,10 +208,10 @@ namespace custard {
                 XCB_NONE,
                 ewmh_connection->get_window(),
                 0, 0, 0, 0,
-                0, 0
+                xcb_connection->get_screen()->width_in_pixels,
+                xcb_connection->get_screen()->height_in_pixels
             );
 
-            xcb_connection->flush();
         }
 
         Workspace *non_target;
