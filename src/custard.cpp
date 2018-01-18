@@ -198,6 +198,22 @@ namespace custard {
             return;
         }
 
+        if (workspace != current_workspace && workspace->num_managed_windows() >= 1)
+        {
+
+            // "Resets" the cursor to prevent window flickering
+
+            xcb_warp_pointer(
+                xcb_connection->get_connection(),
+                XCB_NONE,
+                ewmh_connection->get_window(),
+                0, 0, 0, 0,
+                0, 0
+            );
+
+            xcb_connection->flush();
+        }
+
         Workspace *non_target;
         for (unsigned int index = 0; index < workspaces.size(); index++)
         {

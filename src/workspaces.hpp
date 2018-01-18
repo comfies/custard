@@ -8,6 +8,8 @@ class Workspace {
 
         void map(void);
         void unmap(void);
+
+        unsigned int num_managed_windows(void);
     private:
         int get_window_index(Window*);
         std::vector<Window*> windows;

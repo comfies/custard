@@ -66,8 +66,8 @@ void Workspace::map(void)
     if (focused_window)
     {
         focused_window->raise();
-        focused_window->center_cursor();
         focused_window->focus();
+        focused_window->center_cursor();
     }
 
     this->mapped = true;
@@ -93,6 +93,23 @@ void Workspace::unmap(void)
     }
 
     this->mapped = false;
+}
+
+unsigned int Workspace::num_managed_windows(void)
+{
+    unsigned int managed_windows = 0;
+
+    Window *window = NULL;
+    for (unsigned int index = 0; index < this->windows.size(); index++)
+    {
+        window = this->windows.at(index);
+        if (window->is_managed())
+        {
+            managed_windows++;
+        }
+    }
+
+    return managed_windows;
 }
 
 /* Private members */
