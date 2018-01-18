@@ -159,6 +159,23 @@ namespace custard {
         return NULL;
     }
 
+    static void raise_aot_windows(void)
+    {
+        /*
+            Note: aot stands for always_on_top
+         */
+        Window *window = NULL;
+        for (unsigned int index = 0; index < windows.size(); index++)
+        {
+            window = windows.at(index);
+
+            if (window->always_on_top())
+            {
+                window->raise();
+            }
+        }
+    }
+
     /*
         Workspace methods
      */
@@ -231,6 +248,8 @@ namespace custard {
             0,
             n - 1
         );
+
+        raise_aot_windows();
     }
 
     static void attach_workspace(unsigned int n)
@@ -243,6 +262,8 @@ namespace custard {
         }
 
         workspace->map();
+
+        raise_aot_windows();
     }
 
     static void detach_workspace(unsigned int n)
@@ -255,6 +276,8 @@ namespace custard {
         }
 
         workspace->unmap();
+
+        raise_aot_windows(); // Is this even necessary?
     }
 
     static void send_focused_window_to_workspace(unsigned int n)

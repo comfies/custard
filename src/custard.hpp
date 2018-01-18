@@ -21,6 +21,8 @@ namespace custard {
     static Window* get_focused_window(void);
     static void stop(void);
 
+    static void raise_aot_windows(void);
+
     static Workspace* get_workspace(Window*);
     static Workspace* get_workspace(unsigned int);
     static void go_to_workspace(unsigned int);

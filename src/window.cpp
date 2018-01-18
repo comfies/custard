@@ -43,6 +43,10 @@ Window::Window(xcb_window_t id)
 
                     this->move(position);
                 }
+                else if (atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_NOTIFICATION)
+                {
+                    this->always_on_top = true;
+                }
 
                 return;
             }
@@ -122,6 +126,11 @@ bool Window::is_focused(void)
 bool Window::is_mapped(void)
 {
     return this->mapped;
+}
+
+bool Window::always_on_top(void)
+{
+    return this->always_on_top;
 }
 
 void Window::focus(void)
