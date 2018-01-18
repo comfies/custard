@@ -610,8 +610,9 @@ bool Window::move_up(void)
 
     this->y--;
     this->move(this->x, this->y);
-    this->center_cursor();
+    custard::reset_cursor();
     this->raise();
+    this->center_cursor();
 
     return true;
 }
@@ -625,8 +626,9 @@ bool Window::move_down(void)
 
     this->y++;
     this->move(this->x, this->y);
-    this->center_cursor();
+    custard::reset_cursor();
     this->raise();
+    this->center_cursor();
 
     return true;
 }
@@ -640,8 +642,9 @@ bool Window::move_left(void)
 
     this->x--;
     this->move(this->x, this->y);
-    this->center_cursor();
+    custard::reset_cursor();
     this->raise();
+    this->center_cursor();
 
     return true;
 }
@@ -655,8 +658,9 @@ bool Window::move_right(void)
 
     this->x++;
     this->move(this->x, this->y);
-    this->center_cursor();
+    custard::reset_cursor();
     this->raise();
+    this->center_cursor();
 
     return true;
 }
@@ -675,8 +679,9 @@ bool Window::grow_up(void)
     this->resize(this->span_y, this->span_x);
     this->move(this->x, this->y);
 
-    this->center_cursor();
+    custard::reset_cursor();
     this->raise();
+    this->center_cursor();
     this->update_borders();
 
     return true;
@@ -693,8 +698,9 @@ bool Window::grow_down(void)
     this->span_y++;
     this->resize(this->span_y, this->span_x);
 
-    this->center_cursor();
+    custard::reset_cursor();
     this->raise();
+    this->center_cursor();
     this->update_borders();
 
     return true;
@@ -715,8 +721,9 @@ bool Window::grow_left(void)
     this->resize(this->span_y, this->span_x);
     this->move(this->x, this->y);
 
-    this->center_cursor();
+    custard::reset_cursor();
     this->raise();
+    this->center_cursor();
     this->update_borders();
 
     return true;
@@ -734,8 +741,9 @@ bool Window::grow_right(void)
     this->span_x++;
     this->resize(this->span_y, this->span_x);
 
-    this->center_cursor();
+    custard::reset_cursor();
     this->raise();
+    this->center_cursor();
     this->update_borders();
 
     return true;
@@ -752,8 +760,9 @@ bool Window::shrink_up(void)
     this->span_y--;
     this->resize(this->span_y, this->span_x);
 
-    this->center_cursor();
+    custard::reset_cursor();
     this->raise();
+    this->center_cursor();
     this->update_borders();
 
     return true;
@@ -774,8 +783,9 @@ bool Window::shrink_down(void)
     this->resize(this->span_y, this->span_x);
     this->move(this->x, this->y);
 
-    this->center_cursor();
+    custard::reset_cursor();
     this->raise();
+    this->center_cursor();
     this->update_borders();
 
     return true;
@@ -793,8 +803,9 @@ bool Window::shrink_left(void)
     this->span_x--;
     this->resize(this->span_y, this->span_x);
 
-    this->center_cursor();
+    custard::reset_cursor();
     this->raise();
+    this->center_cursor();
     this->update_borders();
 
     return true;
@@ -813,8 +824,9 @@ bool Window::shrink_right(void)
     this->move(this->x, this->y);
     this->resize(this->span_y, this->span_x);
 
-    this->center_cursor();
+    custard::reset_cursor();
     this->raise();
+    this->center_cursor();
     this->update_borders();
 
     return true;

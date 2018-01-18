@@ -159,6 +159,18 @@ namespace custard {
         return NULL;
     }
 
+    static void reset_cursor(void)
+    {
+        xcb_warp_pointer(
+            xcb_connection->get_connection(),
+            XCB_NONE,
+            ewmh_connection->get_window(),
+            0, 0, 0, 0,
+            xcb_connection->get_screen()->width_in_pixels,
+            xcb_connection->get_screen()->height_in_pixels
+        );
+    }
+
     static void raise_aot_windows(void)
     {
         /*
@@ -220,14 +232,7 @@ namespace custard {
 
             // "Resets" the cursor to prevent window flickering
 
-            xcb_warp_pointer(
-                xcb_connection->get_connection(),
-                XCB_NONE,
-                ewmh_connection->get_window(),
-                0, 0, 0, 0,
-                xcb_connection->get_screen()->width_in_pixels,
-                xcb_connection->get_screen()->height_in_pixels
-            );
+            reset_cursor();
 
         }
 
