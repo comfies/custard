@@ -9,7 +9,7 @@ class Window {
         bool is_managed(void);
         bool is_focused(void);
         bool is_mapped(void);
-        bool always_on_top(void);
+        bool is_always_on_top(void);
 
         void focus(void);
         void set_focus_false(bool = true);

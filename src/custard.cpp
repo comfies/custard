@@ -169,7 +169,7 @@ namespace custard {
         {
             window = windows.at(index);
 
-            if (window->always_on_top())
+            if (window->is_always_on_top())
             {
                 window->raise();
             }

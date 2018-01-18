@@ -128,7 +128,7 @@ bool Window::is_mapped(void)
     return this->mapped;
 }
 
-bool Window::always_on_top(void)
+bool Window::is_always_on_top(void)
 {
     return this->always_on_top;
 }
