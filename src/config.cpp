@@ -180,6 +180,21 @@ namespace Configuration {
 
         xcb_xrm_database_free(database);
 
+        if (grid_rows == 0)
+        {
+            grid_rows = 2;
+        }
+
+        if (grid_columns == 0)
+        {
+            grid_columns = 3;
+        }
+
+        if (workspaces == 0)
+        {
+            workspaces = 2;
+        }
+
     }
 
 }
