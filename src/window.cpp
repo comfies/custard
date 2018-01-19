@@ -46,6 +46,7 @@ Window::Window(xcb_window_t id)
                 else if (atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_NOTIFICATION)
                 {
                     this->always_on_top = true;
+                    std::cout << "Window AOT" << std::endl;
                 }
 
                 return;
@@ -609,8 +610,8 @@ bool Window::move_up(void)
     }
 
     this->y--;
-    this->move(this->x, this->y);
     custard::reset_cursor();
+    this->move(this->x, this->y);
     this->raise();
     this->center_cursor();
 
@@ -625,8 +626,8 @@ bool Window::move_down(void)
     }
 
     this->y++;
-    this->move(this->x, this->y);
     custard::reset_cursor();
+    this->move(this->x, this->y);
     this->raise();
     this->center_cursor();
 
@@ -641,8 +642,8 @@ bool Window::move_left(void)
     }
 
     this->x--;
-    this->move(this->x, this->y);
     custard::reset_cursor();
+    this->move(this->x, this->y);
     this->raise();
     this->center_cursor();
 
@@ -657,8 +658,8 @@ bool Window::move_right(void)
     }
 
     this->x++;
-    this->move(this->x, this->y);
     custard::reset_cursor();
+    this->move(this->x, this->y);
     this->raise();
     this->center_cursor();
 
@@ -676,10 +677,10 @@ bool Window::grow_up(void)
     this->y--;
     this->span_y++;
 
+    custard::reset_cursor();
     this->resize(this->span_y, this->span_x);
     this->move(this->x, this->y);
 
-    custard::reset_cursor();
     this->raise();
     this->center_cursor();
     this->update_borders();
@@ -696,9 +697,9 @@ bool Window::grow_down(void)
     }
 
     this->span_y++;
+    custard::reset_cursor();
     this->resize(this->span_y, this->span_x);
 
-    custard::reset_cursor();
     this->raise();
     this->center_cursor();
     this->update_borders();
@@ -718,10 +719,10 @@ bool Window::grow_left(void)
     this->x--;
     this->span_x++;
 
+    custard::reset_cursor();
     this->resize(this->span_y, this->span_x);
     this->move(this->x, this->y);
 
-    custard::reset_cursor();
     this->raise();
     this->center_cursor();
     this->update_borders();
@@ -739,9 +740,9 @@ bool Window::grow_right(void)
     }
 
     this->span_x++;
+    custard::reset_cursor();
     this->resize(this->span_y, this->span_x);
 
-    custard::reset_cursor();
     this->raise();
     this->center_cursor();
     this->update_borders();
@@ -758,9 +759,9 @@ bool Window::shrink_up(void)
     }
 
     this->span_y--;
+    custard::reset_cursor();
     this->resize(this->span_y, this->span_x);
 
-    custard::reset_cursor();
     this->raise();
     this->center_cursor();
     this->update_borders();
@@ -780,10 +781,10 @@ bool Window::shrink_down(void)
     this->span_y--;
     this->y++;
 
+    custard::reset_cursor();
     this->resize(this->span_y, this->span_x);
     this->move(this->x, this->y);
 
-    custard::reset_cursor();
     this->raise();
     this->center_cursor();
     this->update_borders();
@@ -801,9 +802,9 @@ bool Window::shrink_left(void)
     }
 
     this->span_x--;
+    custard::reset_cursor();
     this->resize(this->span_y, this->span_x);
 
-    custard::reset_cursor();
     this->raise();
     this->center_cursor();
     this->update_borders();
@@ -821,10 +822,10 @@ bool Window::shrink_right(void)
     this->span_x--;
     this->x++;
 
+    custard::reset_cursor();
     this->move(this->x, this->y);
     this->resize(this->span_y, this->span_x);
 
-    custard::reset_cursor();
     this->raise();
     this->center_cursor();
     this->update_borders();
