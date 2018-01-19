@@ -91,7 +91,11 @@ xcb_screen_t* XcbConnection::get_screen(void)
 
 void XcbConnection::flush(void)
 {
-    xcb_flush(
+/*    xcb_flush(
+        this->connection
+    );*/
+
+    xcb_aux_sync(
         this->connection
     );
 }
