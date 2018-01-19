@@ -11,6 +11,7 @@
 #include <xcb/xcb.h>
 #include <xcb/xcb_ewmh.h>
 #include <xcb/xcb_xrm.h>
+#include <xcb/xcb_aux.h>
 
 #include <iostream>
 #include <map>
