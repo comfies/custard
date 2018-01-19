@@ -79,8 +79,6 @@ namespace Handlers {
                 }
             }
         }
-
-        custard::raise_aot_windows();
     }
 
     static void window_destroyed(void)

@@ -171,23 +171,6 @@ namespace custard {
         );
     }
 
-    static void raise_aot_windows(void)
-    {
-        /*
-            Note: aot stands for always_on_top
-         */
-        Window *window = NULL;
-        for (unsigned int index = 0; index < windows.size(); index++)
-        {
-            window = windows.at(index);
-
-            if (window->is_always_on_top())
-            {
-                window->raise();
-            }
-        }
-    }
-
     /*
         Workspace methods
      */
@@ -254,7 +237,7 @@ namespace custard {
             n - 1
         );
 
-        raise_aot_windows();
+        xcb_connection->flush();
     }
 
     static void attach_workspace(unsigned int n)
@@ -268,7 +251,7 @@ namespace custard {
 
         workspace->map();
 
-        raise_aot_windows();
+        xcb_connection->flush();
     }
 
     static void detach_workspace(unsigned int n)
@@ -282,7 +265,7 @@ namespace custard {
 
         workspace->unmap();
 
-        raise_aot_windows(); // Is this even necessary?
+        xcb_connection->flush();
     }
 
     static void send_focused_window_to_workspace(unsigned int n)
@@ -307,6 +290,8 @@ namespace custard {
 
         original_workspace->unmanage(window);
         target_workspace->manage(window);
+
+        xcb_connection->flush();
     }
 
 }
