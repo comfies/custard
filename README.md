@@ -86,6 +86,12 @@ To send a command, the "formula" is `echo "command" > /tmp/custard.fifo`. Comman
 
 `close window` - Closes the focused window.
 
+`stop wm` - Stops custard.
+
+`cycle focus forward` - Focuses on the next visible window.
+
+`cycle focus backward` - Focuses on the last visible window.
+
 `go to workspace N` - Goes to the specified workspace, where N is the Nth workspace. custard works with humane positions, i.e., it does NOT use indexes, and thus specifying a value of `0` does not bring you to the first workspace.
 
 `send to workspace N` - Sends the focused window to the Nth workspace.

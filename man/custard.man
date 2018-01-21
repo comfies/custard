@@ -1,4 +1,4 @@
-.TH CUSTARD 1 "2018-01-14" "1.1" "Custard WM"
+.TH CUSTARD 1 "2018-01-21" "1.1" "Custard WM"
 .SH NAME
 custard \- A window manager
 .SH DESCRIPTION
@@ -122,6 +122,15 @@ custard's fifo path is always
 
 .I close window
 \- Closes the focused window.
+
+.I stop wm
+\- Stops custard.
+
+.I cycle focus forward
+\- Focuses on the next visible window.
+
+.I cycle focus backward
+\- Focuses on the last visible window.
 
 .I go to workspace N
 \- Goes to the Nth workspace, unmapping every other workspace.

@@ -170,6 +170,103 @@ namespace custard {
             xcb_connection->get_screen()->height_in_pixels
         );
     }
+    /*
+        Cycle between windows
+     */
+
+    static void cycle_to_next(void)
+    {
+        Window *window = NULL;
+        std::vector<Window*> mapped;
+
+        unsigned int focused_window_index = 0;
+        for (unsigned int index = 0; index < windows.size(); index++)
+        {
+            window = windows.at(index);
+
+            if (!window->is_mapped() || !window->is_managed())
+            {
+                continue;
+            }
+
+            if (window->is_focused())
+            {
+                focused_window_index = mapped.size();
+            }
+
+            mapped.push_back(window);
+        }
+
+        if (mapped.size() <= 1)
+        {
+            return;
+        }
+
+        unsigned int index = 0;
+        if (focused_window_index == mapped.size() - 1)
+        {
+            index = 0;
+        }
+        else
+        {
+            index = focused_window_index + 1;
+        }
+
+        window = mapped.at(index);
+
+        reset_cursor();
+        get_focused_window()->set_focus_false();
+        window->focus();
+        window->raise();
+        window->center_cursor();
+    }
+
+    static void cycle_to_prev(void)
+    {
+        Window *window = NULL;
+        std::vector<Window*> mapped;
+
+        unsigned int focused_window_index = 0;
+        for (unsigned int index = 0; index < windows.size(); index++)
+        {
+            window = windows.at(index);
+
+            if (!window->is_mapped() || !window->is_managed())
+            {
+                continue;
+            }
+
+            if (window->is_focused())
+            {
+                focused_window_index = mapped.size();
+            }
+
+            mapped.push_back(window);
+        }
+
+        if (mapped.size() <= 1)
+        {
+            return;
+        }
+
+        unsigned int index = 0;
+        if (focused_window_index == 0)
+        {
+            index = mapped.size() - 1;
+        }
+        else
+        {
+            index = focused_window_index - 1;
+        }
+
+        window = mapped.at(index);
+
+        reset_cursor();
+        get_focused_window()->set_focus_false();
+        window->focus();
+        window->raise();
+        window->center_cursor();
+    }
 
     /*
         Workspace methods

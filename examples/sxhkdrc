@@ -13,3 +13,12 @@ super + {_,shift + ,ctrl +,alt +}{1-9,0}
 
 super + w
     echo "close window" > /tmp/custard.fifo
+
+super + Escape
+    echo "stop wm" > /tmp/custard.fifo
+
+super + plus
+    echo "cycle focus forward" > /tmp/custard.fifo
+
+super + minus
+    echo "cycle focus backward" > /tmp/custard.fifo

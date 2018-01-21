@@ -70,9 +70,9 @@ void Workspace::map(void)
 
     if (focused_window)
     {
+        focused_window->center_cursor();
         focused_window->focus();
         focused_window->raise();
-        focused_window->center_cursor();
     }
 
     this->mapped = true;

@@ -23,6 +23,9 @@ namespace custard {
 
     static void reset_cursor(void);
 
+    static void cycle_to_next(void);
+    static void cycle_to_prev(void);
+
     static Workspace* get_workspace(Window*);
     static Workspace* get_workspace(unsigned int);
     static void go_to_workspace(unsigned int);

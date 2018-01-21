@@ -51,6 +51,20 @@ void Fifo::start_read_loop(void)
             update_screen = true;
             /* TODO: reload window sizes */
         }
+        else if (message.find("stop wm") != std::string::npos)
+        {
+            custard::stop();
+        }
+        else if (message.find("cycle focus forward") != std::string::npos)
+        {
+            custard::cycle_to_next();
+            update_screen = true;
+        }
+        else if (message.find("cycle focus backward") != std::string::npos)
+        {
+            custard::cycle_to_prev();
+            update_screen = true;
+        }
         else
         {
 
