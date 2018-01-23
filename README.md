@@ -56,6 +56,8 @@ For configuration, see CONFIGURATION, or refer to `examples/.Xresources`.
 
 # Managing Windows
 
+Note: as of the most recent custard git commits, these commands will not work when sent to the fifo. Documentation will not be updated for this, as a tool is being written to supplement these. It is recommended that you do not update, unless you feel like reading the source for commands. (relevant file is src/fifo.cpp)
+
 custard manages windows via commands from a named pipe/FIFO. For the purposes of this README, understand that "named pipe" is synonymous with "FIFO", as they will be referred to as FIFOs here.
 
 To send a command, the "formula" is `echo "command" > /tmp/custard.fifo`. Commands, as well as what they do, are specified below.
