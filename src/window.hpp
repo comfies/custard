@@ -58,6 +58,8 @@ class Window {
 
         bool managed = false;
 
+        bool maximized = false;
+
         void resize(unsigned int*);
         void move(unsigned int*);
 
