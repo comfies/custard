@@ -203,11 +203,7 @@ namespace custard {
         }
 
         unsigned int index = 0;
-        if (focused_window_index == mapped.size() - 1)
-        {
-            index = 0;
-        }
-        else
+        if (focused_window_index < mapped.size() - 1)
         {
             index = focused_window_index + 1;
         }
@@ -334,7 +330,6 @@ namespace custard {
             n - 1
         );
 
-        xcb_connection->flush();
     }
 
     static void attach_workspace(unsigned int n)
@@ -348,7 +343,6 @@ namespace custard {
 
         workspace->map();
 
-        xcb_connection->flush();
     }
 
     static void detach_workspace(unsigned int n)
@@ -362,7 +356,6 @@ namespace custard {
 
         workspace->unmap();
 
-        xcb_connection->flush();
     }
 
     static void send_focused_window_to_workspace(unsigned int n)
@@ -388,7 +381,6 @@ namespace custard {
         original_workspace->unmanage(window);
         target_workspace->manage(window);
 
-        xcb_connection->flush();
     }
 
 }
