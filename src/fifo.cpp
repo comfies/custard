@@ -33,149 +33,126 @@ void Fifo::start_read_loop(void)
 
         message = this->read();
 
+        std::regex action("(custard)( (stop)| (cycle focus) (forward|backward))|(window)( (move|grow|shrink) (up|down|left|right)| (go to workspace) (\\d+))|(workspace)( (attach|detach|focus) (\\d+))\\;");
+        std::smatch matches;
+
         window = custard::get_focused_window();
 
-        if (message.find("reload config") != std::string::npos)
-        {
-            Configuration::load();
-            Grid::setup();
-
-            Window *window;
-
-            for (unsigned int index = 0; index < custard::windows.size(); index++)
-            {
-                window = custard::windows.at(index);
-                window->update_borders();
-            }
-
-            update_screen = true;
-            /* TODO: reload window sizes */
-        }
-        else if (message.find("stop wm") != std::string::npos)
-        {
-            custard::stop();
-        }
-        else if (message.find("cycle focus forward") != std::string::npos)
-        {
-            custard::cycle_to_next();
-            update_screen = true;
-        }
-        else if (message.find("cycle focus backward") != std::string::npos)
-        {
-            custard::cycle_to_prev();
-            update_screen = true;
-        }
-        else
+        if (std::regex_search(message, matches, action))
         {
 
-            if (message.find("move window up") != std::string::npos && window != NULL)
+            if (matches[1] == "custard")
             {
-                window->move_up();
-                update_screen = true;
-            }
-            else if (message.find("move window down") != std::string::npos && window != NULL)
-            {
-                window->move_down();
-                update_screen = true;
-            }
-            else if (message.find("move window left") != std::string::npos && window != NULL)
-            {
-                window->move_left();
-                update_screen = true;
-            }
-            else if (message.find("move window right") != std::string::npos && window != NULL)
-            {
-                window->move_right();
-                update_screen = true;
-            }
-            else if (message.find("grow window up") != std::string::npos && window != NULL)
-            {
-                window->grow_up();
-                update_screen = true;
-            }
-            else if (message.find("grow window down") != std::string::npos && window != NULL)
-            {
-                window->grow_down();
-                update_screen = true;
-            }
-            else if (message.find("grow window left") != std::string::npos && window != NULL)
-            {
-                window->grow_left();
-                update_screen = true;
-            }
-            else if (message.find("grow window right") != std::string::npos && window != NULL)
-            {
-                window->grow_right();
-                update_screen = true;
-            }
-            else if (message.find("shrink window up") != std::string::npos && window != NULL)
-            {
-                window->shrink_up();
-                update_screen = true;
-            }
-            else if (message.find("shrink window down") != std::string::npos && window != NULL)
-            {
-                window->shrink_down();
-                update_screen = true;
-            }
-            else if (message.find("shrink window left") != std::string::npos && window != NULL)
-            {
-                window->shrink_left();
-                update_screen = true;
-            }
-            else if (message.find("shrink window right") != std::string::npos && window != NULL)
-            {
-                window->shrink_right();
-                update_screen = true;
-            }
-            else if (message.find("close window") != std::string::npos && window != NULL)
-            {
-                window->close();
-                // No need to set `update_screen` here, Window::close calls custard::xcb_connection->flush
-                // We don't want to unnecessarily update the screen
-            }
-            else
-            {
-
-                // Not exactly sure why I did this the way I did, but oh well
-
-                std::regex action("(go to|send to|attach|detach) workspace (\\d+)");
-                std::smatch match;
-
-                if (std::regex_search(message, match, action))
+                if (matches[3] == "stop")
                 {
-                    unsigned int nth_workspace = std::stoi(match[2]);
-                    std::string action = match[1];
-
-                    Workspace *workspace = custard::get_workspace(nth_workspace);
-
-                    if (workspace == NULL)
-                    {
-                        continue;
-                    }
-
-                    if (action == "go to")
-                    {
-                        custard::go_to_workspace(nth_workspace);
-                        update_screen = true;
-                    }
-                    else if (action == "send to" && window != NULL)
-                    {
-                        custard::send_focused_window_to_workspace(nth_workspace);
-                        update_screen = true;
-                    }
-                    else if (action == "attach")
-                    {
-                        custard::attach_workspace(nth_workspace);
-                        update_screen = true;
-                    }
-                    else if (action == "detach")
-                    {
-                        custard::detach_workspace(nth_workspace);
-                        update_screen = true;
-                    }
-
+                    custard::stop();
                 }
+                else if (matches[4] == "cycle focus")
+                {
+                    if (matches[5] == "forward")
+                    {
+                        custard::cycle_to_next();
+                    }
+                    else if (matches[5] == "backward")
+                    {
+                        custard::cycle_to_prev();
+                    }
+
+                    update_screen = true;
+                }
+            }
+            else if (matches[6] == "window")
+            {
+                if (!window)
+                {
+                    continue;
+                }
+
+                if (matches[8] == "move")
+                {
+                    if (matches[9] == "up")
+                    {
+                        window->move_up();
+                    }
+                    else if (matches[9] == "down")
+                    {
+                        window->move_down();
+                    }
+                    else if (matches[9] == "left")
+                    {
+                        window->move_left();
+                    }
+                    else if (matches[9] == "right")
+                    {
+                        window->move_right();
+                    }
+                }
+                else if (matches[8] == "grow")
+                {
+                    if (matches[9] == "up")
+                    {
+                        window->grow_up();
+                    }
+                    else if (matches[9] == "down")
+                    {
+                        window->grow_down();
+                    }
+                    else if (matches[9] == "left")
+                    {
+                        window->grow_left();
+                    }
+                    else if (matches[9] == "right")
+                    {
+                        window->grow_right();
+                    }
+                }
+                else if (matches[8] == "shrink")
+                {
+                    if (matches[9] == "up")
+                    {
+                        window->shrink_up();
+                    }
+                    else if (matches[9] == "down")
+                    {
+                        window->shrink_down();
+                    }
+                    else if (matches[9] == "left")
+                    {
+                        window->shrink_left();
+                    }
+                    else if (matches[9] == "right")
+                    {
+                        window->shrink_right();
+                    }
+                }
+                else if (matches[10] == "go to workspace")
+                {
+                    unsigned int nth_workspace = std::stoi(matches[11]);
+
+                    custard::send_focused_window_to_workspace(nth_workspace);
+                }
+
+                update_screen = true;
+            }
+            else if (matches[12] == "workspace")
+            {
+
+                unsigned int nth_workspace = std::stoi(matches[15]);
+
+                if (matches[14] == "attach")
+                {
+                    custard::attach_workspace(nth_workspace);
+                }
+                else if (matches[14] == "detach")
+                {
+                    custard::detach_workspace(nth_workspace);
+                }
+                else if (matches[14] == "focus")
+                {
+                    custard::go_to_workspace(nth_workspace);
+                }
+
+                update_screen = true;
 
             }
 
