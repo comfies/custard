@@ -28,6 +28,9 @@ class Window {
         void map(void);
         void unmap(void);
 
+        void maximize(void);
+        void unmaximize(void);
+
         bool move_up(void);
         bool move_down(void);
         bool move_left(void);

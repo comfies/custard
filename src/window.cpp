@@ -46,7 +46,6 @@ Window::Window(xcb_window_t id)
                 else if (atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_NOTIFICATION)
                 {
                     this->always_on_top = true;
-                    std::cout << "Window AOT" << std::endl;
                 }
 
                 return;
@@ -598,6 +597,45 @@ void Window::close(void)
 
     custard::xcb_connection->flush();
 
+}
+
+void Window::maximize(void)
+{
+
+    if (this->maximized)
+    {
+        return;
+    }
+
+    this->maximized = true;
+
+    custard::reset_cursor();
+    this->move(0, 0);
+    this->resize(
+        Configuration::grid_rows,
+        Configuration::grid_columns
+    );
+
+    this->raise();
+    this->center_cursor();
+
+}
+
+void Window::unmaximize(void)
+{
+    if (!this->maximized)
+    {
+        return;
+    }
+
+    this->maximized = false;
+
+    custard::reset_cursor();
+    this->move(this->x, this->y);
+    this->resize(this->span_y, this->span_x);
+
+    this->raise();
+    this->center_cursor();
 }
 
 /* Misc */
