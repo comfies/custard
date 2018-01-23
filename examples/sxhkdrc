@@ -1,24 +1,23 @@
-
-super + Escape
-    echo "reload config" > /tmp/custard.fifo
-
 super + Return
     urxvt
 
 super + {_,ctrl + ,alt + }{Up,Down,Left,Right}
-    echo "{move,grow,shrink} window {up,down,left,right}" > /tmp/custard.fifo
+    echo "window {move,grow,shrink} {up,down,left,right};" > /tmp/custard.fifo
 
 super + {_,shift + ,ctrl +,alt +}{1-9,0}
-    echo "{go to,send to,attach,detach} workspace {1-9,10}" > /tmp/custard.fifo
+    echo "workspace {focus,attach,detach} {1-9,10};" > /tmp/custard.fifo
+
+super + shift + {1-9,0}
+    echo "window go to workspace {1-9,10};" > /tmp/custard.fifo
 
 super + w
-    echo "close window" > /tmp/custard.fifo
+    echo "window close;" > /tmp/custard.fifo
 
 super + Escape
-    echo "stop wm" > /tmp/custard.fifo
+    echo "custard stop;" > /tmp/custard.fifo
 
 super + plus
-    echo "cycle focus forward" > /tmp/custard.fifo
+    echo "custard cycle focus forward;" > /tmp/custard.fifo
 
 super + minus
-    echo "cycle focus backward" > /tmp/custard.fifo
+    echo "custard cycle focus backward;" > /tmp/custard.fifo
