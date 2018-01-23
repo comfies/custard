@@ -69,6 +69,8 @@ namespace custard {
     static void stop(void)
     {
 
+        alive = false;
+
         pthread_join(fifo_thread, NULL);
 
         fifo->close();
@@ -124,6 +126,8 @@ namespace custard {
         setup_pre_existing_windows();
 
         Handlers::attach_event_handlers();
+
+        alive = true;
 
         pthread_create(&fifo_thread, NULL, start_fifo_read_loop, NULL);
 

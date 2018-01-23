@@ -105,7 +105,7 @@ void XcbConnection::start_event_loop(void)
 
     int event;
 
-    while (true)
+    while (custard::alive)
     {
 
         custard::generic_event = xcb_wait_for_event(this->connection);

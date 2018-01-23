@@ -5,6 +5,8 @@ namespace custard {
     XcbConnection *xcb_connection;
     EwmhConnection *ewmh_connection;
 
+    bool alive = false;
+
     xcb_generic_event_t *generic_event = NULL;
     int event_mask = XCB_CW_EVENT_MASK;
 

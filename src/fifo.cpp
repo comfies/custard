@@ -23,7 +23,7 @@ void Fifo::start_read_loop(void)
     bool update_screen = false;
     Window *window;
 
-    while (true)
+    while (custard::alive)
     {
         if (update_screen)
         {
@@ -33,7 +33,7 @@ void Fifo::start_read_loop(void)
 
         message = this->read();
 
-        std::regex action("(custard)( (stop)| (cycle focus) (forward|backward))|(window)( (move|grow|shrink) (up|down|left|right)| (go to workspace) (\\d+))|(workspace)( (attach|detach|focus) (\\d+))\\;");
+        std::regex action("(custard)( (stop)| (cycle focus) (forward|backward))|(window)( (move|grow|shrink) (up|down|left|right)| (go to workspace) (\\d+)| (close))|(workspace)( (attach|detach|focus) (\\d+))\\;");
         std::smatch matches;
 
         window = custard::get_focused_window();
@@ -131,23 +131,27 @@ void Fifo::start_read_loop(void)
 
                     custard::send_focused_window_to_workspace(nth_workspace);
                 }
+                else if (matches[12] == "close")
+                {
+                    window->close();
+                }
 
                 update_screen = true;
             }
-            else if (matches[12] == "workspace")
+            else if (matches[13] == "workspace")
             {
 
-                unsigned int nth_workspace = std::stoi(matches[15]);
+                unsigned int nth_workspace = std::stoi(matches[16]);
 
-                if (matches[14] == "attach")
+                if (matches[15] == "attach")
                 {
                     custard::attach_workspace(nth_workspace);
                 }
-                else if (matches[14] == "detach")
+                else if (matches[15] == "detach")
                 {
                     custard::detach_workspace(nth_workspace);
                 }
-                else if (matches[14] == "focus")
+                else if (matches[15] == "focus")
                 {
                     custard::go_to_workspace(nth_workspace);
                 }
