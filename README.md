@@ -66,37 +66,55 @@ A tool is provided by custard that makes things easier on end-users for managing
 
 `echo "custard stop;" > /tmp/custard.fifo`
 
+
+
 `custardctl -focus [next|prev|previous|forward|backward]` - Cycles the focus forward or backward.
 
 `echo "custard cycle focus [forward|backward];" > /tmp/custard.fifo`
+
+
 
 `custardctl window -close` - Closes the currently focused window.
 
 `echo "window close;" > /tmp/custard.fifo`
 
+
+
 `custardctl window -relocate N` - Moves the currently focused window to the Nth workspace.
 
 `echo "window go to workspace N;" > /tmp/custard.fifo`
+
+
 
 `custardctl window -move [up|down|left|right]` - Moves the currently focused window up, down, left, or right.
 
 `echo "window move [up|down|left|right];" > /tmp/custard.fifo`
 
+
+
 `custardctl window -expand [up|down|left|right]` - Makes the currently focused window grow in the specified direction.
 
 `echo "window grow [up|down|left|right];" > /tmp/custard.fifo`
+
+
 
 `custardctl window -contract [up|down|left|right]` - Makes the currently focused window shrink in the specified direction.
 
 `echo "window shrink [up|down|left|right];" > /tmp/custard.fifo`
 
+
+
 `custardctl workspace -focus N` - Focuses on the Nth workspace.
 
 `echo "workspace focus N;" > /tmp/custard.fifo`
 
+
+
 `custardctl workspace -attach N` - Attaches the Nth workspace.
 
 `echo "workspace attach N;" > /tmp/custard.fifo`
+
+
 
 `custardctl workspace -detach N` - Detaches the Nth workspace, if attached.
 
