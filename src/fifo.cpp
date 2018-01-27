@@ -33,6 +33,7 @@ void Fifo::start_read_loop(void)
 
         message = this->read();
 
+        // expect an update for this again soon
         std::regex action("(custard)( (stop)| (cycle focus) (forward|backward))|(window)( (move|grow|shrink) (up|down|left|right)| (go to workspace) (\\d+)| (close))|(workspace)( (attach|detach|focus) (\\d+))\\;");
         std::smatch matches;
 

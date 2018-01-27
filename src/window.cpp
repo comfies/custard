@@ -590,10 +590,90 @@ void Window::close(void)
 
     this->focused = false;
 
-    xcb_kill_client(
+    bool hard_kill = false;
+
+    xcb_icccm_get_wm_protocols_reply_t protocols;
+    xcb_get_property_cookie_t cookie = xcb_icccm_get_wm_protocols_unchecked(
         custard::xcb_connection->get_connection(),
-        this->id
+        this->id,
+        custard::ewmh_connection->get_connection()->WM_PROTOCOLS
     );
+
+    xcb_intern_atom_cookie_t atom_cookie = xcb_intern_atom(
+        custard::xcb_connection->get_connection(),
+        0,
+        16,
+        "WM_DELETE_WINDOW"
+    );
+
+    xcb_intern_atom_reply_t *reply = xcb_intern_atom_reply(
+        custard::xcb_connection->get_connection(),
+        atom_cookie,
+        NULL
+    );
+
+    if (!reply)
+    {
+        hard_kill = true;
+    }
+
+    if (!hard_kill)
+    {
+
+        xcb_atom_t delete_window_atom = reply->atom;
+
+        if (xcb_icccm_get_wm_protocols_reply(
+            custard::xcb_connection->get_connection(),
+            cookie,
+            &protocols,
+            NULL
+        ) == 1)
+        {
+            for (unsigned int index = 0; index < protocols.atoms_len; index++)
+            {
+                if (protocols.atoms[index] == delete_window_atom)
+                {
+                    hard_kill = true;
+                    break;
+                }
+            }
+        }
+
+        if (!hard_kill)
+        {
+
+            xcb_client_message_event_t event = {
+                .response_type = XCB_CLIENT_MESSAGE,
+                .format = 32,
+                .sequence = 0,
+                .window = this->id,
+                .type = custard::ewmh_connection->get_connection()->WM_PROTOCOLS,
+                .data = {
+                    .data32 = {
+                        delete_window_atom,
+                        XCB_CURRENT_TIME
+                    }
+                }
+            };
+
+            xcb_send_event(
+                custard::xcb_connection->get_connection(),
+                false,
+                this->id,
+                XCB_EVENT_MASK_NO_EVENT,
+                (char *)&event
+            );
+        }
+
+    }
+
+    if (hard_kill)
+    {
+        xcb_kill_client(
+            custard::xcb_connection->get_connection(),
+            this->id
+        );
+    }
 
     custard::xcb_connection->flush();
 
@@ -618,7 +698,7 @@ void Window::maximize(void)
 
     this->raise();
     this->center_cursor();
-
+    this->update_borders();
 }
 
 void Window::unmaximize(void)
@@ -636,6 +716,7 @@ void Window::unmaximize(void)
 
     this->raise();
     this->center_cursor();
+    this->update_borders();
 }
 
 /* Misc */

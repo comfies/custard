@@ -368,6 +368,11 @@ namespace custard {
         Window *window = get_focused_window();
         Workspace *original_workspace = get_workspace(window); // Original
 
+        if (!target_workspace)
+        {
+            return;
+        }
+
         if (target_workspace == original_workspace)
         {
             return;
