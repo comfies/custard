@@ -1,7 +1,7 @@
 
 CC=g++
 
-CFLAGS = -std=c++14 -lxcb -lxcb-ewmh -lxcb-xrm -lxcb-util -lpthread
+CFLAGS = -std=c++14 -lxcb -lxcb-ewmh -lxcb-icccm -lxcb-xrm -lxcb-util -lpthread
 
 TARGET = custard
 PREFIX?=/usr/local
@@ -18,6 +18,8 @@ install: $(TARGET)
 	mkdir -p build
 	install build/$(TARGET) $(DESTDIR)$(PREFIX)/bin/$(TARGET)
 	chmod 755 $(DESTDIR)$(PREFIX)/bin/$(TARGET)
+	install contrib/custardctl.py $(DESTDIR)$(PREFIX)/bin/custardctl
+	chmod 755 $(DESTDIR)$(PREFIX)/bin/custardctl
 	install man/custard.man $(DESTDIR)$(MANPREFIX)/man1/custard.1
 	chmod 644 $(DESTDIR)$(MANPREFIX)/man1/custard.1
 
