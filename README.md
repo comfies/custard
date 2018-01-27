@@ -60,47 +60,47 @@ Note: as of the most recent custard git commits, these commands will not work wh
 
 custard manages windows via commands from a named pipe/FIFO. For the purposes of this README, understand that "named pipe" is synonymous with "FIFO", as they will be referred to as FIFOs here.
 
-To send a command, the "formula" is `echo "command" > /tmp/custard.fifo`. Commands, as well as what they do, are specified below.
+A tool is provided by custard that makes things easier on end-users for managing windows. The command and its usage, as well as its shell equivalent command is listed.
 
-`move window up` - Moves the focused window up by a single grid unit.
+`custardctl -stop` - Stops the window manager.
 
-`move window down` - Moves the focused window down by a single grid unit.
+`echo "custard stop;" > /tmp/custard.fifo`
 
-`move window left` - Moves the focused window to the left by a single grid unit.
+`custardctl -focus [next|prev|previous|forward|backward]` - Cycles the focus forward or backward.
 
-`move window right` - Moves the focused window to the right by a single grid unit.
+`echo "custard cycle focus [forward|backward];" > /tmp/custard.fifo`
 
-`grow window up` - Makes the focused window grow by a single grid unit upwards.
+`custardctl window -close` - Closes the currently focused window.
 
-`grow window down` - Makes the focused window grow by a single grid unit downwards.
+`echo "window close;" > /tmp/custard.fifo`
 
-`grow window left` - Makes the focused window grow by a single grid unit to the left.
+`custardctl window -relocate N` - Moves the currently focused window to the Nth workspace.
 
-`grow window right` - Makes the focused window grow by a single grid unit to the right.
+`echo "window go to workspace N;" > /tmp/custard.fifo`
 
-`shrink window up` - Makes the focused window shrink by a single grid unit upwards.
+`custardctl window -move [up|down|left|right]` - Moves the currently focused window up, down, left, or right.
 
-`shrink window down` - Makes the focused window shrink by a single grid unit downwards.
+`echo "window move [up|down|left|right];" > /tmp/custard.fifo`
 
-`shrink window left` - Makes the focused window shrink by a single grid unit to the left.
+`custardctl window -expand [up|down|left|right]` - Makes the currently focused window grow in the specified direction.
 
-`shrink window right` - Makes the focused window shrink by a single grid unit to the right.
+`echo "window grow [up|down|left|right];" > /tmp/custard.fifo`
 
-`close window` - Closes the focused window.
+`custardctl window -contract [up|down|left|right]` - Makes the currently focused window shrink in the specified direction.
 
-`stop wm` - Stops custard.
+`echo "window shrink [up|down|left|right];" > /tmp/custard.fifo`
 
-`cycle focus forward` - Focuses on the next visible window.
+`custardctl workspace -focus N` - Focuses on the Nth workspace.
 
-`cycle focus backward` - Focuses on the last visible window.
+`echo "workspace focus N;" > /tmp/custard.fifo`
 
-`go to workspace N` - Goes to the specified workspace, where N is the Nth workspace. custard works with humane positions, i.e., it does NOT use indexes, and thus specifying a value of `0` does not bring you to the first workspace.
+`custardctl workspace -attach N` - Attaches the Nth workspace.
 
-`send to workspace N` - Sends the focused window to the Nth workspace.
+`echo "workspace attach N;" > /tmp/custard.fifo`
 
-`attach workspace N` - Attaches the Nth workspace. "Attaching" a workspace is the same as bringing all windows in the workspace to the screen. custard will NOT set any attached workspaces as the active workspace, so EWMH hints will not show any attached workspace as the active workspace.
+`custardctl workspace -detach N` - Detaches the Nth workspace, if attached.
 
-`detach workspace N` - Detaches the Nth workspace. This hides the workspace specified, if it's not the active workspace.
+`echo "workspace detach N;" > /tmp/custard.fifo`
 
 [To Table of Contents](#table-of-contents)
 
