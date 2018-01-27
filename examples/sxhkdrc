@@ -2,22 +2,22 @@ super + Return
     urxvt
 
 super + {_,ctrl + ,alt + }{Up,Down,Left,Right}
-    echo "window {move,grow,shrink} {up,down,left,right};" > /tmp/custard.fifo
+    custardctl window -{move,expand,contract} {up,down,left,right}
 
 super + {_,shift + ,ctrl +,alt +}{1-9,0}
-    echo "workspace {focus,attach,detach} {1-9,10};" > /tmp/custard.fifo
+    custardctl workspace -{focus,attach,detach} {1-9,10}
 
 super + shift + {1-9,0}
-    echo "window go to workspace {1-9,10};" > /tmp/custard.fifo
+    custardctl window -relocate {1-9,10}
 
 super + w
-    echo "window close;" > /tmp/custard.fifo
+    custardctl window -close
 
 super + Escape
-    echo "custard stop;" > /tmp/custard.fifo
+    custardctl -stop
 
 super + plus
-    echo "custard cycle focus forward;" > /tmp/custard.fifo
+    custardctl -focus next
 
 super + minus
-    echo "custard cycle focus backward;" > /tmp/custard.fifo
+    custardctl -focus prev
