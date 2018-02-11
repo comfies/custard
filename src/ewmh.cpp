@@ -74,6 +74,7 @@ bool EwmhConnection::establish(void)
 
     xcb_atom_t supported_atoms[] = {
         this->connection->_NET_WM_NAME,
+        this->connection->_NET_ACTIVE_WINDOW,
         this->connection->_NET_SUPPORTED,
         this->connection->_NET_SUPPORTING_WM_CHECK,
         this->connection->_NET_WM_PID,
@@ -91,7 +92,7 @@ bool EwmhConnection::establish(void)
     xcb_ewmh_set_supported(
         this->connection,
         0,  // Screen number
-        11, // supported atoms
+        12, // supported atoms
         supported_atoms
     );
 
