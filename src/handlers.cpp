@@ -131,6 +131,108 @@ namespace Handlers {
         }
     }
 
+    static void window_configure_request(void)
+    {
+        xcb_configure_request_event_t *event;
+        event = (xcb_configure_request_event_t *)custard::generic_event;
+
+        /*
+         * TODO: write a more general use method in `custard` namespace
+         * to get Window instances from their respective window IDs
+         */
+
+        Window *window = NULL;
+
+        for (unsigned int index = 0; index < custard::windows.size(); index++)
+        {
+            window = custard::windows.at(index);
+            if (!window)
+            {
+                continue;
+            }
+
+            if (window->get_id() == event->window)
+            {
+                if (!window->is_managed())
+                {
+
+                    unsigned int data[2];
+
+                    if (event->value_mask & XCB_CONFIG_WINDOW_X &&
+                        event->value_mask & XCB_CONFIG_WINDOW_Y)
+                    {
+                        data[0] = event->x;
+                        data[1] = event->y;
+
+                        window->move(data);
+                        data[0] = 0;
+                        data[1] = 0;
+                    }
+                    else
+                    {
+                        xcb_get_geometry_reply_t *geometry = window->get_geometry();
+
+                        if (event->value_mask & XCB_CONFIG_WINDOW_X)
+                        {
+                            data[0] = event->x;
+                            data[1] = geometry->y;
+
+                            window->move(data);
+                            data[0] = 0;
+                            data[1] = 0;
+                        }
+                        else if (event->value_mask & XCB_CONFIG_WINDOW_Y)
+                        {
+                            data[0] = geometry->x;
+                            data[1] = event->y;
+
+                            window->move(data);
+                            data[0] = 0;
+                            data[1] = 0;
+                        }
+                    }
+
+                    if (event->value_mask & XCB_CONFIG_WINDOW_HEIGHT &&
+                        event->value_mask & XCB_CONFIG_WINDOW_WIDTH)
+                    {
+                        data[0] = event->width;
+                        data[1] = event->height;
+
+                        window->resize(data);
+                        data[0] = 0;
+                        data[1] = 0;
+                    }
+                    else
+                    {
+                        xcb_get_geometry_reply_t *geometry = window->get_geometry();
+
+                        if (event->value_mask & XCB_CONFIG_WINDOW_WIDTH)
+                        {
+                            data[0] = event->width;
+                            data[1] = geometry->height;
+
+                            window->resize(data);
+                            data[0] = 0;
+                            data[1] = 0;
+                        }
+                        else if (event->value_mask & XCB_CONFIG_WINDOW_HEIGHT)
+                        {
+                            data[0] = geometry->width;
+                            data[1] = event->height;
+
+                            window->resize(data);
+                            data[0] = 0;
+                            data[1] = 0;
+                        }
+                    }
+
+                }
+
+                return;
+            }
+        }
+    }
+
     /* End of handlers */
 
     static void attach_event_handler(int event, auto method)
@@ -147,6 +249,7 @@ namespace Handlers {
         attach_event_handler(XCB_DESTROY_NOTIFY, window_destroyed);
         attach_event_handler(XCB_ENTER_NOTIFY, window_on_hover);
         attach_event_handler(XCB_CLIENT_MESSAGE, window_message_received);
+	attach_event_handler(XCB_CONFIGURE_REQUEST, window_configure_request);
     }
 
     static void handle_event(int event)

@@ -16,6 +16,9 @@ class Window {
 
         void center_cursor(void);
 
+	void resize(unsigned int*);
+        void move(unsigned int*);
+
         void resize(short unsigned int, short unsigned int);
         void move(short unsigned int, short unsigned int);
 
@@ -66,9 +69,6 @@ class Window {
 
         bool maximized = false;
         bool fullscreened = false;
-
-        void resize(unsigned int*);
-        void move(unsigned int*);
 
         void update_border_helper_1(void);
         void update_border_helper_2(void);
