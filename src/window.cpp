@@ -267,6 +267,16 @@ void Window::unmap(void)
     );
 }
 
+void Window::fullscreen(void)
+{
+    if (this->fullscreened)
+    {
+            return;
+    }
+
+    this->fullscreened = true;
+}
+
 void Window::update_borders(void)
 {
 

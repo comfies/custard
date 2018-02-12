@@ -31,6 +31,9 @@ class Window {
         void maximize(void);
         void unmaximize(void);
 
+        void fullscreen(void);
+        void window(void);
+
         bool move_up(void);
         bool move_down(void);
         bool move_left(void);
@@ -62,6 +65,7 @@ class Window {
         bool managed = false;
 
         bool maximized = false;
+        bool fullscreened = false;
 
         void resize(unsigned int*);
         void move(unsigned int*);
