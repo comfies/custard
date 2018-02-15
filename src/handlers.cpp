@@ -12,7 +12,7 @@ namespace Handlers {
 
         xcb_window_t window_id = event->window;
 
-        std::cout << " [handler] Window (" << window_id << ") map request." << std::endl;
+        std::cerr << " [handler] Window (" << window_id << ") map request." << std::endl;
 
         Window *window = custard::get_window(window_id);
         if (window)
@@ -43,7 +43,7 @@ namespace Handlers {
         Window *window = NULL;
         xcb_window_t window_id = event->event;
 
-        std::cout << " [handler] Window (" << window_id << ") hovered" << std::endl;
+        std::cerr << " [handler] Window (" << window_id << ") hovered" << std::endl;
 
         window = custard::get_focused_window();
         if (window)
@@ -85,7 +85,7 @@ namespace Handlers {
 
         xcb_window_t window_id = event->window;
 
-        std::cout << " [handler] Window (" << window_id << ") destroyed" << std::endl;
+        std::cerr << " [handler] Window (" << window_id << ") destroyed" << std::endl;
 
         Window *window = NULL;
         for (unsigned int index = 0; index < custard::windows.size(); index++)
@@ -122,7 +122,7 @@ namespace Handlers {
             if (event->data.data32[1] == custard::ewmh_connection->get_connection()->_NET_WM_STATE_FULLSCREEN ||
                 event->data.data32[2] == custard::ewmh_connection->get_connection()->_NET_WM_STATE_FULLSCREEN)
             {
-                    std::cout << "window requested to be fullscreen" << std::endl;
+                    std::cerr << "window requested to be fullscreen" << std::endl;
             }
 
         }

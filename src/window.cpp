@@ -289,13 +289,13 @@ void Window::update_borders(void)
 
     if (!geometry)
     {
-        std::cout << " [window] Window (" << this->id << ") border update stopped; geometry NULL" << std::endl;
+        std::cerr << " [window] Window (" << this->id << ") border update stopped; geometry NULL" << std::endl;
         return;
     }
 
     unsigned int border_width[1] = {Configuration::border_size * Configuration::border_type};
 
-    std::cout << " [window] Window (" << this->id << ") border update" << std::endl;
+    std::cerr << " [window] Window (" << this->id << ") border update" << std::endl;
 
     xcb_configure_window(
         custard::xcb_connection->get_connection(),
@@ -317,7 +317,7 @@ void Window::update_borders(void)
         this->update_border_helper_3();
     }
 
-    std::cout << " [window] Window (" << this->id << ") border update finished" << std::endl;
+    std::cerr << " [window] Window (" << this->id << ") border update finished" << std::endl;
 
 }
 
@@ -469,7 +469,7 @@ void Window::update_border_helper_3(void)
 void Window::update_border_helper_2_3(xcb_rectangle_t *inner_border, unsigned int inner_border_size)
 {
 
-    std::cout << " [window] Window (" << this->id << ") border update interstitial" << std::endl;
+    std::cerr << " [window] Window (" << this->id << ") border update interstitial" << std::endl;
 
     unsigned int data[1] = {Configuration::border_unfocused_color};
     unsigned int background_color[1] = {Configuration::border_background_color};

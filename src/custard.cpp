@@ -79,11 +79,11 @@ namespace custard {
         pthread_join(fifo_thread, NULL);
 
         fifo->close();
-        std::cout << " [custard] Fifo closed" << std::endl;
+        std::cerr << " [custard] Fifo closed" << std::endl;
         ewmh_connection->close();
-        std::cout << " [custard] EWMH connection closed" << std::endl;
+        std::cerr << " [custard] EWMH connection closed" << std::endl;
         xcb_connection->close();
-        std::cout << " [custard] XCB connection closed" << std::endl;
+        std::cerr << " [custard] XCB connection closed" << std::endl;
 
         free(fifo);
         free(ewmh_connection);
