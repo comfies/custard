@@ -69,13 +69,21 @@ namespace custard {
     static void stop(void)
     {
 
+        if (!alive)
+        {
+            return;
+        }
+
         alive = false;
 
         pthread_join(fifo_thread, NULL);
 
         fifo->close();
+        std::cout << " [custard] Fifo closed" << std::endl;
         ewmh_connection->close();
+        std::cout << " [custard] EWMH connection closed" << std::endl;
         xcb_connection->close();
+        std::cout << " [custard] XCB connection closed" << std::endl;
 
         free(fifo);
         free(ewmh_connection);

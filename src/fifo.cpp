@@ -39,6 +39,8 @@ void Fifo::start_read_loop(void)
 
         window = custard::get_focused_window();
 
+        std::cout << " [fifo] command received" << std::endl;
+
         if (std::regex_search(message, matches, action))
         {
 
