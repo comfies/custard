@@ -21,6 +21,7 @@ namespace custard {
     static void setup_pre_existing_windows(void);
     static void start(void);
     static Window* get_focused_window(void);
+    static Window* get_window(xcb_window_t);
     static void stop(void);
 
     static void reset_cursor(void);

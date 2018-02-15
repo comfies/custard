@@ -156,11 +156,32 @@ namespace custard {
 
     static Window* get_focused_window(void)
     {
-        Window *window;
+        Window *window = NULL;
         for (unsigned int index = 0; index < windows.size(); index++)
         {
             window = windows.at(index);
             if (window->is_focused() && window->is_mapped())
+            {
+                return window;
+            }
+        }
+
+        return NULL;
+    }
+
+    static Window* get_window(xcb_window_t id)
+    {
+        Window *window = NULL;
+
+        for (unsigned int index = 0; index < windows.size(); index++)
+        {
+            window = windows.at(index);
+            if (!window)
+            {
+                continue;
+            }
+
+            if (window->get_id() == id)
             {
                 return window;
             }

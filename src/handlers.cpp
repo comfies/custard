@@ -14,14 +14,10 @@ namespace Handlers {
 
         std::cout << " [handler] Window (" << window_id << ") map request." << std::endl;
 
-        Window *window = NULL;
-        for (unsigned int index = 0; index < custard::windows.size(); index++)
+        Window *window = custard::get_window(window_id);
+        if (window)
         {
-            window = custard::windows.at(index);
-            if (window->get_id() == window_id)
-            {
-                return;
-            }
+            return;
         }
 
         window = new Window(window_id);
@@ -79,6 +75,7 @@ namespace Handlers {
                 }
             }
         }
+        // Prefer this to custard::get_window, for `set_focus_false`
     }
 
     static void window_destroyed(void)
@@ -141,94 +138,88 @@ namespace Handlers {
          * to get Window instances from their respective window IDs
          */
 
-        Window *window = NULL;
+        xcb_window_t window_id = event->window;
+        Window *window = custard::get_window(window_id);
 
-        for (unsigned int index = 0; index < custard::windows.size(); index++)
+        if (!window)
         {
-            window = custard::windows.at(index);
-            if (!window)
+            return;
+        }
+
+        if (window->is_managed())
+        {
+            return; // May as well combine this and the above condition
+        }
+
+        unsigned int data[2];
+
+        // This is a tasteless implementation, I should change it sometime.
+
+        if (event->value_mask & XCB_CONFIG_WINDOW_X &&
+            event->value_mask & XCB_CONFIG_WINDOW_Y)
+        {
+            data[0] = event->x;
+            data[1] = event->y;
+
+            window->move(data);
+            data[0] = 0;
+            data[1] = 0;
+        }
+        else
+        {
+            xcb_get_geometry_reply_t *geometry = window->get_geometry();
+
+            if (event->value_mask & XCB_CONFIG_WINDOW_X)
             {
-                continue;
+                data[0] = event->x;
+                data[1] = geometry->y;
+
+                window->move(data);
+                data[0] = 0;
+                data[1] = 0;
             }
-
-            if (window->get_id() == event->window)
+            else if (event->value_mask & XCB_CONFIG_WINDOW_Y)
             {
-                if (!window->is_managed())
-                {
+                data[0] = geometry->x;
+                data[1] = event->y;
 
-                    unsigned int data[2];
+                window->move(data);
+                data[0] = 0;
+                data[1] = 0;
+            }
+        }
 
-                    if (event->value_mask & XCB_CONFIG_WINDOW_X &&
-                        event->value_mask & XCB_CONFIG_WINDOW_Y)
-                    {
-                        data[0] = event->x;
-                        data[1] = event->y;
+        if (event->value_mask & XCB_CONFIG_WINDOW_HEIGHT &&
+            event->value_mask & XCB_CONFIG_WINDOW_WIDTH)
+        {
+            data[0] = event->width;
+            data[1] = event->height;
 
-                        window->move(data);
-                        data[0] = 0;
-                        data[1] = 0;
-                    }
-                    else
-                    {
-                        xcb_get_geometry_reply_t *geometry = window->get_geometry();
+            window->resize(data);
+            data[0] = 0;
+            data[1] = 0;
+        }
+        else
+        {
+            xcb_get_geometry_reply_t *geometry = window->get_geometry();
 
-                        if (event->value_mask & XCB_CONFIG_WINDOW_X)
-                        {
-                            data[0] = event->x;
-                            data[1] = geometry->y;
+            if (event->value_mask & XCB_CONFIG_WINDOW_WIDTH)
+            {
+                data[0] = event->width;
+                data[1] = geometry->height;
 
-                            window->move(data);
-                            data[0] = 0;
-                            data[1] = 0;
-                        }
-                        else if (event->value_mask & XCB_CONFIG_WINDOW_Y)
-                        {
-                            data[0] = geometry->x;
-                            data[1] = event->y;
+                window->resize(data);
+                data[0] = 0;
+                data[1] = 0;
+            }
+            else if (event->value_mask & XCB_CONFIG_WINDOW_HEIGHT)
+            {
+                data[0] = geometry->width;
+                data[1] = event->height;
 
-                            window->move(data);
-                            data[0] = 0;
-                            data[1] = 0;
-                        }
-                    }
-
-                    if (event->value_mask & XCB_CONFIG_WINDOW_HEIGHT &&
-                        event->value_mask & XCB_CONFIG_WINDOW_WIDTH)
-                    {
-                        data[0] = event->width;
-                        data[1] = event->height;
-
-                        window->resize(data);
-                        data[0] = 0;
-                        data[1] = 0;
-                    }
-                    else
-                    {
-                        xcb_get_geometry_reply_t *geometry = window->get_geometry();
-
-                        if (event->value_mask & XCB_CONFIG_WINDOW_WIDTH)
-                        {
-                            data[0] = event->width;
-                            data[1] = geometry->height;
-
-                            window->resize(data);
-                            data[0] = 0;
-                            data[1] = 0;
-                        }
-                        else if (event->value_mask & XCB_CONFIG_WINDOW_HEIGHT)
-                        {
-                            data[0] = geometry->width;
-                            data[1] = event->height;
-
-                            window->resize(data);
-                            data[0] = 0;
-                            data[1] = 0;
-                        }
-                    }
-
-                }
-
-                return;
+                window->resize(data);
+                data[0] = 0;
+                data[1] = 0;
             }
         }
     }
