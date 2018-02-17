@@ -26,8 +26,101 @@ namespace Configuration {
 
     /* End user config */
 
-    unsigned int parse_color(const char* hexadecimal_notation)
+    static void apply_defaults(void)
     {
+        if (!grid_rows)
+        {
+            grid_rows = 2;
+        }
+
+        if (!grid_columns)
+        {
+            grid_columns = 3;
+        }
+
+        if (!border_focused_color)
+        {
+            border_focused_color = 0xFFFFFF;
+        }
+
+        if (!border_unfocused_color)
+        {
+            border_unfocused_color = 0x676767;
+        }
+
+        if (!border_background_color)
+        {
+            border_background_color = 0x000000;
+        }
+
+        if (!grid_gap_size)
+        {
+            grid_gap_size = 0;
+        }
+
+        if (!screen_margin_top)
+        {
+            screen_margin_top = 0;
+        }
+
+        if (!screen_margin_bottom)
+        {
+            screen_margin_bottom = 0;
+        }
+
+        if (!screen_margin_left)
+        {
+            screen_margin_left = 0;
+        }
+
+        if (!screen_margin_right)
+        {
+            screen_margin_right = 0;
+        }
+
+        /* placeholder */
+
+        if (!workspaces)
+        {
+            workspaces = 2;
+        }
+    }
+
+    static unsigned int parse_uint(const char* str)
+    {
+        if (str)
+        {
+            return atoi(str);
+        }
+        return 0;
+    }
+
+    static bool parse_bool(const char* str)
+    {
+        if (str)
+        {
+            if (strcmp(str, "True") == 0 || strcmp(str, "true") == 0)
+            {
+                return true;
+            }
+            else if (strcmp(str, "False") == 0 || strcmp(str, "false") == 0)
+            {
+                return false;
+            } // Not needed, but I like having it written explicitly.
+
+            return false;
+        }
+
+        return false;
+    }
+
+    static unsigned int parse_color(const char* hexadecimal_notation)
+    {
+        if (!hexadecimal_notation)
+        {
+            return 0;
+        }
+
         unsigned int RGB;
         char string_groups[7] = {
             hexadecimal_notation[1],
@@ -44,6 +137,20 @@ namespace Configuration {
         return RGB;
     }
 
+    static char* get_setting(xcb_xrm_database_t *database, std::string name)
+    {
+        std::string setting = "custard." + name;
+
+        char *str;
+        if (xcb_xrm_resource_get_string(database,
+            setting.c_str(), NULL, &str) >= 0)
+        {
+            return str;
+        }
+
+        return NULL;
+    }
+
     static void load(void)
     {
 
@@ -51,60 +158,33 @@ namespace Configuration {
             custard::xcb_connection->get_connection()
         );
 
-        if (database == NULL)
+        if (!database)
         {
             return;
         }
 
-        char* temporary;
-
-        if (xcb_xrm_resource_get_string(
-            database, "custard.rows", NULL, &temporary) >= 0)
-        {
-            grid_rows = atoi(temporary);
-        }
-
-        if (xcb_xrm_resource_get_string(
-            database, "custard.columns", NULL, &temporary) >= 0)
-        {
-            grid_columns = atoi(temporary);
-        }
+        grid_rows = parse_uint(get_setting(database, "rows"));
+        grid_columns = parse_uint(get_setting(database, "columns"));
 
         // Colors
 
-        if (xcb_xrm_resource_get_string(
-            database, "custard.focused_color", NULL, &temporary) >= 0)
-        {
-            border_focused_color = parse_color(temporary);
-        }
+        border_focused_color = parse_color(
+                                get_setting(database, "focused_color"));
 
-        if (xcb_xrm_resource_get_string(
-            database, "custard.unfocused_color", NULL, &temporary) >= 0)
-        {
-            border_unfocused_color = parse_color(temporary);
-        }
+        border_unfocused_color = parse_color(
+                                get_setting(database, "unfocused_color"));
 
-        if (xcb_xrm_resource_get_string(
-            database, "custard.background_color", NULL, &temporary) >= 0)
-        {
-            border_background_color = parse_color(temporary);
-        }
+        border_background_color = parse_color(
+                                get_setting(database, "background_color"));
 
-        if (xcb_xrm_resource_get_string(
-            database, "custard.invert_colors", NULL, &temporary) >= 0)
-        {
-            if (strcmp(
-                temporary, "True") == 0 || strcmp(
-                temporary, "true") == 0)
-            {
-                border_invert_colors = true;
-            }
-        }
+        border_invert_colors = parse_bool(
+                                get_setting(database, "invert_colors"));
 
         // Borders
 
-        if (xcb_xrm_resource_get_string(
-            database, "custard.border_type", NULL, &temporary) >= 0)
+        char *temporary = get_setting(database, "border_type");
+
+        if (temporary)
         {
 
             if (strcmp(
@@ -132,68 +212,25 @@ namespace Configuration {
 
         }
 
-        if (xcb_xrm_resource_get_string(
-            database, "custard.border_size", NULL, &temporary) >= 0)
-        {
-            border_size = atoi(temporary);
-        }
+        border_size = parse_uint(get_setting(database, "border_size"));
 
         // Margins
 
-        if (xcb_xrm_resource_get_string(
-            database, "custard.margin", NULL, &temporary) >= 0)
-        {
-            grid_gap_size = atoi(temporary);
-        }
+        grid_gap_size = parse_uint(get_setting(database, "margin"));
 
-        if (xcb_xrm_resource_get_string(
-            database, "custard.margin_top", NULL, &temporary) >= 0)
-        {
-            screen_margin_top = atoi(temporary);
-        }
-
-        if (xcb_xrm_resource_get_string(
-            database, "custard.margin_bottom", NULL, &temporary) >= 0)
-        {
-            screen_margin_bottom = atoi(temporary);
-        }
-
-        if (xcb_xrm_resource_get_string(
-            database, "custard.margin_left", NULL, &temporary) >= 0)
-        {
-            screen_margin_left = atoi(temporary);
-        }
-
-        if (xcb_xrm_resource_get_string(
-            database, "custard.margin_right", NULL, &temporary) >= 0)
-        {
-            screen_margin_right = atoi(temporary);
-        }
+        screen_margin_top = parse_uint(get_setting(database, "margin_top"));
+        screen_margin_bottom = parse_uint(
+                                get_setting(database, "margin_bottom"));
+        screen_margin_left = parse_uint(get_setting(database, "margin_left"));
+        screen_margin_right = parse_uint(
+                                get_setting(database, "margin_right"));
 
         // Groups
 
-        if (xcb_xrm_resource_get_string(
-            database, "custard.workspaces", NULL, &temporary) >= 0)
-        {
-            workspaces = atoi(temporary);
-        }
+        workspaces = parse_uint(get_setting(database, "workspaces"));
 
         xcb_xrm_database_free(database);
-
-        if (grid_rows == 0)
-        {
-            grid_rows = 2;
-        }
-
-        if (grid_columns == 0)
-        {
-            grid_columns = 3;
-        }
-
-        if (workspaces == 0)
-        {
-            workspaces = 2;
-        }
+        apply_defaults();
 
     }
 
