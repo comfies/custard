@@ -116,13 +116,29 @@ namespace Handlers {
         xcb_client_message_event_t *event;
         event = (xcb_client_message_event_t *)custard::generic_event;
 
+        Window *window = custard::get_window(event->window);
+
+        if (!window)
+        {
+            return;
+        }
+
         if (event->type == custard::ewmh_connection->get_connection()->_NET_WM_STATE)
         {
 
             if (event->data.data32[1] == custard::ewmh_connection->get_connection()->_NET_WM_STATE_FULLSCREEN ||
                 event->data.data32[2] == custard::ewmh_connection->get_connection()->_NET_WM_STATE_FULLSCREEN)
             {
-                    std::cerr << "window requested to be fullscreen" << std::endl;
+                    if (window->is_fullscreen())
+                    {
+                        window->window();
+                        window->update_borders();
+                    }
+                    else
+                    {
+                        window->remove_borders();
+                        window->fullscreen();
+                    }
             }
 
         }
@@ -240,7 +256,7 @@ namespace Handlers {
         attach_event_handler(XCB_DESTROY_NOTIFY, window_destroyed);
         attach_event_handler(XCB_ENTER_NOTIFY, window_on_hover);
         attach_event_handler(XCB_CLIENT_MESSAGE, window_message_received);
-	attach_event_handler(XCB_CONFIGURE_REQUEST, window_configure_request);
+        attach_event_handler(XCB_CONFIGURE_REQUEST, window_configure_request);
     }
 
     static void handle_event(int event)

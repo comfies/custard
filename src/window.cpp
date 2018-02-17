@@ -133,6 +133,11 @@ bool Window::is_always_on_top(void)
     return this->always_on_top;
 }
 
+bool Window::is_fullscreen(void)
+{
+    return this->fullscreened;
+}
+
 void Window::focus(void)
 {
     if (this->focused)
@@ -201,6 +206,12 @@ void Window::resize(short unsigned int height, short unsigned int width)
         return;
     }
 
+    if (this->fullscreened)
+    {
+        this->window();
+        this->update_borders();
+    }
+
     this->span_x = width;
     this->span_y = height;
 
@@ -226,6 +237,12 @@ void Window::move(short unsigned int x, short unsigned int y)
     if (!this->managed)
     {
         return;
+    }
+
+    if (this->fullscreened)
+    {
+        this->window();
+        this->update_borders();
     }
 
     this->x = x;
@@ -275,6 +292,49 @@ void Window::fullscreen(void)
     }
 
     this->fullscreened = true;
+
+    unsigned int data[2] = {0, 0};
+
+    this->move(data);
+
+    data[0] = custard::xcb_connection->get_screen()->width_in_pixels;
+    data[1] = custard::xcb_connection->get_screen()->height_in_pixels;
+
+    this->resize(data);
+
+    this->raise();
+}
+
+void Window::window(void)
+{
+    if (!this->fullscreened)
+    {
+        return;
+    }
+
+    this->fullscreened = false;
+
+    this->move(this->x, this->y);
+    this->resize(this->span_y, this->span_x);
+}
+
+void Window::remove_borders(void)
+{
+    xcb_get_geometry_reply_t *geometry = this->get_geometry();
+
+    if (!geometry)
+    {
+        return;
+    }
+
+    unsigned int border_width[1] = {0};
+
+    xcb_configure_window(
+        custard::xcb_connection->get_connection(),
+        this->id,
+        XCB_CONFIG_WINDOW_BORDER_WIDTH,
+        border_width
+    );
 }
 
 void Window::update_borders(void)

@@ -10,13 +10,14 @@ class Window {
         bool is_focused(void);
         bool is_mapped(void);
         bool is_always_on_top(void);
+        bool is_fullscreen(void);
 
         void focus(void);
         void set_focus_false(bool = true);
 
         void center_cursor(void);
 
-	void resize(unsigned int*);
+        void resize(unsigned int*);
         void move(unsigned int*);
 
         void resize(short unsigned int, short unsigned int);
@@ -24,6 +25,7 @@ class Window {
 
         void raise(void);
 
+        void remove_borders(void);
         void update_borders(void);
 
         void close(void);
