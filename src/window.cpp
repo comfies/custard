@@ -154,7 +154,8 @@ void Window::focus(void)
         XCB_CURRENT_TIME
     );
 
-    this->update_borders();
+    if (!this->fullscreened)
+        this->update_borders();
 }
 
 void Window::set_focus_false(bool update_borders)
