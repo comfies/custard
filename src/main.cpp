@@ -33,6 +33,7 @@
 #include "grid.cpp"
 #include "window.cpp"
 #include "workspaces.cpp"
+#include "commands.cpp"
 #include "fifo.cpp"
 #include "custard.cpp"
 

@@ -4,53 +4,6 @@ import sys
 
 FIFO_PATH = "/tmp/custard.fifo"
 
-FIFO_COMMANDS = {
-    "window": {
-        "close": {
-            "output": "close"
-        },
-        "relocate": {
-            "expects": int,
-            "output": "go to workspace {0}"
-        },
-        "move": {
-            "expects": "direction",
-            "output": "move {0}"
-        },
-        "expand": {
-            "expects": "direction",
-            "output": "grow {0}"
-        },
-        "contract": {
-            "expects": "direction",
-            "output": "shrink {0}"
-        }
-    },
-    "workspace": {
-        "focus": {
-            "expects": int,
-            "output": "focus {0}"
-        },
-        "attach": {
-            "expects": int,
-            "output": "attach {0}"
-        },
-        "detach": {
-            "expects": int,
-            "output": "detach {0}"
-        }
-    },
-    "custard": {
-        "focus": {
-            "expects": "relative_position",
-            "output": "cycle focus {0}"
-        },
-        "stop": {
-            "output": "stop"
-        }
-    }
-}
-
 def usage():
     print("thing")
     exit(1)
@@ -60,13 +13,98 @@ def write_command(command):
     fifo.write(command)
     fifo.close()
 
+def create_output(alpha, beta, gamma):
+    output = list()
+
+    if alpha not in ("custard", "window", "workspace"):
+        usage()
+
+    if alpha == "custard":
+        output.append(0)
+
+        if beta not in ("stop", "focus"):
+            usage()
+
+        if beta == "stop":
+            output += list((0, 0))
+            return output
+
+        if beta == "focus":
+            output.append(1)
+
+            if gamma not in ("forward", "next", "backward", "prev"):
+                usage()
+
+            if gamma == "forward" or gamma == "next":
+                output.append(1)
+            if gamma == "backward" or gamma == "prev":
+                output.append(0)
+
+            return output
+
+    if alpha == "window":
+        output.append(1)
+
+        if beta not in ("move", "expand", "contract", "relocate", "close"):
+            usage()
+
+        if beta == "move":
+            output.append(0)
+        if beta == "expand":
+            output.append(1)
+        if beta == "contract":
+            output.append(2)
+        if beta == "relocate":
+            if not gamma.isdigit():
+                usage()
+
+            output += list((3, gamma))
+            return output
+
+        if beta == "close":
+            output += list((4, 0))
+            return output
+
+        if gamma not in ("up", "down", "left", "right"):
+            usage()
+
+        if gamma == "up":
+            output.append(0)
+        if gamma == "down":
+            output.append(1)
+        if gamma == "left":
+            output.append(2)
+        if gamma == "right":
+            output.append(3)
+
+        return output
+
+    if alpha == "workspace":
+        output.append(2)
+
+        if beta not in ("focus", "attach", "detach"):
+            usage()
+
+        if not gamma.isdigit():
+            usage()
+
+        if beta == "attach":
+            output += list((0, gamma))
+        if beta == "detach":
+            output += list((1, gamma))
+        if beta == "focus":
+            output += list((2, gamma))
+
+        return output
+
 def parse(args):
     if len(args) > 3 or len(args) == 0:
         usage()
+
     elif len(args) == 3:
         alpha, beta, gamma = args
-    elif len(args) == 2:
 
+    elif len(args) == 2:
         alpha = "custard"
         beta, gamma = args
 
@@ -89,40 +127,12 @@ def parse(args):
 
     alpha, beta, gamma = alpha.lower(), beta.lower(), gamma.lower()
 
-    fifo_command_array = FIFO_COMMANDS.get(alpha, -1)
+    output = create_output(alpha, beta, gamma)
 
-    if type(fifo_command_array) is int:
+    if len(output) < 3:
         usage()
 
-    fifo_command = fifo_command_array.get(beta, -1)
-
-    if type(fifo_command) is int:
-        usage()
-
-    expectation = fifo_command.get('expects', None)
-
-    if type(expectation) is type(None):
-        if gamma != "":
-            usage()
-    elif type(expectation) is int:
-        if not gamma.isdigit():
-            usage()
-    elif type(expectation) is str:
-        if expectation == "direction":
-            if gamma not in ["up", "down", "left", "right"]:
-                usage()
-
-        elif expectation == "relative_position":
-            if gamma not in ["next", "prev", "previous", "forward", "backward"]:
-                usage()
-
-            if gamma == "next":
-                gamma = "forward"
-            elif gamma == "prev" or gamma == "previous":
-                gamma = "backward"
-
-    output = "{0} {1};".format(alpha,
-                              fifo_command.get("output").format(gamma))
+    output = "+{}.{}.{};".format(*output)
 
     write_command(output)
 
