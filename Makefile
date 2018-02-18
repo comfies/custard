@@ -1,7 +1,8 @@
 
 CC=g++
 
-CFLAGS = -std=c++14 -lxcb -lxcb-ewmh -lxcb-icccm -lxcb-xrm -lxcb-util -lpthread
+OPTFLAGS = -O2
+CFLAGS = $(OPTFLAGS) -std=c++14 -lxcb -lxcb-ewmh -lxcb-icccm -lxcb-xrm -lxcb-util -lpthread
 
 TARGET = custard
 PREFIX?=/usr/local
@@ -14,14 +15,9 @@ $(TARGET): src/main.cpp
 	$(CC) src/main.cpp $(CFLAGS) -o build/$(TARGET)
 
 install: $(TARGET)
-	mkdir -p $(DESTDIR)$(PREFIX)/bin
-	mkdir -p build
-	install build/$(TARGET) $(DESTDIR)$(PREFIX)/bin/$(TARGET)
-	chmod 755 $(DESTDIR)$(PREFIX)/bin/$(TARGET)
-	install contrib/custardctl.py $(DESTDIR)$(PREFIX)/bin/custardctl
-	chmod 755 $(DESTDIR)$(PREFIX)/bin/custardctl
-	install man/custard.man $(DESTDIR)$(MANPREFIX)/man1/custard.1
-	chmod 644 $(DESTDIR)$(MANPREFIX)/man1/custard.1
+	install -m 755 -D build/$(TARGET) $(DESTDIR)$(PREFIX)/bin/$(TARGET)
+	install -m 755 -D contrib/custardctl.py $(DESTDIR)$(PREFIX)/bin/custardctl
+	install -m 644 -D man/custard.man $(DESTDIR)$(MANPREFIX)/man1/custard.1
 
 clean:
 	$(RM) build/$(TARGET)
