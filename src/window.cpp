@@ -753,37 +753,21 @@ void Window::close(void)
 void Window::maximize(void)
 {
 
-    if (this->maximized)
-    {
-        return;
-    }
-
-    this->maximized = true;
-
     custard::reset_cursor();
-    this->move(0, 0);
-    this->resize(
-        Configuration::grid_rows,
-        Configuration::grid_columns
-    );
+    this->resize(Configuration::grid_rows, Configuration::grid_columns);
+    this->move(1, 1);
 
     this->raise();
     this->center_cursor();
     this->update_borders();
 }
 
-void Window::unmaximize(void)
+void Window::minimize(void)
 {
-    if (!this->maximized)
-    {
-        return;
-    }
-
-    this->maximized = false;
 
     custard::reset_cursor();
-    this->move(this->x, this->y);
-    this->resize(this->span_y, this->span_x);
+    this->resize(Grid::default_height, Grid::default_width);
+    this->move(Grid::default_x, Grid::default_y);
 
     this->raise();
     this->center_cursor();

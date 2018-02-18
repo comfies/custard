@@ -45,7 +45,7 @@ def create_output(alpha, beta, gamma):
     if alpha == "window":
         output.append(1)
 
-        if beta not in ("move", "expand", "contract", "relocate", "close"):
+        if beta not in ("move", "expand", "contract", "relocate", "close", "maximize", "minimize"):
             usage()
 
         if beta == "move":
@@ -59,6 +59,14 @@ def create_output(alpha, beta, gamma):
                 usage()
 
             output += list((3, gamma))
+            return output
+
+        if beta == "maximize":
+            output += list((5, 0))
+            return output
+
+        if beta == "minimize":
+            output += list((6, 0))
             return output
 
         if beta == "close":

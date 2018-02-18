@@ -118,6 +118,18 @@ namespace Commands {
 
                 return true;
                 break;
+
+            case 5:
+                window->maximize();
+
+                return true;
+                break;
+
+            case 6:
+                window->minimize();
+
+                return true;
+                break;
         }
 
         return false;

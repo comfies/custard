@@ -34,7 +34,7 @@ class Window {
         void unmap(void);
 
         void maximize(void);
-        void unmaximize(void);
+        void minimize(void);
 
         void fullscreen(void);
         void window(void);
@@ -69,7 +69,6 @@ class Window {
 
         bool managed = false;
 
-        bool maximized = false;
         bool fullscreened = false;
 
         void update_border_helper_1(void);
