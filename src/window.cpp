@@ -753,6 +753,11 @@ void Window::close(void)
 void Window::maximize(void)
 {
 
+    if (this->fullscreened)
+    {
+        return;
+    }
+
     custard::reset_cursor();
     this->resize(Configuration::grid_rows, Configuration::grid_columns);
     this->move(1, 1);
@@ -764,6 +769,11 @@ void Window::maximize(void)
 
 void Window::minimize(void)
 {
+
+    if (this->fullscreened)
+    {
+        return;
+    }
 
     custard::reset_cursor();
     this->resize(Grid::default_height, Grid::default_width);
