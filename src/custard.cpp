@@ -1,8 +1,9 @@
 namespace custard {
 
-    static void* start_fifo_read_loop(void*)
+    static void *start_fifo_read_loop(void*)
     {
         fifo->start_read_loop();
+        return NULL;
     }
 
     static void setup_pre_existing_windows(void)
