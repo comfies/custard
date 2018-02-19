@@ -149,11 +149,6 @@ namespace Handlers {
         xcb_configure_request_event_t *event;
         event = (xcb_configure_request_event_t *)custard::generic_event;
 
-        /*
-         * TODO: write a more general use method in `custard` namespace
-         * to get Window instances from their respective window IDs
-         */
-
         xcb_window_t window_id = event->window;
         Window *window = custard::get_window(window_id);
 
