@@ -7,6 +7,8 @@ doesntexist(){
 }
 
 checkdepends(){
+    command -v make > /dev/null || doesntexit "make"
+    #just in case?
     command -v g++ > /dev/null || doesntexist "g++"
     command -v python3 > /dev/null || doesntexist "python3"
 }
