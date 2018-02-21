@@ -25,7 +25,7 @@ installandconfigure(){
     echo -e "#!/bin/bash\n" > ~/.config/custard/start.sh
     chmod +x ~/.config/custard/start.sh
 
-    echo "echo '' > /tmp/custard.log" >> ~/.config/custard.start.sh
+    echo "echo '' > /tmp/custard.log" >> ~/.config/custard/start.sh
     echo "xrdb -merge ~/.config/custard/Xresources" >> ~/.config/custard/start.sh
     echo "sxhkd -c ~/.config/custard/sxhkdrc &" >> ~/.config/custard/start.sh
     echo "custard 2>> /tmp/custard.log" >> ~/.config/custard/start.sh
