@@ -74,6 +74,14 @@ void Workspace::map(void)
         focused_window->focus();
         focused_window->raise();
     }
+    else
+    {
+        xcb_ewmh_set_active_window(
+            custard::ewmh_connection->get_connection(),
+            0,
+            custard::xcb_connection->get_screen()->root
+        );
+    }
 
     this->mapped = true;
 }

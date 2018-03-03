@@ -140,6 +140,13 @@ bool Window::is_fullscreen(void)
 
 void Window::focus(void)
 {
+
+    xcb_ewmh_set_active_window(
+        custard::ewmh_connection->get_connection(),
+        0,
+        this->id
+    );
+
     if (this->focused)
     {
         return;
@@ -156,6 +163,7 @@ void Window::focus(void)
 
     if (!this->fullscreened)
         this->update_borders();
+
 }
 
 void Window::set_focus_false(bool update_borders)
@@ -171,6 +179,12 @@ void Window::set_focus_false(bool update_borders)
     {
         this->update_borders();
     }
+
+    xcb_ewmh_set_active_window(
+        custard::ewmh_connection->get_connection(),
+        0,
+        custard::xcb_connection->get_screen()->root
+    );
 }
 
 void Window::center_cursor(void)
