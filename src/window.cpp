@@ -141,12 +141,6 @@ bool Window::is_fullscreen(void)
 void Window::focus(void)
 {
 
-    xcb_ewmh_set_active_window(
-        custard::ewmh_connection->get_connection(),
-        0,
-        this->id
-    );
-
     if (this->focused)
     {
         return;
@@ -167,6 +161,12 @@ void Window::focus(void)
         XCB_INPUT_FOCUS_POINTER_ROOT,
         this->id,
         XCB_CURRENT_TIME
+    );
+
+    xcb_ewmh_set_active_window(
+        custard::ewmh_connection->get_connection(),
+        0,
+        this->id
     );
 
     if (!this->fullscreened)
