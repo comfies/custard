@@ -19,7 +19,7 @@
 #include <vector>
 #include <regex>
 
-#include "connection.hpp"
+#include "xcb.hpp"
 #include "ewmh.hpp"
 #include "window.hpp"
 #include "workspaces.hpp"
@@ -27,7 +27,7 @@
 #include "custard.hpp"
 
 #include "handlers.cpp"
-#include "connection.cpp"
+#include "xcb.cpp"
 #include "ewmh.cpp"
 #include "config.cpp"
 #include "grid.cpp"
