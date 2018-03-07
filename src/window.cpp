@@ -143,6 +143,12 @@ void Window::focus(void)
 
     if (this->focused)
     {
+        xcb_ewmh_set_active_window(
+            custard::ewmh_connection->get_connection(),
+            0,
+            this->id
+        ); // Ensure this window is the active window
+
         return;
     }
 
