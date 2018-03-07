@@ -79,7 +79,7 @@ void Workspace::map(void)
         xcb_ewmh_set_active_window(
             custard::ewmh_connection->get_connection(),
             0,
-            custard::xcb_connection->get_screen()->root
+            XCB_NONE
         );
     }
 

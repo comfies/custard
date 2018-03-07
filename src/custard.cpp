@@ -152,7 +152,7 @@ namespace custard {
         xcb_ewmh_set_active_window(
             ewmh_connection->get_connection(),
             0,
-            xcb_connection->get_screen()->root
+            XCB_NONE
         );
 
         xcb_connection->flush();
