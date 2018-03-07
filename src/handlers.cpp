@@ -40,7 +40,7 @@ namespace Handlers {
         xcb_enter_notify_event_t *event;
         event = (xcb_enter_notify_event_t *)custard::generic_event;
 
-/*        Window *window = NULL;
+        Window *window = NULL;
         xcb_window_t window_id = event->event;
 
         std::cerr << " [handler] Window (" << window_id << ") hovered" << std::endl;
@@ -74,7 +74,7 @@ namespace Handlers {
                     window->set_focus_false();
                 }
             }
-        }*/
+        }
         // Prefer this to custard::get_window, for `set_focus_false`
     }
 
@@ -106,6 +106,7 @@ namespace Handlers {
                 {
                     workspace->unmanage(window);
                 }
+
                 return;
             }
         }
@@ -249,7 +250,7 @@ namespace Handlers {
     {
         attach_event_handler(XCB_MAP_REQUEST, window_map_request);
         attach_event_handler(XCB_DESTROY_NOTIFY, window_destroyed);
-        attach_event_handler(XCB_ENTER_NOTIFY, window_on_hover);
+/*        attach_event_handler(XCB_ENTER_NOTIFY, window_on_hover);*/
         attach_event_handler(XCB_CLIENT_MESSAGE, window_message_received);
         attach_event_handler(XCB_CONFIGURE_REQUEST, window_configure_request);
     }
