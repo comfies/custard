@@ -248,10 +248,14 @@ namespace custard {
             index = focused_window_index + 1;
         }
 
+        Window* previous_window = get_focused_window();
         window = mapped.at(index);
 
         reset_cursor();
-        get_focused_window()->set_focus_false();
+        if (previous_window)
+        {
+            previous_window->set_focus_false();
+        }
         window->focus();
         window->raise();
         window->center_cursor();
@@ -295,10 +299,14 @@ namespace custard {
             index = focused_window_index - 1;
         }
 
+        Window* previous_window = get_focused_window();
         window = mapped.at(index);
 
         reset_cursor();
-        get_focused_window()->set_focus_false();
+        if (previous_window)
+        {
+            previous_window->set_focus_false();
+        }
         window->focus();
         window->raise();
         window->center_cursor();
