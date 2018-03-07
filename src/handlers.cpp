@@ -107,6 +107,8 @@ namespace Handlers {
                     workspace->unmanage(window);
                 }
 
+                free(window);
+
                 return;
             }
         }
@@ -123,6 +125,7 @@ namespace Handlers {
         {
             return;
         }
+
 
         if (event->type == custard::ewmh_connection->get_connection()->_NET_WM_STATE)
         {
