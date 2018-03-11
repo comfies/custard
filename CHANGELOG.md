@@ -1,3 +1,13 @@
+# 1.2
+
+## Fixes
+
+## Additions
+
+## Changes
+
+1. Removed sloppy focus in favor of window cycling
+
 # 1.1
 
 ## Fixes
