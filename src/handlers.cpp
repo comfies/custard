@@ -89,20 +89,6 @@ namespace Handlers {
 
         Window *window = NULL;
 
-        Window *next_focus_target = NULL;
-        for (unsigned int index = 0; index < custard::windows.size(); index++)
-        {
-            window = custard::windows.at(index);
-            if (!window->is_mapped() || !window->is_managed() || window->get_id() == window_id)
-            {
-                continue;
-            }
-
-            next_focus_target = window;
-        }
-
-        bool mapped = false;
-
         window = NULL;
         for (unsigned int index = 0; index < custard::windows.size(); index++)
         {
@@ -112,11 +98,6 @@ namespace Handlers {
                 if (window->is_focused())
                 {
                     window->set_focus_false(false);
-                }
-
-                if (window->is_mapped())
-                {
-                    mapped = true;
                 }
 
                 custard::windows.erase(custard::windows.begin() + index);
@@ -129,15 +110,6 @@ namespace Handlers {
                 }
 
                 free(window);
-
-                if (mapped && next_focus_target)
-                {
-                    custard::reset_cursor();
-                    next_focus_target->raise();
-                    next_focus_target->focus();
-                    next_focus_target->center_cursor();
-                }
-
                 return;
             }
         }

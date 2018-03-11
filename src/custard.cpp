@@ -237,7 +237,7 @@ namespace custard {
             mapped.push_back(window);
         }
 
-        if (mapped.size() <= 1)
+        if (mapped.size() == 0)
         {
             return;
         }
@@ -284,7 +284,7 @@ namespace custard {
             mapped.push_back(window);
         }
 
-        if (mapped.size() <= 1)
+        if (mapped.size() == 0)
         {
             return;
         }

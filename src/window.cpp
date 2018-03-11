@@ -175,8 +175,7 @@ void Window::focus(void)
         this->id
     );
 
-    if (!this->fullscreened)
-        this->update_borders();
+    this->update_borders();
 
 }
 
@@ -369,7 +368,7 @@ void Window::remove_borders(void)
 void Window::update_borders(void)
 {
 
-    if (!this->managed)
+    if (!this->managed || this->fullscreened)
     {
         return;
     }
