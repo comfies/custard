@@ -82,6 +82,9 @@ bool EwmhConnection::establish(void)
         this->connection->_NET_WM_WINDOW_TYPE,
         this->connection->_NET_WM_WINDOW_TYPE_DOCK,
         this->connection->_NET_WM_WINDOW_TYPE_TOOLBAR,
+        this->connection->_NET_WM_WINDOW_TYPE_MENU,
+        this->connection->_NET_WM_WINDOW_TYPE_DROPDOWN_MENU,
+        this->connection->_NET_WM_WINDOW_TYPE_POPUP_MENU,
         this->connection->_NET_WM_WINDOW_TYPE_DESKTOP,
         this->connection->_NET_WM_WINDOW_TYPE_SPLASH,
         this->connection->_NET_WM_WINDOW_TYPE_DND,
@@ -92,7 +95,7 @@ bool EwmhConnection::establish(void)
     xcb_ewmh_set_supported(
         this->connection,
         0,  // Screen number
-        12, // supported atoms
+        15, // supported atoms
         supported_atoms
     );
 

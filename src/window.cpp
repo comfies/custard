@@ -21,6 +21,9 @@ Window::Window(xcb_window_t id)
             atom = window_type.atoms[index];
 
             if (atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_TOOLBAR ||
+                atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_MENU ||
+                atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_DROPDOWN_MENU ||
+                atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_POPUP_MENU ||
                 atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_DND ||
                 atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_DOCK ||
                 atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_DESKTOP ||
