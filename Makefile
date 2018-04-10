@@ -1,8 +1,8 @@
 
 CC=g++
 
-OPTFLAGS = -O2
-CFLAGS = $(OPTFLAGS) -std=c++14 -lxcb -lxcb-ewmh -lxcb-icccm -lxcb-xrm -lxcb-util -lpthread
+OPTFLAGS = -O3
+CFLAGS = $(OPTFLAGS) -std=c++14 -lxcb -lxcb-ewmh -lxcb-icccm -lxcb-xrm -lxcb-util -lpthread -Wno-unused-result
 
 TARGET = custard
 PREFIX?=/usr/local
