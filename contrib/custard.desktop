@@ -1,0 +1,9 @@
+ [Desktop Entry]
+ Name=custard
+ Comment=Gridded window manager
+ Exec=custard
+ TryExec=custard
+ Type=Application
+ X-LightDM-DesktopName=custard
+ DesktopNames=custard
+ Keywords=stacking;floating;windowmanager;window;manager
