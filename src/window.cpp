@@ -51,7 +51,10 @@ Window::Window(xcb_window_t id)
 
                     this->move(position);
                 }
-                else if (atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_DIALOG)
+                else if (atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_MENU ||
+                         atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_DROPDOWN_MENU ||
+                         atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_POPUP_MENU ||
+                         atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_DIALOG)
                 {
                     this->preventfocus = true;
                 }
