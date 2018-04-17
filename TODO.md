@@ -6,6 +6,9 @@
 4. ~~Finish full-screen support~~
 5. Update the man page
 6. ~~Rewrite for custardctl, it looks pretty bad~~.
-7. ~~Add rounded borders (curved windows/shaped X windows)?~~ Delayed/cancelled
-8. Multimonitor support
-9. ~~Add maximize and minimize~~
+7. ~~Add maximize and minimize~~
+
+# Delayed
+
+1. Multimonitor support
+2. Add rounded borders (curved windows/shaped X windows)
