@@ -63,6 +63,7 @@ class Window {
 
         bool mapped = false;
         bool focused = false;
+        bool preventfocus = false;
         bool always_on_top = false;
 
         xcb_window_t id;

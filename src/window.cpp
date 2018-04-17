@@ -17,18 +17,24 @@ Window::Window(xcb_window_t id)
 
         for (unsigned int index = 0; index < window_type.atoms_len; index++)
         {
-
             atom = window_type.atoms[index];
 
-            if (atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_TOOLBAR ||
+            bool matched_atom = (
+                atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_TOOLBAR ||
+
                 atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_MENU ||
                 atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_DROPDOWN_MENU ||
                 atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_POPUP_MENU ||
+                atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_DIALOG ||
+
                 atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_DND ||
                 atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_DOCK ||
                 atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_DESKTOP ||
                 atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_SPLASH ||
-                atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_NOTIFICATION)
+                atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_NOTIFICATION
+            );
+
+            if (matched_atom)
             {
                 xcb_ewmh_get_atoms_reply_wipe(&window_type);
 
@@ -36,19 +42,18 @@ Window::Window(xcb_window_t id)
                 {
                     xcb_get_geometry_reply_t *geometry = this->get_geometry();
 
-                    unsigned int width = geometry->width;
-                    unsigned int height = geometry->height;
-
-                    unsigned int x = (custard::xcb_connection->get_screen()->width_in_pixels - width) / 2;
-                    unsigned int y = (custard::xcb_connection->get_screen()->height_in_pixels - height) / 2;
-
-                    unsigned int position[2] = {x, y};
+                    unsigned int position[2] = {
+                        (custard::xcb_connection->get_screen()->width_in_pixels - \
+                            (unsigned int)geometry->width) / 2,
+                        (custard::xcb_connection->get_screen()->height_in_pixels - \
+                            (unsigned int)geometry->height) / 2
+                    };
 
                     this->move(position);
                 }
-                else if (atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_NOTIFICATION)
+                else if (atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_DIALOG)
                 {
-                    this->always_on_top = true;
+                    this->preventfocus = true;
                 }
 
                 return;
@@ -57,6 +62,27 @@ Window::Window(xcb_window_t id)
         }
 
     }
+
+    xcb_query_tree_reply_t *tree = xcb_query_tree_reply(
+        custard::xcb_connection->get_connection(),
+        xcb_query_tree(
+            custard::xcb_connection->get_connection(),
+            this->id
+        ),
+        NULL
+    );
+
+    if (tree)
+    {
+        if (this->id != tree->root && tree->parent != tree->root)
+        {
+            this->preventfocus = true;
+            free(tree);
+            return;
+        }
+    }
+
+    free(tree);
 
     xcb_get_window_attributes_reply_t *attributes = this->get_attributes();
 
@@ -144,6 +170,11 @@ bool Window::is_fullscreen(void)
 void Window::focus(void)
 {
 
+    if (this->preventfocus)
+    {
+        return;
+    }
+
     if (this->focused)
     {
         xcb_ewmh_set_active_window(
@@ -170,7 +201,7 @@ void Window::focus(void)
         XCB_INPUT_FOCUS_POINTER_ROOT,
         this->id,
         XCB_CURRENT_TIME
-    );
+    ); /* The input focus is what causes the bug with chrome right click dailogs*/
 
     xcb_ewmh_set_active_window(
         custard::ewmh_connection->get_connection(),
@@ -184,6 +215,11 @@ void Window::focus(void)
 
 void Window::set_focus_false(bool update_borders)
 {
+    if (this->preventfocus)
+    {
+        return;
+    }
+
     if (!this->focused)
     {
         return;
