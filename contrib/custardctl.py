@@ -5,7 +5,32 @@ import sys
 FIFO_PATH = "/tmp/custard.fifo"
 
 def usage():
-    print("thing")
+    print("""
+    custard v1.3
+
+    custardctl [target] [-action] [argument]
+
+    Possible targets and their respective actions
+        custard
+            -help
+            -stop
+            -focus [next|previous|forward|backward]
+        window
+            -move [up|down|left|right]
+            -expand [up|down|left|right]
+            -contract [up|down|left|right]
+            -maximize
+            -minimize
+            -close
+        workspace
+            -focus [n]
+            -attach [n]
+            -detach [n]
+
+    For more information, see the `custard' man page, or navigate to the GitHub page.
+
+    https://github.com/Sweets/custard
+    """)
     exit(1)
 
 def write_command(command):
@@ -22,8 +47,11 @@ def create_output(alpha, beta, gamma):
     if alpha == "custard":
         output.append(0)
 
-        if beta not in ("stop", "focus"):
+        if beta not in ("stop", "focus", "help"):
             usage()
+
+        if beta == "help":
+            usage() # Technically didn't need to test for `help` explicitly
 
         if beta == "stop":
             output += list((0, 0))
