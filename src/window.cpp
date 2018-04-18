@@ -199,12 +199,28 @@ void Window::focus(void)
 
     this->focused = true;
 
+    unsigned int data[2] = {
+        XCB_ICCCM_WM_STATE_NORMAL,
+        XCB_NONE
+    };
+
+    xcb_change_property(
+        custard::xcb_connection->get_connection(),
+        XCB_PROP_MODE_REPLACE,
+        this->id,
+        custard::ewmh_connection->get_connection()->_NET_WM_STATE,
+        custard::ewmh_connection->get_connection()->_NET_WM_STATE,
+        32,
+        2,
+        data
+    );
+
     xcb_set_input_focus(
         custard::xcb_connection->get_connection(),
         XCB_INPUT_FOCUS_POINTER_ROOT,
         this->id,
         XCB_CURRENT_TIME
-    ); /* The input focus is what causes the bug with chrome right click dailogs*/
+    );
 
     xcb_ewmh_set_active_window(
         custard::ewmh_connection->get_connection(),
