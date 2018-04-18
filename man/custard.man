@@ -1,6 +1,14 @@
-.TH CUSTARD 1 "2018-01-21" "1.1" "Custard WM"
+.TH CUSTARD 1 "2018-04-17" "1.2" "Custard WM"
 .SH NAME
-custard \- A window manager
+custard \- A stacking window manager that sizes and moves windows based on a virtual grid
+
+.SH SYNOPSIS
+
+.B custard
+
+.B custarctl
+[target] [-action] [argument]
+
 .SH DESCRIPTION
 .B custard
 is a floating window manager written over the XCB library based on 2bwm, howm, swm, and subtle. Window size and location are relative to a grid on the screen. It is configured via the X resource manager.
@@ -74,83 +82,136 @@ In ~/.Xresources
 
 .SH USAGE
 
-custard is controlled by sending commands via the fifo. You can use a hot-key daemon like
+custard is controlled via a helper program called custardctl. You can use a hot-key daemon like
 .I sxhkd
-to send said commands.
+to bind keys to commands.
 
-custard's fifo path is always
-.B /tmp/custard.fifo
+The basic usage for custardctl is
+.B custardctl
+[target] [-action] [argument]
 
-.I reload config
-\- Reloads XRM (.Xresources) and repositions windows accordingly.
+Each target has specific actions that they can do, and the argument is supplied for the action if required.
 
-.I move window up
-\- Moves the focused window up by one grid unit.
+All possible targets are listed below. If no target is specified, it is assumed that the
+.B custard
+target was wanted.
 
-.I move window down
-\- Moves the focused window down by one grid unit.
+.B custard
 
-.I move window left
-\- Moves the focused window left by one grid unit.
+.I
+    \-help
+        
+        Shows the help dialogue.
 
-.I move window right
-\- Moves the focused window right by one grid unit.
+.I
+    \-stop
 
-.I grow window up
-\- Makes the focused window grow by one grid unit upwards.
+        Stops custard.
 
-.I grow window down
-\- Makes the focused window grow by one grid unit downwards.
+.I
+    \-focus
+[
+.B next
+|
+.B previous
+|
+.B forward
+|
+.B backward
+]
 
-.I grow window left
-\- Makes the focused window grow by one grid unit to the left.
+        Cycles focus to the either the next or previous argument in the window stack.
 
-.I grow window right
-\- Makes the focused window grow by one grid unit to the right.
+.B window
 
-.I shrink window up
-\- Makes the focused window shrink one grid unit upwards.
+.I
+    \-move
+[
+.B up
+|
+.B down
+|
+.B left
+|
+.B right
+]
 
-.I shrink window down
-\- Makes the focused window shrink one grid unit downwards.
+        Moves the window in the specified direction.
 
-.I shrink window left
-\- Makes the focused window shrink one grid unit to the left.
+.I
+    \-expand
+[
+.B up
+|
+.B down
+|
+.B left
+|
+.B right
+]
 
-.I shrink window right
-\- Makes the focused window shrink one grid unit to the right.
+        Expands the window in the specified direction.
 
-.I close window
-\- Closes the focused window.
+.I
+    \-contract
+[
+.B up
+|
+.B down
+|
+.B left
+|
+.B right
+]
 
-.I stop wm
-\- Stops custard.
+        Contracts the window in the specified direction.
 
-.I cycle focus forward
-\- Focuses on the next visible window.
+.I
+    \-maximize
 
-.I cycle focus backward
-\- Focuses on the last visible window.
+        Resizes the focused window to the maximum possible size on the grid.
 
-.I go to workspace N
-\- Goes to the Nth workspace, unmapping every other workspace.
+.I
+    \-minimize
 
-.I send to workspace N
-\- Sends the focused window to the Nth workspace.
+        Resizes the focused window to the minimum possible size on the grid.
 
-.I attach workspace N
-\- Maps the Nth workspace. Read WORKSPACE ATTACHING for information on attaching a workspace.
+.I
+    \-close
 
-.I detach workspace N
-\- Unmaps the Nth workspace. Read WORKSPACE ATTACHING for information on detaching a workspace.
+        Closes the focused window.
 
-.SH USAGE EXAMPLE
+.B workspace
 
-To move a window up by a single grid unit, execute the following command.
+.I
+    \-focus [n]
 
-    echo "move window up" > /tmp/custard.fifo
+        Focuses on the specified workspace.
 
-Commands that can be sent to the FIFO and that will be parsed by custard are specified in USAGE.
+.I
+
+    \-attach [n]
+
+        Attaches the specified workspace. See
+.B WORKSPACE ATTACHING
+
+.I
+
+    \-detach [n]
+
+        Detaches the specified workspace. See
+.B WORKSPACE ATTACHING
+
+.SH EXAMPLES
+
+.B custardctl -stop
+    Stops custard.
+
+.B custardctl window -move down
+    Moves the focused window down by one grid unit.
+
+.B custardctl workspace -focus 3
+    Focuses on the third workspace.
 
 .SH WORKSPACE ATTACHING
 
