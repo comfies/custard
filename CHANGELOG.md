@@ -2,11 +2,21 @@
 
 ## Fixes
 
+1. Segfault fixed when cycling through windows
+2. Fixed unused result warnings during compilation
+3. Fixed right click/dialog window bug
+4. Transient windows are no longer focused on, nor are any windows of the menu types
+
 ## Additions
+
+1. Support for `_NET_WM_WINDOW_TYPE_MENU`, `_NET_WM_WINDOW_TYPE_DROPDOWN_MENU`, `_NET_WM_WINDOW_TYPE_POPUP_MENU`, and `_NET_WM_WINDOW_TYPE_DIALOG`
+2. Added `custard.desktop` file for display managers
 
 ## Changes
 
 1. Removed sloppy focus in favor of window cycling
+2. EWMH active window property is now set when focusing on a winow
+3. `_NET_WM_STATE` is now set when focusing on a window
 
 # 1.1
 
