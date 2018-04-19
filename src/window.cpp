@@ -25,7 +25,6 @@ Window::Window(xcb_window_t id)
                 atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_MENU ||
                 atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_DROPDOWN_MENU ||
                 atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_POPUP_MENU ||
-                atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_DIALOG ||
 
                 atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_DND ||
                 atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_DOCK ||
@@ -53,8 +52,7 @@ Window::Window(xcb_window_t id)
                 }
                 else if (atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_MENU ||
                          atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_DROPDOWN_MENU ||
-                         atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_POPUP_MENU ||
-                         atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_DIALOG)
+                         atom == custard::ewmh_connection->get_connection()->_NET_WM_WINDOW_TYPE_POPUP_MENU)
                 {
                     this->preventfocus = true;
                 }
@@ -66,7 +64,7 @@ Window::Window(xcb_window_t id)
 
     }
 
-    xcb_query_tree_reply_t *tree = xcb_query_tree_reply(
+/*    xcb_query_tree_reply_t *tree = xcb_query_tree_reply(
         custard::xcb_connection->get_connection(),
         xcb_query_tree(
             custard::xcb_connection->get_connection(),
@@ -85,7 +83,7 @@ Window::Window(xcb_window_t id)
         }
     }
 
-    free(tree);
+    free(tree);*/
 
     xcb_get_window_attributes_reply_t *attributes = this->get_attributes();
 
