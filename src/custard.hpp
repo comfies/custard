@@ -29,7 +29,7 @@ namespace custard {
     static void cycle_to_next(void);
     static void cycle_to_prev(void);
 
-    static void focus_window_at(unsigned int, unsigned int);
+    static Window* get_window_at(unsigned int, unsigned int);
 
     static void focus_north(void);
     static void focus_south(void);

@@ -317,9 +317,10 @@ namespace custard {
 
      */
 
-    static void focus_window_at(unsigned int x, unsigned int y)
+    static Window* get_window_at(unsigned int x, unsigned int y)
     {
         Window *window = NULL;
+        std::cerr << " [custard] Attempt to focus window at (" << x << "," << y << ")" << std::endl;
         for (unsigned int index = 0; index < windows.size(); index++)
         {
             window = windows.at(index);
@@ -329,14 +330,19 @@ namespace custard {
                 continue;
             }
 
-            if (window->get_x() == x && window->get_y() == y)
+            if (window == get_focused_window())
             {
-                window->focus();
-                window->raise();
-                window->center_cursor();
-                return;
+                continue;
+            }
+
+            if (window->get_x() == x && window->get_y() == y ||
+                x <= window->get_x() + window->get_span_x() && y <= window->get_y() + window->get_span_y())
+            {
+                return window;
             }
         }
+
+        return NULL;
     }
 
     static void focus_north(void)
@@ -351,7 +357,28 @@ namespace custard {
         unsigned int x = window->get_x();
         unsigned int y = window->get_y() - 1;
 
-        focus_window_at(x, y);
+        unsigned int span_x = window->get_span_x();
+        unsigned int span_y = window->get_span_y();
+
+        Window *next_window = get_window_at(x, y);
+
+        if (!next_window)
+        {
+            next_window = get_window_at(x + span_x, y + span_y);
+            if (!next_window)
+            {
+                return;
+            }
+        }
+
+        if (next_window->get_y() == (y + 1))
+        {
+            return;
+        }
+
+        next_window->focus();
+        next_window->raise();
+        next_window->center_cursor();
     }
 
     static void focus_south(void)
@@ -366,7 +393,28 @@ namespace custard {
         unsigned int x = window->get_x();
         unsigned int y = window->get_y() + 1;
 
-        focus_window_at(x, y);
+        unsigned int span_x = window->get_span_x();
+        unsigned int span_y = window->get_span_y();
+
+        Window *next_window = get_window_at(x, y);
+
+        if (!next_window)
+        {
+            next_window = get_window_at(x + span_x, y + span_y);
+            if (!next_window)
+            {
+                return;
+            }
+        }
+
+        if (next_window->get_y() == (y - 1))
+        {
+            return;
+        }
+
+        next_window->focus();
+        next_window->raise();
+        next_window->center_cursor();
     }
 
     static void focus_west(void)
@@ -381,7 +429,28 @@ namespace custard {
         unsigned int x = window->get_x() - 1;
         unsigned int y = window->get_y();
 
-        focus_window_at(x, y);
+        unsigned int span_x = window->get_span_x();
+        unsigned int span_y = window->get_span_y();
+
+        Window *next_window = get_window_at(x, y);
+
+        if (!next_window)
+        {
+            next_window = get_window_at(x + span_x, y + span_y);
+            if (!next_window)
+            {
+                return;
+            }
+        }
+
+        if (next_window->get_x() == (x + 1))
+        {
+            return;
+        }
+
+        next_window->focus();
+        next_window->raise();
+        next_window->center_cursor();
     }
 
     static void focus_east(void)
@@ -396,7 +465,28 @@ namespace custard {
         unsigned int x = window->get_x() + 1;
         unsigned int y = window->get_y();
 
-        focus_window_at(x, y);
+        unsigned int span_x = window->get_span_x();
+        unsigned int span_y = window->get_span_y();
+
+        Window *next_window = get_window_at(x, y);
+
+        if (!next_window)
+        {
+            next_window = get_window_at(x + span_x, y + span_y);
+            if (!next_window)
+            {
+                return;
+            }
+        }
+
+        if (next_window->get_x() == (x - 1))
+        {
+            return;
+        }
+
+        next_window->focus();
+        next_window->raise();
+        next_window->center_cursor();
     }
 
     /*
