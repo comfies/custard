@@ -23,6 +23,26 @@ namespace Commands {
                 return true;
 
                 break;
+            case 2:
+                if (argument == 0)
+                {
+                    custard::focus_north();
+                }
+                else if (argument == 1)
+                {
+                    custard::focus_south();
+                }
+                else if (argument == 2)
+                {
+                    custard::focus_west();
+                }
+                else if (argument == 3)
+                {
+                    custard::focus_east();
+                }
+
+                return true;
+                break;
         }
 
         return false;
