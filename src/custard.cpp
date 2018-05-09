@@ -317,34 +317,6 @@ namespace custard {
 
      */
 
-    static Window* get_window_at(unsigned int x, unsigned int y)
-    {
-        Window *window = NULL;
-        std::cerr << " [custard] Attempt to focus window at (" << x << "," << y << ")" << std::endl;
-        for (unsigned int index = 0; index < windows.size(); index++)
-        {
-            window = windows.at(index);
-
-            if (!window->is_mapped() || !window->is_managed())
-            {
-                continue;
-            }
-
-            if (window == get_focused_window())
-            {
-                continue;
-            }
-
-            if (window->get_x() == x && window->get_y() == y ||
-                x <= window->get_x() + window->get_span_x() && y <= window->get_y() + window->get_span_y())
-            {
-                return window;
-            }
-        }
-
-        return NULL;
-    }
-
     static void focus_north(void)
     {
         Window *window = get_focused_window();
@@ -354,31 +326,24 @@ namespace custard {
             return;
         }
 
-        unsigned int x = window->get_x();
-        unsigned int y = window->get_y() - 1;
+        unsigned int y = window->get_y();
 
-        unsigned int span_x = window->get_span_x();
-        unsigned int span_y = window->get_span_y();
-
-        Window *next_window = get_window_at(x, y);
-
-        if (!next_window)
+        for (unsigned int index = 0; index < windows.size(); index++)
         {
-            next_window = get_window_at(x + span_x, y + span_y);
-            if (!next_window)
+            window = windows.at(index);
+            if (!window->is_mapped() || !window->is_managed())
             {
+                continue;
+            }
+
+            if (window->get_y() > y)
+            {
+                window->focus();
+                window->raise();
+                window->center_cursor();
                 return;
             }
         }
-
-        if (next_window->get_y() == (y + 1))
-        {
-            return;
-        }
-
-        next_window->focus();
-        next_window->raise();
-        next_window->center_cursor();
     }
 
     static void focus_south(void)
@@ -390,31 +355,24 @@ namespace custard {
             return;
         }
 
-        unsigned int x = window->get_x();
-        unsigned int y = window->get_y() + 1;
+        unsigned int y = window->get_y();
 
-        unsigned int span_x = window->get_span_x();
-        unsigned int span_y = window->get_span_y();
-
-        Window *next_window = get_window_at(x, y);
-
-        if (!next_window)
+        for (unsigned int index = 0; index < windows.size(); index++)
         {
-            next_window = get_window_at(x + span_x, y + span_y);
-            if (!next_window)
+            window = windows.at(index);
+            if (!window->is_mapped() || !window->is_managed())
             {
+                continue;
+            }
+
+            if (window->get_y() < y)
+            {
+                window->focus();
+                window->raise();
+                window->center_cursor();
                 return;
             }
         }
-
-        if (next_window->get_y() == (y - 1))
-        {
-            return;
-        }
-
-        next_window->focus();
-        next_window->raise();
-        next_window->center_cursor();
     }
 
     static void focus_west(void)
@@ -426,31 +384,24 @@ namespace custard {
             return;
         }
 
-        unsigned int x = window->get_x() - 1;
-        unsigned int y = window->get_y();
+        unsigned int x = window->get_x();
 
-        unsigned int span_x = window->get_span_x();
-        unsigned int span_y = window->get_span_y();
-
-        Window *next_window = get_window_at(x, y);
-
-        if (!next_window)
+        for (unsigned int index = 0; index < windows.size(); index++)
         {
-            next_window = get_window_at(x + span_x, y + span_y);
-            if (!next_window)
+            window = windows.at(index);
+            if (!window->is_mapped() || !window->is_managed())
             {
+                continue;
+            }
+
+            if (window->get_x() > x)
+            {
+                window->focus();
+                window->raise();
+                window->center_cursor();
                 return;
             }
         }
-
-        if (next_window->get_x() == (x + 1))
-        {
-            return;
-        }
-
-        next_window->focus();
-        next_window->raise();
-        next_window->center_cursor();
     }
 
     static void focus_east(void)
@@ -462,31 +413,24 @@ namespace custard {
             return;
         }
 
-        unsigned int x = window->get_x() + 1;
-        unsigned int y = window->get_y();
+        unsigned int x = window->get_x();
 
-        unsigned int span_x = window->get_span_x();
-        unsigned int span_y = window->get_span_y();
-
-        Window *next_window = get_window_at(x, y);
-
-        if (!next_window)
+        for (unsigned int index = 0; index < windows.size(); index++)
         {
-            next_window = get_window_at(x + span_x, y + span_y);
-            if (!next_window)
+            window = windows.at(index);
+            if (!window->is_mapped() || !window->is_managed())
             {
+                continue;
+            }
+
+            if (window->get_x() < x)
+            {
+                window->focus();
+                window->raise();
+                window->center_cursor();
                 return;
             }
         }
-
-        if (next_window->get_x() == (x - 1))
-        {
-            return;
-        }
-
-        next_window->focus();
-        next_window->raise();
-        next_window->center_cursor();
     }
 
     /*
