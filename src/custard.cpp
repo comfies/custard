@@ -313,6 +313,27 @@ namespace custard {
     }
 
     /*
+        Focus methods
+
+     */
+
+    static void focus_north(void)
+    {
+    }
+
+    static void focus_south(void)
+    {
+    }
+
+    static void focus_west(void)
+    {
+    }
+
+    static void focus_east(void)
+    {
+    }
+
+    /*
         Workspace methods
      */
 

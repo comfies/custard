@@ -29,6 +29,11 @@ namespace custard {
     static void cycle_to_next(void);
     static void cycle_to_prev(void);
 
+    static void focus_north(void);
+    static void focus_south(void);
+    static void focus_west(void);
+    static void focus_east(void);
+
     static Workspace* get_workspace(Window*);
     static Workspace* get_workspace(unsigned int);
     static void go_to_workspace(unsigned int);
