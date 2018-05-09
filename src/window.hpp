@@ -12,6 +12,11 @@ class Window {
         bool is_always_on_top(void);
         bool is_fullscreen(void);
 
+        unsigned int get_x(void);
+        unsigned int get_y(void);
+        unsigned int get_span_x(void);
+        unsigned int get_span_y(void);
+
         void focus(void);
         void set_focus_false(bool = true);
 

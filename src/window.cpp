@@ -168,6 +168,26 @@ bool Window::is_fullscreen(void)
     return this->fullscreened;
 }
 
+unsigned int Window::get_x(void)
+{
+    return this->x;
+}
+
+unsigned int Window::get_y(void)
+{
+    return this->y;
+}
+
+unsigned int Window::get_span_x(void)
+{
+    return this->span_x;
+}
+
+unsigned int Window::get_span_y(void)
+{
+    return this->span_y;
+}
+
 void Window::focus(void)
 {
 
