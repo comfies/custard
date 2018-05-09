@@ -43,22 +43,22 @@ namespace Commands {
                 if (argument == 0)
                 {
                     // up
-                    window->move_up();
+                    window->move_north();
                 }
                 else if (argument == 1)
                 {
                     // down
-                    window->move_down();
+                    window->move_south();
                 }
                 else if (argument == 2)
                 {
                     // left
-                    window->move_left();
+                    window->move_west();
                 }
                 else if (argument == 3)
                 {
                     // right
-                    window->move_right();
+                    window->move_east();
                 }
 
                 return true;
@@ -67,19 +67,19 @@ namespace Commands {
             case 1:
                 if (argument == 0)
                 {
-                    window->grow_up();
+                    window->grow_north();
                 }
                 else if (argument == 1)
                 {
-                    window->grow_down();
+                    window->grow_south();
                 }
                 else if (argument == 2)
                 {
-                    window->grow_left();
+                    window->grow_west();
                 }
                 else if (argument == 3)
                 {
-                    window->grow_right();
+                    window->grow_east();
                 }
 
                 return true;
@@ -88,19 +88,19 @@ namespace Commands {
             case 2:
                 if (argument == 0)
                 {
-                    window->shrink_up();
+                    window->shrink_north();
                 }
                 else if (argument == 1)
                 {
-                    window->shrink_down();
+                    window->shrink_south();
                 }
                 else if (argument == 2)
                 {
-                    window->shrink_left();
+                    window->shrink_west();
                 }
                 else if (argument == 3)
                 {
-                    window->shrink_right();
+                    window->shrink_east();
                 }
 
                 return true;

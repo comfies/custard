@@ -24,6 +24,7 @@ class Window {
         void move(short unsigned int, short unsigned int);
 
         void raise(void);
+        void lower(void);
 
         void remove_borders(void);
         void update_borders(void);
@@ -39,20 +40,20 @@ class Window {
         void fullscreen(void);
         void window(void);
 
-        bool move_up(void);
-        bool move_down(void);
-        bool move_left(void);
-        bool move_right(void);
+        bool move_north(void);
+        bool move_south(void);
+        bool move_west(void);
+        bool move_east(void);
 
-        bool grow_up(void);
-        bool grow_down(void);
-        bool grow_left(void);
-        bool grow_right(void);
+        bool grow_north(void);
+        bool grow_south(void);
+        bool grow_west(void);
+        bool grow_east(void);
 
-        bool shrink_up(void);
-        bool shrink_down(void);
-        bool shrink_left(void);
-        bool shrink_right(void);
+        bool shrink_north(void);
+        bool shrink_south(void);
+        bool shrink_west(void);
+        bool shrink_east(void);
 
         Window(xcb_window_t);
     private:

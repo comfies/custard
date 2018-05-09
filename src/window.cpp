@@ -880,7 +880,7 @@ void Window::minimize(void)
 
 /* Misc */
 
-bool Window::move_up(void)
+bool Window::move_north(void)
 {
     if (this->y == 1)
     {
@@ -896,7 +896,7 @@ bool Window::move_up(void)
     return true;
 }
 
-bool Window::move_down(void)
+bool Window::move_south(void)
 {
     if (this->y == Configuration::grid_rows || this->y + this->span_y > Configuration::grid_rows)
     {
@@ -912,7 +912,7 @@ bool Window::move_down(void)
     return true;
 }
 
-bool Window::move_left(void)
+bool Window::move_west(void)
 {
     if (this->x == 1)
     {
@@ -928,7 +928,7 @@ bool Window::move_left(void)
     return true;
 }
 
-bool Window::move_right(void)
+bool Window::move_east(void)
 {
     if (this->x == Configuration::grid_columns || this->x + this->span_x > Configuration::grid_columns)
     {
@@ -944,7 +944,7 @@ bool Window::move_right(void)
     return true;
 }
 
-bool Window::grow_up(void)
+bool Window::grow_north(void)
 {
 
     if ((this->y - 1) == 0)
@@ -966,7 +966,7 @@ bool Window::grow_up(void)
     return true;
 }
 
-bool Window::grow_down(void)
+bool Window::grow_south(void)
 {
 
     if (this->y + (this->span_y + 1) > (Configuration::grid_rows + 1))
@@ -986,7 +986,7 @@ bool Window::grow_down(void)
 
 }
 
-bool Window::grow_left(void)
+bool Window::grow_west(void)
 {
 
     if ((this->x - 1) == 0)
@@ -1009,7 +1009,7 @@ bool Window::grow_left(void)
 
 }
 
-bool Window::grow_right(void)
+bool Window::grow_east(void)
 {
 
     if (this->x + (this->span_x + 1) > (Configuration::grid_columns + 1))
@@ -1028,7 +1028,7 @@ bool Window::grow_right(void)
     return true;
 }
 
-bool Window::shrink_up(void)
+bool Window::shrink_north(void)
 {
 
     if ((this->span_y - 1) == 0)
@@ -1048,7 +1048,7 @@ bool Window::shrink_up(void)
 
 }
 
-bool Window::shrink_down(void)
+bool Window::shrink_south(void)
 {
 
     if ((this->span_y - 1) == 0)
@@ -1071,7 +1071,7 @@ bool Window::shrink_down(void)
 
 }
 
-bool Window::shrink_left(void)
+bool Window::shrink_west(void)
 {
 
     if ((this->span_x - 1) == 0)
@@ -1090,7 +1090,7 @@ bool Window::shrink_left(void)
     return true;
 }
 
-bool Window::shrink_right(void)
+bool Window::shrink_east(void)
 {
     if ((this->span_x - 1) == 0)
     {
