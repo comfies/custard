@@ -317,20 +317,86 @@ namespace custard {
 
      */
 
+    static void focus_window_at(unsigned int x, unsigned int y)
+    {
+        Window *window = NULL;
+        for (unsigned int index = 0; index < windows.size(); index++)
+        {
+            window = windows.at(index);
+
+            if (!window->is_mapped() || !window->is_managed())
+            {
+                continue;
+            }
+
+            if (window->get_x() == x && window->get_y() == y)
+            {
+                window->focus();
+                window->raise();
+                window->center_cursor();
+                return;
+            }
+        }
+    }
+
     static void focus_north(void)
     {
+        Window *window = get_focused_window();
+
+        if (!window)
+        {
+            return;
+        }
+
+        unsigned int x = window->get_x();
+        unsigned int y = window->get_y() - 1;
+
+        focus_window_at(x, y);
     }
 
     static void focus_south(void)
     {
+        Window *window = get_focused_window();
+
+        if (!window)
+        {
+            return;
+        }
+
+        unsigned int x = window->get_x();
+        unsigned int y = window->get_y() + 1;
+
+        focus_window_at(x, y);
     }
 
     static void focus_west(void)
     {
+        Window *window = get_focused_window();
+
+        if (!window)
+        {
+            return;
+        }
+
+        unsigned int x = window->get_x() - 1;
+        unsigned int y = window->get_y();
+
+        focus_window_at(x, y);
     }
 
     static void focus_east(void)
     {
+        Window *window = get_focused_window();
+
+        if (!window)
+        {
+            return;
+        }
+
+        unsigned int x = window->get_x() + 1;
+        unsigned int y = window->get_y();
+
+        focus_window_at(x, y);
     }
 
     /*
