@@ -336,7 +336,7 @@ namespace custard {
                 continue;
             }
 
-            if (window->get_y() > y)
+            if (window->get_y() < y)
             {
                 window->focus();
                 window->raise();
@@ -365,7 +365,7 @@ namespace custard {
                 continue;
             }
 
-            if (window->get_y() < y)
+            if (window->get_y() > y)
             {
                 window->focus();
                 window->raise();
@@ -394,7 +394,7 @@ namespace custard {
                 continue;
             }
 
-            if (window->get_x() > x)
+            if (window->get_x() < x)
             {
                 window->focus();
                 window->raise();
@@ -423,7 +423,7 @@ namespace custard {
                 continue;
             }
 
-            if (window->get_x() < x)
+            if (window->get_x() > x)
             {
                 window->focus();
                 window->raise();
