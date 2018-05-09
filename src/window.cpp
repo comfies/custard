@@ -350,6 +350,17 @@ void Window::raise(void)
     );
 }
 
+void Window::lower(void)
+{
+    unsigned int data[1] = {XCB_STACK_MODE_BELOW};
+    xcb_configure_window(
+        custard::xcb_connection->get_connection(),
+        this->id,
+        XCB_CONFIG_WINDOW_STACK_MODE,
+        data
+    );
+}
+
 void Window::map(void)
 {
     this->mapped = true;
