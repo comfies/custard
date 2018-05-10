@@ -14,11 +14,12 @@ def usage():
         custard
             -help
             -stop
-            -focus [next|previous|forward|backward]
+            -cycle [next|previous|forward|backward]
+            -focus [north|south|west|east]
         window
-            -move [up|down|left|right]
-            -expand [up|down|left|right]
-            -contract [up|down|left|right]
+            -move [north|south|west|east]
+            -expand [north|south|west|east]
+            -contract [north|south|west|east]
             -maximize
             -minimize
             -close
@@ -47,7 +48,7 @@ def create_output(alpha, beta, gamma):
     if alpha == "custard":
         output.append(0)
 
-        if beta not in ("stop", "focus", "help"):
+        if beta not in ("stop", "cycle", "focus", "help"):
             usage()
 
         if beta == "help":
@@ -57,7 +58,7 @@ def create_output(alpha, beta, gamma):
             output += list((0, 0))
             return output
 
-        if beta == "focus":
+        if beta == "cycle":
             output.append(1)
 
             if gamma not in ("forward", "next", "backward", "prev"):
@@ -67,6 +68,23 @@ def create_output(alpha, beta, gamma):
                 output.append(1)
             if gamma == "backward" or gamma == "prev":
                 output.append(0)
+
+            return output
+
+        if beta == "focus":
+            output.append(2)
+
+            if gamma not in ("north", "south", "west", "east"):
+                usage()
+
+            if gamma == "north":
+                output.append(0)
+            if gamma == "south":
+                output.append(1)
+            if gamma == "west":
+                output.append(2)
+            if gamma == "east":
+                output.append(3)
 
             return output
 
@@ -101,16 +119,16 @@ def create_output(alpha, beta, gamma):
             output += list((4, 0))
             return output
 
-        if gamma not in ("up", "down", "left", "right"):
+        if gamma not in ("north", "south", "west", "east"):
             usage()
 
-        if gamma == "up":
+        if gamma == "north":
             output.append(0)
-        if gamma == "down":
+        if gamma == "south":
             output.append(1)
-        if gamma == "left":
+        if gamma == "west":
             output.append(2)
-        if gamma == "right":
+        if gamma == "east":
             output.append(3)
 
         return output
