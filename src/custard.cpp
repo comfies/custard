@@ -326,22 +326,28 @@ namespace custard {
             return;
         }
 
+        unsigned int x = window->get_x();
         unsigned int y = window->get_y();
 
-        for (unsigned int index = 0; index < windows.size(); index++)
+        while (y >= 1)
         {
-            window = windows.at(index);
-            if (!window->is_mapped() || !window->is_managed())
+            y--;
+        
+            for (unsigned int index = 0; index < windows.size(); index++)
             {
-                continue;
-            }
+                window = windows.at(index);
+                if (!window->is_mapped() || !window->is_managed())
+                {
+                    continue;
+                }
 
-            if (window->get_y() < y)
-            {
-                window->focus();
-                window->raise();
-                window->center_cursor();
-                return;
+                if (window->get_x() == x && window->get_y() == y)
+                {
+                    window->focus();
+                    window->raise();
+                    window->center_cursor();
+                    return;
+                }
             }
         }
     }
@@ -355,22 +361,28 @@ namespace custard {
             return;
         }
 
+        unsigned int x = window->get_x();
         unsigned int y = window->get_y();
 
-        for (unsigned int index = 0; index < windows.size(); index++)
+        while (y <= Configuration::grid_rows)
         {
-            window = windows.at(index);
-            if (!window->is_mapped() || !window->is_managed())
-            {
-                continue;
-            }
+            y++;
 
-            if (window->get_y() > y)
+            for (unsigned int index = 0; index < windows.size(); index++)
             {
-                window->focus();
-                window->raise();
-                window->center_cursor();
-                return;
+                window = windows.at(index);
+                if (!window->is_mapped() || !window->is_managed())
+                {
+                    continue;
+                }
+
+                if (window->get_x() == x && window->get_y() == y)
+                {
+                    window->focus();
+                    window->raise();
+                    window->center_cursor();
+                    return;
+                }
             }
         }
     }
@@ -385,21 +397,27 @@ namespace custard {
         }
 
         unsigned int x = window->get_x();
+        unsigned int y = window->get_y();
 
-        for (unsigned int index = 0; index < windows.size(); index++)
+        while (x >= 1)
         {
-            window = windows.at(index);
-            if (!window->is_mapped() || !window->is_managed())
-            {
-                continue;
-            }
+            x--;
 
-            if (window->get_x() < x)
+            for (unsigned int index = 0; index < windows.size(); index++)
             {
-                window->focus();
-                window->raise();
-                window->center_cursor();
-                return;
+                window = windows.at(index);
+                if (!window->is_mapped() || !window->is_managed())
+                {
+                    continue;
+                }
+
+                if (window->get_x() == x && window->get_y() == y)
+                {
+                    window->focus();
+                    window->raise();
+                    window->center_cursor();
+                    return;
+                }
             }
         }
     }
@@ -414,21 +432,27 @@ namespace custard {
         }
 
         unsigned int x = window->get_x();
+        unsigned int y = window->get_y();
 
-        for (unsigned int index = 0; index < windows.size(); index++)
+        while (x <= Configuration::grid_columns)
         {
-            window = windows.at(index);
-            if (!window->is_mapped() || !window->is_managed())
-            {
-                continue;
-            }
+            x++;
 
-            if (window->get_x() > x)
+            for (unsigned int index = 0; index < windows.size(); index++)
             {
-                window->focus();
-                window->raise();
-                window->center_cursor();
-                return;
+                window = windows.at(index);
+                if (!window->is_mapped() || !window->is_managed())
+                {
+                    continue;
+                }
+
+                if (window->get_x() == x && window->get_y() == y)
+                {
+                    window->focus();
+                    window->raise();
+                    window->center_cursor();
+                    return;
+                }
             }
         }
     }
