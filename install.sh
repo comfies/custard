@@ -22,24 +22,30 @@ installandconfigure(){
     cp ./examples/sxhkdrc ~/.config/custard/sxhkdrc
     cp ./examples/Xresources ~/.config/custard/Xresources
 
-    echo -e "#!/bin/bash\n" > ~/.config/custard/start.sh
+    cat <<EOF>> ~/.config/custard/start.sh
+\#!/bin/bash
+echo '' > /tmp/custard.log
+xrdb -merge ~/.config/custard/Xresources
+sxhkd -c ~/.config/custard/sxhkd
+custard 2>> /tmp/custard.log
+EOF
     chmod +x ~/.config/custard/start.sh
-
-    echo "echo '' > /tmp/custard.log" >> ~/.config/custard/start.sh
-    echo "xrdb -merge ~/.config/custard/Xresources" >> ~/.config/custard/start.sh
-    echo "sxhkd -c ~/.config/custard/sxhkdrc &" >> ~/.config/custard/start.sh
-    echo "custard 2>> /tmp/custard.log" >> ~/.config/custard/start.sh
-
 }
 
 inform(){
-    echo "custard has been installed on your system."
-    echo "To use custard, comment out any WM or DE being started in"
-    echo "~/.xinitrc, and add the following line:"
-    echo "\t\`~/.config/custard/start.sh\`"
-    echo -e "\nEnsure that there is no display manager running or enabled,"
-    echo "otherwise, they will take precedence over ~/.xinitrc."
-    echo "When you login, invoke \`startx\`."
+    cat <<EOF
+custard has been installed on your system.
+To use custard, comment out any WM or DE being started in
+~/.xinitrc, and add the following line:
+    \`~/.config/custard/start.sh\`
+
+Ensure that there is no display manager running or enabled,
+or if there is, you copy the .desktop file from the contrib
+directory to the appropriate location for your display manager,
+otherwise, it will take precedence over ~/.xinitrc.
+
+When you login, invoke \`startx\`.
+EOF
 }
 
 main(){
