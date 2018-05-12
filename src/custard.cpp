@@ -321,12 +321,12 @@ namespace custard {
     {
         Window *window = get_focused_window();
         unsigned int x = Grid::default_x;
-        unsigned int y = Grid::default_y;
+        unsigned int y = Grid::default_y + 1;
 
         if (window)
         {
             x = window->get_x();
-            y = window->get_y() + 1;
+            y = window->get_y();
         }
 
         while (y >= 1)
@@ -356,12 +356,12 @@ namespace custard {
     {
         Window *window = get_focused_window();
         unsigned int x = Grid::default_x;
-        unsigned int y = Grid::default_y;
+        unsigned int y = Grid::default_y - 1;
 
         if (window)
         {
             x = window->get_x();
-            y = window->get_y() - 1;
+            y = window->get_y();
         }
 
         while (y <= Configuration::grid_rows)
