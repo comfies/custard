@@ -349,6 +349,28 @@ namespace custard {
                     return;
                 }
             }
+
+            /* Ideally, these would be a single for loop, but that's
+                not easily done, in this specific case.
+             */
+
+            for (unsigned int index = 0; index < windows.size(); index++)
+            {
+                window = windows.at(index);
+                if (!window->is_mapped() || !window->is_managed())
+                {
+                    continue;
+                }
+
+                if (x <= window->get_x() + window->get_span_x() && window->get_y() == y)
+                {
+                    window->focus();
+                    window->raise();
+                    window->center_cursor();
+                    return;
+                }
+            }
+
         }
     }
 
@@ -384,6 +406,24 @@ namespace custard {
                     return;
                 }
             }
+
+            for (unsigned int index = 0; index < windows.size(); index++)
+            {
+                window = windows.at(index);
+                if (!window->is_mapped() || !window->is_managed())
+                {
+                    continue;
+                }
+
+                if (x <= window->get_x() + window->get_span_x() && window->get_y() == y)
+                {
+                    window->focus();
+                    window->raise();
+                    window->center_cursor();
+                    return;
+                }
+            }
+
         }
     }
 
@@ -419,6 +459,24 @@ namespace custard {
                     return;
                 }
             }
+
+            for (unsigned int index = 0; index < windows.size(); index++)
+            {
+                window = windows.at(index);
+                if (!window->is_mapped() || !window->is_managed())
+                {
+                    continue;
+                }
+
+                if (window->get_x() == x && y <= window->get_y() + window->get_span_y())
+                {
+                    window->focus();
+                    window->raise();
+                    window->center_cursor();
+                    return;
+                }
+            }
+
         }
     }
 
@@ -454,6 +512,24 @@ namespace custard {
                     return;
                 }
             }
+
+            for (unsigned int index = 0; index < windows.size(); index++)
+            {
+                window = windows.at(index);
+                if (!window->is_mapped() || !window->is_managed())
+                {
+                    continue;
+                }
+
+                if (window->get_x() == x && y <= window->get_y() + window->get_span_y())
+                {
+                    window->focus();
+                    window->raise();
+                    window->center_cursor();
+                    return;
+                }
+            }
+
         }
     }
 
