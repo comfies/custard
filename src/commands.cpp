@@ -10,17 +10,7 @@ namespace Commands {
                 break;
 
             case 1:
-                // cycle
-                if (argument == 0)
-                {
-                    custard::cycle_to_prev();
-                }
-                else if (argument == 1)
-                {
-                    custard::cycle_to_next();
-                }
-
-                return true;
+                return false;
 
                 break;
             case 2:
