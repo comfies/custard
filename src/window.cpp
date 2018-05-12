@@ -207,8 +207,7 @@ void Window::focus(void)
         return;
     }
 
-    Window *focused_window = NULL;
-    focused_window = custard::get_focused_window();
+    Window *focused_window = custard::get_focused_window();
 
     if (focused_window)
     {
