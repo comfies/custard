@@ -320,14 +320,14 @@ namespace custard {
     static void focus_north(void)
     {
         Window *window = get_focused_window();
+        unsigned int x = Grid::default_x;
+        unsigned int y = Grid::default_y;
 
-        if (!window)
+        if (window)
         {
-            return;
+            x = window->get_x();
+            y = window->get_y() + 1;
         }
-
-        unsigned int x = window->get_x();
-        unsigned int y = window->get_y();
 
         while (y >= 1)
         {
@@ -355,14 +355,14 @@ namespace custard {
     static void focus_south(void)
     {
         Window *window = get_focused_window();
+        unsigned int x = Grid::default_x;
+        unsigned int y = Grid::default_y;
 
-        if (!window)
+        if (window)
         {
-            return;
+            x = window->get_x();
+            y = window->get_y() - 1;
         }
-
-        unsigned int x = window->get_x();
-        unsigned int y = window->get_y();
 
         while (y <= Configuration::grid_rows)
         {
@@ -390,14 +390,14 @@ namespace custard {
     static void focus_west(void)
     {
         Window *window = get_focused_window();
+        unsigned int x = Grid::default_x + 1;
+        unsigned int y = Grid::default_y;
 
-        if (!window)
+        if (window)
         {
-            return;
+            x = window->get_x();
+            y = window->get_y();
         }
-
-        unsigned int x = window->get_x();
-        unsigned int y = window->get_y();
 
         while (x >= 1)
         {
@@ -425,14 +425,14 @@ namespace custard {
     static void focus_east(void)
     {
         Window *window = get_focused_window();
+        unsigned int x = Grid::default_x - 1;
+        unsigned int y = Grid::default_y;
 
-        if (!window)
+        if (window)
         {
-            return;
+            x = window->get_x();
+            y = window->get_y();
         }
-
-        unsigned int x = window->get_x();
-        unsigned int y = window->get_y();
 
         while (x <= Configuration::grid_columns)
         {
