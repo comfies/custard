@@ -111,29 +111,29 @@ target was wanted.
 .I
     \-focus
 [
-.B next
+.B north
 |
-.B previous
+.B south
 |
-.B forward
+.B west
 |
-.B backward
+.B east
 ]
 
-        Cycles focus to the either the next or previous argument in the window stack.
+        Cycles focus towards the specified cardinal direction.
 
 .B window
 
 .I
     \-move
 [
-.B up
+.B north
 |
-.B down
+.B south
 |
-.B left
+.B west
 |
-.B right
+.B east
 ]
 
         Moves the window in the specified direction.
@@ -141,13 +141,13 @@ target was wanted.
 .I
     \-expand
 [
-.B up
+.B north
 |
-.B down
+.B south
 |
-.B left
+.B west
 |
-.B right
+.B east
 ]
 
         Expands the window in the specified direction.
@@ -155,13 +155,13 @@ target was wanted.
 .I
     \-contract
 [
-.B up
+.B north
 |
-.B down
+.B south
 |
-.B left
+.B west
 |
-.B right
+.B east
 ]
 
         Contracts the window in the specified direction.
