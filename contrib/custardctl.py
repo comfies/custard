@@ -14,7 +14,6 @@ def usage():
         custard
             -help
             -stop
-            -cycle [next|previous|forward|backward]
             -focus [north|south|west|east]
         window
             -move [north|south|west|east]
@@ -48,7 +47,7 @@ def create_output(alpha, beta, gamma):
     if alpha == "custard":
         output.append(0)
 
-        if beta not in ("stop", "cycle", "focus", "help"):
+        if beta not in ("stop", "focus", "help"):
             usage()
 
         if beta == "help":
@@ -56,19 +55,6 @@ def create_output(alpha, beta, gamma):
 
         if beta == "stop":
             output += list((0, 0))
-            return output
-
-        if beta == "cycle":
-            output.append(1)
-
-            if gamma not in ("forward", "next", "backward", "prev"):
-                usage()
-
-            if gamma == "forward" or gamma == "next":
-                output.append(1)
-            if gamma == "backward" or gamma == "prev":
-                output.append(0)
-
             return output
 
         if beta == "focus":
