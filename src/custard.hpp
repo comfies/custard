@@ -26,8 +26,6 @@ namespace custard {
 
     static void reset_cursor(void);
 
-    static Window* get_window_at(unsigned int, unsigned int);
-
     static void focus_north(void);
     static void focus_south(void);
     static void focus_west(void);
