@@ -242,7 +242,7 @@ namespace Handlers {
 
     /* End of handlers */
 
-    static void attach_event_handler(int event, auto method)
+    static void attach_event_handler(int event, void(*method)(void))
     {
         if (!handlers[event])
         {
