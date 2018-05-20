@@ -1,0 +1,19 @@
+# Template file for 'custard'
+pkgname=custard
+version=1.2
+revision=1
+makedepends="libxcb-devel xcb-util-devel xcb-util-wm-devel xcb-util-xrm-devel"
+short_desc="Custard is a stacking/floating window manager for X.Org"
+maintainer="MeYou <meeyou@tuta.io>"
+license="MIT"
+homepage="https://github.com/Sweets/custard"
+distfiles="https://github.com/Sweets/${pkgname}/archive/v${version}.tar.gz"
+checksum=90579bc10eac9fd0330b76a6cce29ddf5ce3075ee7156d56e71f14d5ad538d57
+
+do_install() {
+	make
+	vbin build/custard
+	vbin contrib/custardctl.py custardctl
+	vman man/custard.man custard.1
+	vlicense LICENSE
+}
