@@ -7,3 +7,7 @@ User contributions are _always_ welcome in custard. This directory is for extern
 # custard.desktop
 
 `.desktop` file for display managers, contributed by [srashee](https://github.com/srashee)
+
+# template
+
+Void template, contributed by [MeYou](https://github.com/uMeYou)
