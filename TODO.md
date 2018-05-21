@@ -2,6 +2,8 @@
 
 1. Support two pixel sizes for borders, inner and outer
 2. Proper support for desktops, change desktop requests
+3. Cache inner border values in window.cpp, rather than recalculating ever border update
+4. Support for alpha transparency in borders
 
 # Delayed
 
