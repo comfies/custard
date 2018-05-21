@@ -469,17 +469,21 @@ void Window::update_borders(void)
         return;
     }
 
-/*    unsigned int border_width[1] = {Configuration::border_size * Configuration::border_type};*/
-
     unsigned int border_width[1];
 
     if (Configuration::border_type == 1)
     {
         border_width[0] = Configuration::outer_border_size;
     }
-    else
+    else if (Configuration::border_type == 2)
     {
-        border_width[0] = Configuration::inner_border_size + (Configuration::outer_border_size * 2);
+        border_width[0] = Configuration::inner_border_size + (
+            Configuration::outer_border_size);
+    }
+    else if (Configuration::border_type == 3)
+    {
+        border_width[0] = Configuration::inner_border_size + (
+            Configuration::outer_border_size * 2);
     }
 
     std::cerr << " [window] Window (" << this->id << ") border update" << std::endl;
@@ -554,10 +558,40 @@ void Window::update_border_helper_2(void)
     short unsigned int height = (short unsigned)geometry->height;
 
     unsigned int border_size = Configuration::inner_border_size + (
-        Configuration::outer_border_size * 2);
+        Configuration::outer_border_size);
 
     xcb_rectangle_t inner_border[5] = {
         {
+            (short)width,
+            0,
+            (short unsigned)Configuration::inner_border_size,
+            (short unsigned)(height + Configuration::inner_border_size)
+        }, /* Right */
+        {
+            0,
+            (short)height,
+            (short unsigned)(width + Configuration::inner_border_size),
+            (short unsigned)Configuration::inner_border_size
+        }, /* Bottom */
+        {
+            (short)(width + border_size + Configuration::outer_border_size),
+            0,
+            (short unsigned)Configuration::inner_border_size,
+            (short unsigned)(height + Configuration::inner_border_size)
+        }, /* Left */
+        {
+            0,
+            (short)(height + border_size + Configuration::outer_border_size),
+            (short unsigned)(width + Configuration::inner_border_size),
+            (short unsigned)Configuration::inner_border_size
+        }, /* Top */
+        {
+            (short)(width + border_size + Configuration::outer_border_size),
+            (short)(height + border_size + Configuration::outer_border_size),
+            (short unsigned)Configuration::inner_border_size,
+            (short unsigned)Configuration::inner_border_size
+        } /* Top-left corner */
+        /*{
             (short)width,
             0,
             (short unsigned)border_size,
@@ -587,6 +621,7 @@ void Window::update_border_helper_2(void)
             (short unsigned)border_size,
             (short unsigned)border_size
         } // Top-left corner
+        */
     };
 
     this->update_border_helper_2_3(inner_border, 5);
@@ -697,9 +732,15 @@ void Window::update_border_helper_2_3(xcb_rectangle_t *inner_border, unsigned in
     {
         border_size = Configuration::outer_border_size;
     }
-    else if (Configuration::border_type >= 2)
+    else if (Configuration::border_type == 2)
     {
-        border_size = (Configuration::inner_border_size + (Configuration::outer_border_size * 2));
+        border_size = Configuration::inner_border_size + (
+            Configuration::outer_border_size);
+    }
+    else if (Configuration::border_type == 3)
+    {
+        border_size = (Configuration::inner_border_size + (
+            Configuration::outer_border_size * 2));
     }
     else
     {
