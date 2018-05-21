@@ -71,8 +71,6 @@ void Workspace::map(void)
     if (focused_window)
     {
         focused_window->focus();
-        focused_window->raise();
-        focused_window->center_cursor();
     }
     else
     {
@@ -102,7 +100,7 @@ void Workspace::unmap(void)
             continue;
         }
         window->unmap();
-//        window->set_focus_false();
+        window->set_focus_false();
     }
 
     this->mapped = false;

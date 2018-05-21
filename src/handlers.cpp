@@ -24,9 +24,6 @@ namespace Handlers {
         window->map();
         window->focus();
 
-        window->raise();
-        window->center_cursor();
-
         custard::windows.push_back(window);
 
         if (window->is_managed())
@@ -64,7 +61,6 @@ namespace Handlers {
 
             if (window->get_id() == window_id)
             {
-                window->raise();
                 window->focus();
             }
             else
