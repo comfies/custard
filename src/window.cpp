@@ -610,53 +610,53 @@ void Window::update_border_helper_3(void)
 
     xcb_rectangle_t inner_border[8] = {
         {
-            (short)(width + border_size),
+            (short)(width + Configuration::outer_border_size),
             0,
-            (short unsigned)border_size,
-            (short unsigned)(height + (border_size * 2))
-        }, // Right
-        {
-            0,
-            (short)(height + border_size),
-            (short unsigned)(width + (border_size * 2)),
-            (short unsigned)border_size
-        }, // Bottom
-        {
-            (short)(width + (border_size * 4)),
-            0,
-            (short unsigned)border_size,
-            (short unsigned)(height + (border_size * 2))
-        }, // Left
-        {
-            (short)(width + (border_size * 4)),
-            (short)(height + (border_size * 4)),
-            (short unsigned)(border_size * 2),
-            (short unsigned)border_size
-        }, // Top-left corner (1)
+            (short unsigned)Configuration::inner_border_size,
+            (short unsigned)(height + Configuration::outer_border_size + Configuration::inner_border_size)
+        }, /* Right */
         {
             0,
-            (short)(height + (border_size * 4)),
-            (short unsigned)(width + (border_size * 2)),
-            (short unsigned)border_size
-        }, // Top
+            (short)(height + Configuration::outer_border_size),
+            (short unsigned)(width + Configuration::outer_border_size),
+            (short unsigned)Configuration::inner_border_size
+        }, /* Bottom */
         {
-            (short)(width + border_size),
-            (short)(height + (border_size * 4)),
-            (short unsigned)border_size,
-            (short unsigned)(border_size * 2)
-        }, // Top-right corner
+            (short)(width + border_size + Configuration::outer_border_size),
+            0,
+            (short unsigned)Configuration::inner_border_size,
+            (short unsigned)(height + Configuration::outer_border_size)
+        }, /* Left */
         {
-            (short)(width + (border_size * 4)),
-            (short)(height + (border_size * 4)),
-            (short unsigned)border_size,
-            (short unsigned)(border_size * 2)
-        }, // Top-left corner (2)
+            0,
+            (short)(height + border_size + Configuration::outer_border_size),
+            (short unsigned)(width + Configuration::outer_border_size),
+            (short unsigned)Configuration::inner_border_size
+        }, /* Top */
         {
-            (short)(width + (border_size * 4)),
-            (short)(height + border_size),
-            (short unsigned)(border_size * 2),
-            (short unsigned)border_size
-        } // Bottom-left corner
+            (short)(width + border_size + Configuration::outer_border_size),
+            (short)(height + border_size + Configuration::outer_border_size),
+            (short unsigned)Configuration::inner_border_size,
+            (short unsigned)(Configuration::outer_border_size + Configuration::inner_border_size)
+        }, /* Top-left corner (1) */
+        {
+            (short)(width + border_size + Configuration::outer_border_size),
+            (short)(height + border_size + Configuration::outer_border_size),
+            (short unsigned)(Configuration::outer_border_size + Configuration::inner_border_size),
+            (short unsigned)Configuration::inner_border_size
+        }, /* Top-left corner (2) */
+        {
+            (short)(width + Configuration::outer_border_size),
+            (short)(height + border_size + Configuration::outer_border_size),
+            (short unsigned)Configuration::inner_border_size,
+            (short unsigned)(Configuration::inner_border_size + Configuration::outer_border_size)
+        }, /* Top-right corner */
+        {
+            (short)(width + border_size + Configuration::outer_border_size),
+            (short)(height + Configuration::outer_border_size),
+            (short unsigned)(Configuration::inner_border_size + Configuration::outer_border_size),
+            (short unsigned)Configuration::inner_border_size
+        } /* Bottom-left corner */
     };
 
     this->update_border_helper_2_3(inner_border, 8);
