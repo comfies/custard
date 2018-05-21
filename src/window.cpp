@@ -246,6 +246,8 @@ void Window::focus(void)
     );
 
     this->update_borders();
+    this->raise();
+    this->center_cursor();
 
 }
 
@@ -467,7 +469,18 @@ void Window::update_borders(void)
         return;
     }
 
-    unsigned int border_width[1] = {Configuration::border_size * Configuration::border_type};
+/*    unsigned int border_width[1] = {Configuration::border_size * Configuration::border_type};*/
+
+    unsigned int border_width[1];
+
+    if (Configuration::border_type == 1)
+    {
+        border_width[0] = Configuration::outer_border_size;
+    }
+    else
+    {
+        border_width[0] = Configuration::inner_border_size + (Configuration::outer_border_size * 2);
+    }
 
     std::cerr << " [window] Window (" << this->id << ") border update" << std::endl;
 
@@ -540,36 +553,39 @@ void Window::update_border_helper_2(void)
     short unsigned int width = (short unsigned)geometry->width;
     short unsigned int height = (short unsigned)geometry->height;
 
+    unsigned int border_size = Configuration::inner_border_size + (
+        Configuration::outer_border_size * 2);
+
     xcb_rectangle_t inner_border[5] = {
         {
             (short)width,
             0,
-            (short unsigned)Configuration::border_size,
-            (short unsigned)(height + Configuration::border_size)
+            (short unsigned)border_size,
+            (short unsigned)(height + border_size)
         }, // Right
         {
             0,
             (short)height,
-            (short unsigned)(width + Configuration::border_size),
-            (short unsigned)Configuration::border_size
+            (short unsigned)(width + border_size),
+            (short unsigned)border_size
         }, // Bottom
         {
-            (short)(width + (Configuration::border_size * 3)),
+            (short)(width + (border_size * 3)),
             0,
-            (short unsigned)Configuration::border_size,
-            (short unsigned)(height + Configuration::border_size)
+            (short unsigned)border_size,
+            (short unsigned)(height + border_size)
         }, // Left
         {
             0,
-            (short)(height + (Configuration::border_size * 3)),
-            (short unsigned)(width + Configuration::border_size),
-            (short unsigned)Configuration::border_size
+            (short)(height + (border_size * 3)),
+            (short unsigned)(width + border_size),
+            (short unsigned)border_size
         }, // Top
         {
-            (short)(width + (Configuration::border_size * 3)),
-            (short)(height + (Configuration::border_size * 3)),
-            (short unsigned)Configuration::border_size,
-            (short unsigned)Configuration::border_size
+            (short)(width + (border_size * 3)),
+            (short)(height + (border_size * 3)),
+            (short unsigned)border_size,
+            (short unsigned)border_size
         } // Top-left corner
     };
 
@@ -585,54 +601,57 @@ void Window::update_border_helper_3(void)
     short unsigned int width = (short unsigned)geometry->width;
     short unsigned int height = (short unsigned)geometry->height;
 
+    unsigned int border_size = Configuration::inner_border_size + (
+        Configuration::outer_border_size * 2);
+
     xcb_rectangle_t inner_border[8] = {
         {
-            (short)(width + Configuration::border_size),
+            (short)(width + border_size),
             0,
-            (short unsigned)Configuration::border_size,
-            (short unsigned)(height + (Configuration::border_size * 2))
+            (short unsigned)border_size,
+            (short unsigned)(height + (border_size * 2))
         }, // Right
         {
             0,
-            (short)(height + Configuration::border_size),
-            (short unsigned)(width + (Configuration::border_size * 2)),
-            (short unsigned)Configuration::border_size
+            (short)(height + border_size),
+            (short unsigned)(width + (border_size * 2)),
+            (short unsigned)border_size
         }, // Bottom
         {
-            (short)(width + (Configuration::border_size * 4)),
+            (short)(width + (border_size * 4)),
             0,
-            (short unsigned)Configuration::border_size,
-            (short unsigned)(height + (Configuration::border_size * 2))
+            (short unsigned)border_size,
+            (short unsigned)(height + (border_size * 2))
         }, // Left
         {
-            (short)(width + (Configuration::border_size * 4)),
-            (short)(height + (Configuration::border_size * 4)),
-            (short unsigned)(Configuration::border_size * 2),
-            (short unsigned)Configuration::border_size
+            (short)(width + (border_size * 4)),
+            (short)(height + (border_size * 4)),
+            (short unsigned)(border_size * 2),
+            (short unsigned)border_size
         }, // Top-left corner (1)
         {
             0,
-            (short)(height + (Configuration::border_size * 4)),
-            (short unsigned)(width + (Configuration::border_size * 2)),
-            (short unsigned)Configuration::border_size
+            (short)(height + (border_size * 4)),
+            (short unsigned)(width + (border_size * 2)),
+            (short unsigned)border_size
         }, // Top
         {
-            (short)(width + Configuration::border_size),
-            (short)(height + (Configuration::border_size * 4)),
-            (short unsigned)Configuration::border_size,
-            (short unsigned)(Configuration::border_size * 2)
+            (short)(width + border_size),
+            (short)(height + (border_size * 4)),
+            (short unsigned)border_size,
+            (short unsigned)(border_size * 2)
         }, // Top-right corner
         {
-            (short)(width + (Configuration::border_size * 4)),
-            (short)(height + (Configuration::border_size * 4)),
-            (short unsigned)Configuration::border_size,
-            (short unsigned)(Configuration::border_size * 2)
+            (short)(width + (border_size * 4)),
+            (short)(height + (border_size * 4)),
+            (short unsigned)border_size,
+            (short unsigned)(border_size * 2)
         }, // Top-left corner (2)
         {
-            (short)(width + (Configuration::border_size * 4)),
-            (short)(height + Configuration::border_size),
-            (short unsigned)(Configuration::border_size * 2),
-            (short unsigned)Configuration::border_size
+            (short)(width + (border_size * 4)),
+            (short)(height + border_size),
+            (short unsigned)(border_size * 2),
+            (short unsigned)border_size
         } // Bottom-left corner
     };
 
@@ -642,6 +661,8 @@ void Window::update_border_helper_3(void)
 
 void Window::update_border_helper_2_3(xcb_rectangle_t *inner_border, unsigned int inner_border_size)
 {
+
+    /* TODO: cache `inner_border`? */
 
     std::cerr << " [window] Window (" << this->id << ") border update interstitial" << std::endl;
 
@@ -672,13 +693,13 @@ void Window::update_border_helper_2_3(xcb_rectangle_t *inner_border, unsigned in
     xcb_get_geometry_reply_t *geometry = this->get_geometry();
     unsigned int border_size;
 
-    if (Configuration::border_type == 2)
+    if (Configuration::border_type == 1)
     {
-        border_size = (Configuration::border_size * 2);
+        border_size = Configuration::outer_border_size;
     }
-    else if (Configuration::border_type == 3)
+    else if (Configuration::border_type >= 2)
     {
-        border_size = (Configuration::border_size * 3);
+        border_size = (Configuration::inner_border_size + (Configuration::outer_border_size * 2));
     }
     else
     {
