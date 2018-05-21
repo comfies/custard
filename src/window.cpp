@@ -591,37 +591,6 @@ void Window::update_border_helper_2(void)
             (short unsigned)Configuration::inner_border_size,
             (short unsigned)Configuration::inner_border_size
         } /* Top-left corner */
-        /*{
-            (short)width,
-            0,
-            (short unsigned)border_size,
-            (short unsigned)(height + border_size)
-        }, // Right
-        {
-            0,
-            (short)height,
-            (short unsigned)(width + border_size),
-            (short unsigned)border_size
-        }, // Bottom
-        {
-            (short)(width + (border_size * 3)),
-            0,
-            (short unsigned)border_size,
-            (short unsigned)(height + border_size)
-        }, // Left
-        {
-            0,
-            (short)(height + (border_size * 3)),
-            (short unsigned)(width + border_size),
-            (short unsigned)border_size
-        }, // Top
-        {
-            (short)(width + (border_size * 3)),
-            (short)(height + (border_size * 3)),
-            (short unsigned)border_size,
-            (short unsigned)border_size
-        } // Top-left corner
-        */
     };
 
     this->update_border_helper_2_3(inner_border, 5);
