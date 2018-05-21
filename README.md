@@ -13,7 +13,3 @@ custard is based on subtle, 2bwm, swm, and howm. Some of the codebase was based 
 All of the documentation for this project has been moved to the Wiki page. In the footer, you will see when the information on the Wiki was last checked and updated as needed (all of the Wiki, not just a single page).
 
 https://github.com/Sweets/custard/wiki
-
-# Notes
-
-Note that as of commit 8256a056e638bf5a401c5870bc9f14d03d4f8c53, border types `Double` and `Triple` do not render properly. This should be fixed in the next few commits.
