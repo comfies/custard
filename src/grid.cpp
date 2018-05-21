@@ -15,7 +15,15 @@ namespace Grid {
     static void setup(void)
     {
 
-        border_size = Configuration::border_size * Configuration::border_type;
+        if (Configuration::border_type == 1)
+        {
+            border_size = Configuration::outer_border_size;
+        }
+        else
+        {
+            border_size = Configuration::inner_border_size + (
+                Configuration::outer_border_size * 2);
+        }
 
         unit_pixel_size_y = (custard::xcb_connection->get_screen()->height_in_pixels - (
             (Configuration::grid_gap_size * (Configuration::grid_rows + 1)) + (

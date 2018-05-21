@@ -7,7 +7,9 @@ namespace Configuration {
     short unsigned int grid_columns = 3;
 
     short unsigned int border_type = 0;
-    unsigned int border_size = 0;
+
+    unsigned int inner_border_size = 0;
+    unsigned int outer_border_size = 0;
 
     unsigned int border_focused_color = 0xFFFFFF;
     unsigned int border_unfocused_color = 0x676767;
@@ -212,7 +214,8 @@ namespace Configuration {
 
         }
 
-        border_size = parse_uint(get_setting(database, "border_size"));
+        inner_border_size = parse_uint(get_setting(database, "inner_border_size"));
+        outer_border_size = parse_uint(get_setting(database, "outer_border_size"));
 
         // Margins
 

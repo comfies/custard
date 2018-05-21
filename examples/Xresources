@@ -2,7 +2,8 @@ custard.rows: 2
 custard.columns: 3
 
 custard.border_type: None
-custard.border_size: 0
+custard.inner_border_size: 1
+custard.outer_border_size: 3
 
 custard.focused_color: #FFFFFF
 custard.unfocused_color: #676767
