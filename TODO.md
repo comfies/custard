@@ -1,8 +1,10 @@
 # To-do
 
-1. Proper support for desktops, change desktop requests
-2. Cache inner border values in window.cpp, rather than recalculating ever border update
-3. Support for alpha transparency in borders
+1. Remove FIFO in favor of an IPC
+2. Make custard configurable via custardctl, after the IPC implementation
+3. Proper support for desktop atoms, change desktop requests (ewmh)
+4. Cache inner border values in window.cpp, rather than recalculating ever border update
+5. Support for alpha transparency in borders
 
 # Delayed
 
