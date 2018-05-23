@@ -1,3 +1,7 @@
+# Contrib tool
+
+If you aren't modifying the custard source yourself, but rather making some accompanying tool, script, configuration, or otherwise, then the code style does not apply. Go with what you're comfortable with!
+
 # Coding style
 
 To remain consistent with custard's codebase, anytime curly braces are required to be used, they should have their own dedicated lines.
