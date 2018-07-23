@@ -15,6 +15,7 @@ get_group_state(unsigned int group)
 void
 attach_window_to_group(xcb_window_t window_id, unsigned int group) {
     debug_output("attach_window_to_group(): called");
+    /*TODO: check if group > 16*/
     Window *window = window_list_get_window(window_id);
 
     if (window) {
@@ -26,6 +27,7 @@ attach_window_to_group(xcb_window_t window_id, unsigned int group) {
     if (state == FOCUSED || state == MAPPED) {
         map_window(window->id);
     } else {
+        /* TODO: check if any of the other groups it's attached to are mapped*/
         unmap_window(window->id);
     }
 }
@@ -33,19 +35,34 @@ attach_window_to_group(xcb_window_t window_id, unsigned int group) {
 void
 detach_window_from_group(xcb_window_t window_id, unsigned int group) {
     debug_output("detach_window_to_group(): called");
+    /*TODO: check if group > 16*/
     Window *window = window_list_get_window(window_id);
 
     if (window) {
         window->groups &= ~(1 << (group - 1));
+    }
+
+    group_state_t state = get_group_state(group);
+
+    if (state == UNMAPPED) {
+        unmap_window(window->id);
     }
 }
 
 void
 focus_group(unsigned int group) {
     debug_output("focus_group(): called");
+    /*TODO: check if group > 16*/
+
+    /*TODO:
+      rather than unmapping and remapping whole groups,
+      check if each individual window should be unmapped or mapped,
+      and don't do anything to windows in the old AND new groups*/
 
     for (unsigned int index = 0; index < Configuration->groups; index++) {
-        unmap_group(index + 1);
+        if ((index + 1) != group) {
+            unmap_group(index + 1);
+        }
     }
 
     map_group(group);
