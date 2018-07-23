@@ -25,7 +25,7 @@
 #include "handlers.h"
 #include "grid.h"
 #include "window.h"
-//#include "group.h"
+#include "group.h"
 
 #include "custard.c"
 
@@ -37,7 +37,7 @@
 #include "handlers.c"
 #include "grid.c"
 #include "window.c"
-//#include "group.c"
+#include "group.c"
 
 int
 main(int argc, char** argv) {
