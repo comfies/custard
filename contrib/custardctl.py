@@ -5,7 +5,7 @@ import re
 import socket
 import sys
 
-DRY = False
+dry = False
 
 def show_help():
     print("[...] show help")
@@ -17,7 +17,7 @@ def error_out(message):
 
 def send_message(message):
     message = message.lower()
-    if DRY:
+    if dry:
         print(message)
         exit(0)
     socket_path = '/tmp/custard.sock'
@@ -83,18 +83,19 @@ if __name__ == '__main__':
         'minimize': ['window'],
         'raise': ['window'],
         'lower': ['window'],
+        'relocate': ['window'],
         'attach_to_group': ['window'],
         'detach_from_group': ['window'],
         'close': ['window'],
-        'map': ['group'],
-        'unmap': ['group']
+        'attach': ['group'],
+        'detach': ['group']
     }
 
     optionlist, arguments = getopt.getopt(command_line_arguments,
         '', list(option_target_map.keys()))
 
     if 'dry' in arguments:
-        DRY = True
+        dry = True
 
     action = optionlist[0][0][2:]
 
@@ -151,6 +152,10 @@ if __name__ == '__main__':
             elif variable in bool_vars:
                 data = parse_boolean(value)
 
+            if variable == 'groups':
+                if not 1 <= data <= 16:
+                    error_out("Invalid number of groups: 1 <= groups <= 16")
+
             data = str(data)
 
             output = f"{target} configure {variable} {data}"
@@ -194,6 +199,7 @@ if __name__ == '__main__':
     elif target == 'group':
         group = arguments[0]
         group = parse_unsigned_integer(group)
+
         output = f"{target} {action} {group}"
 
     send_message(output)
