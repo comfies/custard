@@ -113,11 +113,9 @@ manage_window(xcb_window_t window_id) {
     window->height = grid_window_default_height;
     window->width = grid_window_default_width;
 
-//    for (unsigned int index = 0; index < Configuration->groups; index++) {
-//        window->groups[index] = 0;
-//    }
-
     window_list_append_window(window);
+
+    attach_window_to_group(window_id, focused_group);
 
     debug_output("manage_window(): Window created and added to linked list");
 

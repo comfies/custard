@@ -7,7 +7,7 @@ struct Window {
     unsigned int y;
     unsigned int width;
     unsigned int height;
-    short unsigned int groups[];
+    short unsigned int groups;
 };
 
 short unsigned int manage_window(xcb_window_t);
