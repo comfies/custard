@@ -1,6 +1,6 @@
-
 void
-apply_config_defaults() {
+apply_config_defaults()
+{
     Configuration->border_type = 0;
     Configuration->border_invert_colors = 0;
     Configuration->border_inner_size = 0;
@@ -20,7 +20,8 @@ apply_config_defaults() {
 }
 
 void
-apply_config() {
+apply_config()
+{
     if (Configuration->border_type == 0) {
         Configuration->border_total_size = 0;
     } else if (Configuration->border_type == 1) {

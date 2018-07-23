@@ -1,4 +1,3 @@
-
 struct Config {
     short unsigned int border_type;
     short unsigned int border_invert_colors;

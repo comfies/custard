@@ -1,6 +1,6 @@
-
 void
-grid_apply_configuration() {
+grid_apply_configuration()
+{
 
     grid_x_unit_size_in_pixels = ((screen->width_in_pixels - (
             ((Configuration->border_total_size * 2) *
@@ -35,7 +35,8 @@ grid_apply_configuration() {
 }
 
 unsigned int
-grid_get_span(unsigned int unit_size_in_pixels, unsigned int amount) {
+grid_get_span(unsigned int unit_size_in_pixels, unsigned int amount)
+{
     return (unit_size_in_pixels * amount) + (
         Configuration->grid_gap * (amount - 1)
     ) + (
@@ -44,17 +45,20 @@ grid_get_span(unsigned int unit_size_in_pixels, unsigned int amount) {
 }
 
 unsigned int
-grid_get_span_x(unsigned int amount) {
+grid_get_span_x(unsigned int amount)
+{
     return grid_get_span(grid_x_unit_size_in_pixels, amount);
 }
 
 unsigned int
-grid_get_span_y(unsigned int amount) {
+grid_get_span_y(unsigned int amount)
+{
     return grid_get_span(grid_y_unit_size_in_pixels, amount);
 }
 
 unsigned int
-grid_get_offset(unsigned int unit_size_in_pixels, unsigned int amount) {
+grid_get_offset(unsigned int unit_size_in_pixels, unsigned int amount)
+{
     return (
         Configuration->grid_gap * (amount)
     ) + (unit_size_in_pixels * (amount - 1)) + (
@@ -63,11 +67,13 @@ grid_get_offset(unsigned int unit_size_in_pixels, unsigned int amount) {
 }
 
 unsigned int
-grid_get_offset_x(unsigned int amount) {
+grid_get_offset_x(unsigned int amount)
+{
     return grid_get_offset(grid_x_unit_size_in_pixels, amount);
 }
 
 unsigned int
-grid_get_offset_y(unsigned int amount) {
+grid_get_offset_y(unsigned int amount)
+{
     return grid_get_offset(grid_y_unit_size_in_pixels, amount);
 }

@@ -1,6 +1,6 @@
-
 unsigned short int
-initialize_xcb_connection() {
+initialize_xcb_connection()
+{
     unsigned int data[1] = {
         XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT |
         XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY |
@@ -60,18 +60,19 @@ initialize_xcb_connection() {
 }
 
 void
-commit() {
+commit()
+{
     debug_output("commit(): Flushed to X");
     xcb_flush(xcb_connection);
 }
 
 unsigned short int
-finalize_xcb_connection() {
+finalize_xcb_connection()
+{
     if (xcb_connection) {
         debug_output("finalize_xcb_connection(): called");
 
         xcb_disconnect(xcb_connection);
-        /*free(xcb_connection);*/
 
         return 1;
     }

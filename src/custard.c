@@ -1,6 +1,6 @@
-
 short unsigned int
-window_list_append_window(Window *window) {
+window_list_append_window(Window *window)
+{
     if (window_list_get_window(window->id)) {
         return 0;
     }
@@ -37,7 +37,8 @@ window_list_append_window(Window *window) {
 }
 
 short unsigned int
-window_list_remove_window(xcb_window_t window_id) {
+window_list_remove_window(xcb_window_t window_id)
+{
     struct WindowLinkedListElement *element = window_list_head;
     struct WindowLinkedListElement *old_element = NULL;
 
@@ -46,7 +47,7 @@ window_list_remove_window(xcb_window_t window_id) {
             element = window_list_head;
 
             window_list_head = element->next;
-//            free(element->window);
+/*            free(element->window);*/
             free(element);
 
             return 1;
@@ -60,7 +61,7 @@ window_list_remove_window(xcb_window_t window_id) {
             old_element = element->next;
 
             element->next = element->next->next;
-//            free(old_element->window);
+/*            free(old_element->window);*/
             free(old_element);
             return 1;
         }
@@ -72,7 +73,8 @@ window_list_remove_window(xcb_window_t window_id) {
 }
 
 Window *
-window_list_get_window(xcb_window_t window_id) {
+window_list_get_window(xcb_window_t window_id)
+{
     struct WindowLinkedListElement *last_window_element = window_list_head;
 
     while (last_window_element) {
@@ -87,14 +89,16 @@ window_list_get_window(xcb_window_t window_id) {
 }
 
 static void *
-debug_output(char *message) {
+debug_output(char *message)
+{
     if (debug) {
         fprintf(stderr, "[debug] %s\n", message);
     }
 }
 
 int
-start_custard() {
+start_custard()
+{
     if (!initialize_xcb_connection() ||
         !initialize_ewmh_connection() ||
         !initialize_socket()) {
@@ -155,7 +159,7 @@ start_custard() {
         event = xcb_wait_for_event(xcb_connection);
         if (event) {
             handlers_handle_event(event);
-//            free(event);
+/*            free(event);*/
         } else {
             stop_custard();
         }
@@ -167,7 +171,8 @@ start_custard() {
 }
 
 void
-stop_custard() {
+stop_custard()
+{
     debug_output("stop_custard(): called, joining socket thread and finalizing");
 
     if (!wm_running) {

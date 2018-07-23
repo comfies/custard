@@ -1,4 +1,3 @@
-
 struct Window {
     xcb_window_t id;
     short unsigned int mapped;

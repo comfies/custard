@@ -1,6 +1,6 @@
-
 unsigned short int
-initialize_ewmh_connection() {
+initialize_ewmh_connection()
+{
     unsigned int data[1] = {
         XCB_EVENT_MASK_POINTER_MOTION
     };
@@ -98,7 +98,8 @@ initialize_ewmh_connection() {
 }
 
 unsigned short int
-finalize_ewmh_connection(void) {
+finalize_ewmh_connection(void)
+{
     if (ewmh_connection) {
         debug_output("finalize_ewmh_connection(): called");
 

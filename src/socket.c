@@ -1,6 +1,6 @@
-
 unsigned short int
-initialize_socket() {
+initialize_socket()
+{
     struct sockaddr_un address;
 
     memset(&address, 0, sizeof(address));
@@ -30,7 +30,8 @@ initialize_socket() {
 }
 
 void
-read_socket() {
+read_socket()
+{
     int command_file_descriptor = accept(socket_file_descriptor, NULL, 0);
 
     if (command_file_descriptor == -1) {
@@ -54,7 +55,8 @@ read_socket() {
 }
 
 void *
-start_socket_read_loop(void *pointer) {
+start_socket_read_loop(void *pointer)
+{
     debug_output("start_socket_read_loop(): started socket read loop");
     while (wm_running) {
         read_socket();
@@ -62,7 +64,8 @@ start_socket_read_loop(void *pointer) {
 }
 
 unsigned short int
-finalize_socket() {
+finalize_socket()
+{
     debug_output("finalize_socket(): called");
     unlink(socket_path);
 }

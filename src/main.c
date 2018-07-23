@@ -40,7 +40,8 @@
 #include "group.c"
 
 int
-main(int argc, char** argv) {
+main(int argc, char** argv)
+{
 
     int commandline_argument;
 

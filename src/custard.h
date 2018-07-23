@@ -1,4 +1,3 @@
-
 #define event_mask XCB_CW_EVENT_MASK
 
 typedef struct Window Window;

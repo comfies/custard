@@ -1,6 +1,6 @@
-
 short unsigned int
-manage_window(xcb_window_t window_id) {
+manage_window(xcb_window_t window_id)
+{
 
     if (window_id == ewmh_window_id) {
         return 0;
@@ -141,7 +141,8 @@ update_window_borders() {
 }
 
 void
-focus_on_window(xcb_window_t window_id) {
+focus_on_window(xcb_window_t window_id)
+{
 
     debug_output("focus_on_window(): called");
 
@@ -209,7 +210,8 @@ focus_on_window(xcb_window_t window_id) {
 }
 
 void
-close_window(xcb_window_t window_id) {
+close_window(xcb_window_t window_id)
+{
 
     debug_output("close_window(): called");
 
@@ -290,7 +292,8 @@ close_window(xcb_window_t window_id) {
 }
 
 void
-map_window(xcb_window_t window_id) {
+map_window(xcb_window_t window_id)
+{
     debug_output("map_window(): called");
     xcb_map_window(
         xcb_connection,
@@ -299,7 +302,8 @@ map_window(xcb_window_t window_id) {
 }
 
 void
-unmap_window(xcb_window_t window_id) {
+unmap_window(xcb_window_t window_id)
+{
     debug_output("unmap_window(): called");
     xcb_unmap_window(
         xcb_connection,
@@ -308,7 +312,8 @@ unmap_window(xcb_window_t window_id) {
 }
 
 void
-raise_window(xcb_window_t window_id) {
+raise_window(xcb_window_t window_id)
+{
     unsigned int data[1] = {
         XCB_STACK_MODE_ABOVE
     };
@@ -322,7 +327,8 @@ raise_window(xcb_window_t window_id) {
 }
 
 void
-lower_window(xcb_window_t window_id) {
+lower_window(xcb_window_t window_id)
+{
     unsigned int data[1] = {
         XCB_STACK_MODE_BELOW
     };
@@ -337,7 +343,8 @@ lower_window(xcb_window_t window_id) {
 
 void
 move_window_to_pixel_coordinate(xcb_window_t window_id,
-    unsigned int x, unsigned int y) {
+    unsigned int x, unsigned int y)
+{
 
     unsigned int data[2] = {x, y};
 
@@ -351,7 +358,8 @@ move_window_to_pixel_coordinate(xcb_window_t window_id,
 
 void
 move_window_to_grid_coordinate(xcb_window_t window_id,
-    unsigned int x, unsigned int y) {
+    unsigned int x, unsigned int y)
+{
 
     unsigned int x_in_pixels = grid_get_offset_x(x) +
         Configuration->grid_margin_left;
@@ -366,7 +374,8 @@ move_window_to_grid_coordinate(xcb_window_t window_id,
 
 void
 resize_window_with_pixels(xcb_window_t window_id,
-    unsigned int height, unsigned int width) {
+    unsigned int height, unsigned int width)
+{
 
     unsigned int data[2] = {
         width, height
@@ -382,7 +391,8 @@ resize_window_with_pixels(xcb_window_t window_id,
 
 void
 resize_window_with_grid_units(xcb_window_t window_id,
-    unsigned int height, unsigned int width) {
+    unsigned int height, unsigned int width)
+{
 
     unsigned int height_in_pixels = grid_get_span_y(height);
     unsigned int width_in_pixels = grid_get_span_x(width);
@@ -395,7 +405,8 @@ resize_window_with_grid_units(xcb_window_t window_id,
 
 void
 move_window_cardinal(xcb_window_t window_id,
-    cardinal_direction_t direction) {
+    cardinal_direction_t direction)
+{
     Window *window = window_list_get_window(window_id);
 
     if (!window) {
@@ -445,7 +456,8 @@ move_window_cardinal(xcb_window_t window_id,
 
 void
 expand_window_cardinal(xcb_window_t window_id,
-    cardinal_direction_t direction) {
+    cardinal_direction_t direction)
+{
     debug_output("expand_window_cardinal(): called");
     Window *window = window_list_get_window(window_id);
 
@@ -502,7 +514,8 @@ expand_window_cardinal(xcb_window_t window_id,
 
 void
 contract_window_cardinal(xcb_window_t window_id,
-    cardinal_direction_t direction) {
+    cardinal_direction_t direction)
+{
     Window *window = window_list_get_window(window_id);
 
     if (!window) {
@@ -553,8 +566,8 @@ contract_window_cardinal(xcb_window_t window_id,
 }
 
 void
-border_update(xcb_window_t window_id) {
-
+border_update(xcb_window_t window_id)
+{
     debug_output("border_update(): called");
 
     if (Configuration->border_type == 0) {
@@ -597,7 +610,8 @@ border_update(xcb_window_t window_id) {
 }
 
 void
-border_update_single(xcb_window_t window_id) {
+border_update_single(xcb_window_t window_id)
+{
     debug_output("border_update_single(): selected");
 
     unsigned int data[1];
@@ -632,7 +646,8 @@ border_update_single(xcb_window_t window_id) {
 }
 
 void
-border_update_double(xcb_window_t window_id) {
+border_update_double(xcb_window_t window_id)
+{
     debug_output("border_update_double(): selected");
 
     xcb_get_geometry_reply_t *geometry = xcb_get_geometry_reply(
@@ -690,7 +705,8 @@ border_update_double(xcb_window_t window_id) {
 }
 
 void
-border_update_triple(xcb_window_t window_id) {
+border_update_triple(xcb_window_t window_id)
+{
     debug_output("border_update_triple(): selected");
 
     xcb_get_geometry_reply_t *geometry = xcb_get_geometry_reply(
@@ -779,7 +795,8 @@ border_update_triple(xcb_window_t window_id) {
 
 void
 border_update_with_graphics_context(xcb_window_t window_id,
-    xcb_rectangle_t *inner_border, unsigned int inner_border_array_size) {
+    xcb_rectangle_t *inner_border, unsigned int inner_border_array_size)
+{
 
     debug_output("border_update_with_graphics_context(): Using graphics context for border");
 

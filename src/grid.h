@@ -1,4 +1,3 @@
-
 unsigned int grid_x_unit_size_in_pixels = 0;
 unsigned int grid_y_unit_size_in_pixels = 0;
 

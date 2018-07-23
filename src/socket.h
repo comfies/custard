@@ -1,4 +1,3 @@
-
 char socket_path[] = "/tmp/custard.sock";
 int socket_file_descriptor;
 
