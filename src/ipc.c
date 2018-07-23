@@ -1,6 +1,6 @@
-
 void
-process_command(char *input) {
+process_command(char *input)
+{
     debug_output("process_command(): beginning of received input");
     debug_output(input);
     debug_output("process_command(): end of received input");
@@ -87,7 +87,7 @@ process_command(char *input) {
                 Configuration->grid_margin_right = parse_unsigned_integer(
                     diced[3]);
             } else if (strcmp(diced[2], "groups") == 0) {
-                Configuration->groups = parse_unsigned_integer(diced[2]);
+                Configuration->groups = parse_unsigned_integer(diced[3]);
             } else {
                 return;
             }
@@ -154,11 +154,7 @@ process_command(char *input) {
         }
 
     } else if (strcmp(diced[0], "group") == 0) {
-        if (!diced[1]) {
-            return;
-        }
-
-        if (!diced[2]) {
+        if (!diced[1] || !diced[2]) {
             return;
         }
 
@@ -182,7 +178,8 @@ process_command(char *input) {
 }
 
 unsigned short int
-parse_boolean(const char *input) {
+parse_boolean(const char *input)
+{
     if (input) {
         if (strcmp(input, "True") == 0 || strcmp(input, "true") == 0) {
             return 1;
@@ -196,7 +193,8 @@ parse_boolean(const char *input) {
 }
 
 unsigned int
-parse_unsigned_integer(const char *input) {
+parse_unsigned_integer(const char *input)
+{
     if (input) {
         return atoi(input);
     }
@@ -205,7 +203,8 @@ parse_unsigned_integer(const char *input) {
 }
 
 unsigned int
-parse_rgba_color(const char *input) {
+parse_rgba_color(const char *input)
+{
     if (input) {
         unsigned int RGBA;
 
