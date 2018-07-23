@@ -143,9 +143,9 @@ process_command(char *input) {
             unsigned int group = parse_unsigned_integer(diced[2]);
 
             if (strcmp(diced[1], "attach_to_group") == 0) {
-//                attach_window_to_group(window_id, group);
+                attach_window_to_group(window_id, group);
             } else if (strcmp(diced[1], "detach_from_group") == 0) {
-//                detach_window_from_group(window_id, group);
+                detach_window_from_group(window_id, group);
             } else {
                 return;
             }
@@ -154,7 +154,24 @@ process_command(char *input) {
         }
 
     } else if (strcmp(diced[0], "group") == 0) {
-        /* TODO: this */
+        if (!diced[1]) {
+            return;
+        }
+
+        if (!diced[2]) {
+            return;
+        }
+
+        unsigned int group = parse_unsigned_integer(diced[2]);
+
+        if (strcmp(diced[1], "focus") == 0) {
+            focus_group(group);
+        } else if (strcmp(diced[1], "attach") == 0) {
+            map_group(group);
+        } else if (strcmp(diced[1], "detach") == 0) {
+            unmap_group(group);
+        }
+
     } else {
         return;
     }
