@@ -1,31 +1,50 @@
 
+group_state_t
+get_group_state(unsigned int group)
+{
+    debug_output("get_group_state(): called");
+    group_state_t state = (group_state_t)((groups & (1 << (group - 1))) % 2);
+
+    if (state == MAPPED && focused_group == group) {
+        state = FOCUSED;
+    }
+
+    return state;
+}
+
 void
 attach_window_to_group(xcb_window_t window_id, unsigned int group) {
+    debug_output("attach_window_to_group(): called");
     Window *window = window_list_get_window(window_id);
 
     if (window) {
-        window->groups[group - 1] = 1;
+        window->groups |= (1 << (group - 1));
     }
 
-    /* TODO: check if group is mapped, and map window if it is? */
+    group_state_t state = get_group_state(group);
+
+    if (state == FOCUSED || state == MAPPED) {
+        map_window(window->id);
+    } else {
+        unmap_window(window->id);
+    }
 }
 
 void
 detach_window_from_group(xcb_window_t window_id, unsigned int group) {
+    debug_output("detach_window_to_group(): called");
     Window *window = window_list_get_window(window_id);
 
     if (window) {
-        window->groups[group - 1] = 0;
+        window->groups &= ~(1 << (group - 1));
     }
 }
 
 void
 focus_group(unsigned int group) {
-    for (unsigned int index = 0; index < Configuration->groups; index++) {
-        if (group == (index + 1)) {
-            continue;
-        }
+    debug_output("focus_group(): called");
 
+    for (unsigned int index = 0; index < Configuration->groups; index++) {
         unmap_group(index + 1);
     }
 
@@ -34,6 +53,7 @@ focus_group(unsigned int group) {
 
 void
 map_group(unsigned int group) {
+    debug_output("map_group(): called");
     struct WindowLinkedListElement *element = window_list_head;
     Window *window = NULL;
     unsigned int index = group - 1;
@@ -41,7 +61,7 @@ map_group(unsigned int group) {
     while (element) {
         window = element->window;
 
-        if (window->groups[index] == 1) {
+        if (window->groups & (1 << index)) {
             map_window(window->id);
         }
 
@@ -51,6 +71,7 @@ map_group(unsigned int group) {
 
 void
 unmap_group(unsigned int group) {
+    debug_output("unmap_group(): called");
     struct WindowLinkedListElement *element = window_list_head;
     Window *window = NULL;
     unsigned int index = group - 1;
@@ -58,7 +79,7 @@ unmap_group(unsigned int group) {
     while (element) {
         window = element->window;
 
-        if (window->groups[index] == 1) {
+        if (window->groups & (1 << index)) {
             unmap_window(window->id);
         }
 
