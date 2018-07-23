@@ -135,7 +135,7 @@ process_command(char *input) {
             }
 
         } else if (strcmp(diced[1], "attach_to_group") == 0 ||
-            strcmp(diced[1], "detach_from_group")) {
+            strcmp(diced[1], "detach_from_group") == 0) {
             if (!diced[2]) {
                 return;
             }
