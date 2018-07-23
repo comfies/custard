@@ -115,8 +115,6 @@ manage_window(xcb_window_t window_id) {
 
     window_list_append_window(window);
 
-    attach_window_to_group(window_id, focused_group);
-
     debug_output("manage_window(): Window created and added to linked list");
 
     return 1;
