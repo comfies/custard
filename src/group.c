@@ -49,6 +49,8 @@ focus_group(unsigned int group) {
     }
 
     map_group(group);
+
+    focused_group = group;
 }
 
 void
