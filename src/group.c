@@ -4,6 +4,10 @@ get_group_state(unsigned int group)
     debug_output("get_group_state(): called");
     group_state_t state;
 
+    if (group < 1 || group > 16 || group > Configuration->groups) {
+        return UNMAPPED;
+    }
+
     if ((groups & (1 << (group - 1))) > 0) {
         state = MAPPED;
     } else {
@@ -17,11 +21,25 @@ get_group_state(unsigned int group)
     return state;
 }
 
+short unsigned int
+window_is_in_group(xcb_window_t window_id, unsigned int group)
+{
+    Window *window = window_list_get_window(window_id);
+
+    if ((window->groups & (1 << (group - 1))) > 0) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
 void
 attach_window_to_group(xcb_window_t window_id, unsigned int group)
 {
     debug_output("attach_window_to_group(): called");
-    /*TODO: check if group > 16*/
+    if (group < 1 || group > 16 || group > Configuration->groups) {
+        return;
+    }
     Window *window = window_list_get_window(window_id);
 
     if (window) {
@@ -34,7 +52,9 @@ attach_window_to_group(xcb_window_t window_id, unsigned int group)
         map_window(window->id);
     } else {
         /* TODO: check if any of the other groups it's attached to are mapped*/
-        unmap_window(window->id);
+        if (!window_is_in_group(window->id, focused_group)) {
+            unmap_window(window->id);
+        }
     }
 }
 
@@ -42,7 +62,9 @@ void
 detach_window_from_group(xcb_window_t window_id, unsigned int group)
 {
     debug_output("detach_window_to_group(): called");
-    /*TODO: check if group > 16*/
+    if (group < 1 || group > 16 || group > Configuration->groups) {
+        return;
+    }
     Window *window = window_list_get_window(window_id);
 
     if (window) {
@@ -60,20 +82,26 @@ void
 focus_group(unsigned int group)
 {
     debug_output("focus_group(): called");
-    /*TODO: check if group > 16*/
-
-    /*TODO:
-      rather than unmapping and remapping whole groups,
-      check if each individual window should be unmapped or mapped,
-      and don't do anything to windows in the old AND new groups*/
-
-    for (unsigned int index = 0; index < Configuration->groups; index++) {
-        if ((index + 1) != group) {
-            unmap_group(index + 1);
-        }
+    if (group < 1 || group > 16 || group > Configuration->groups) {
+        return;
     }
 
-    map_group(group);
+    unsigned int old_group = focused_group;
+
+    struct WindowLinkedListElement *element = window_list_head;
+    Window *window = NULL;
+
+    while (element) {
+        window = element->window;
+
+        if (window_is_in_group(window->id, group)) {
+            map_window(window->id);
+        } else {
+            unmap_window(window->id);
+        }
+
+        element = element->next;
+    }
 
     focused_group = group;
 }
@@ -84,12 +112,11 @@ map_group(unsigned int group)
     debug_output("map_group(): called");
     struct WindowLinkedListElement *element = window_list_head;
     Window *window = NULL;
-    unsigned int index = group - 1;
 
     while (element) {
         window = element->window;
 
-        if (window->groups & (1 << index)) {
+        if (window_is_in_group(window->id, group)) {
             map_window(window->id);
         }
 
@@ -103,13 +130,14 @@ unmap_group(unsigned int group)
     debug_output("unmap_group(): called");
     struct WindowLinkedListElement *element = window_list_head;
     Window *window = NULL;
-    unsigned int index = group - 1;
 
     while (element) {
         window = element->window;
 
-        if (window->groups & (1 << index)) {
-            unmap_window(window->id);
+        if (window_is_in_group(window->id, group)) {
+            if (!window_is_in_group(window->id, focused_group)) {
+                unmap_window(window->id);
+            }
         }
 
         element = element->next;
