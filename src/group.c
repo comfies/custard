@@ -3,7 +3,13 @@ group_state_t
 get_group_state(unsigned int group)
 {
     debug_output("get_group_state(): called");
-    group_state_t state = (group_state_t)((groups & (1 << (group - 1))) % 2);
+    group_state_t state;
+
+    if (groups & (1 << (group - 1))) {
+        state = MAPPED;
+    } else {
+        state = UNMAPPED;
+    }
 
     if (state == MAPPED && focused_group == group) {
         state = FOCUSED;
