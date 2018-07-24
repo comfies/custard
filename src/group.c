@@ -30,10 +30,8 @@ get_group_state(unsigned int group)
 }
 
 short unsigned int
-window_is_in_group(xcb_window_t window_id, unsigned int group)
+window_is_in_group(Window *window, unsigned int group)
 {
-    Window *window = window_list_get_window(window_id);
-
     if ((window->groups & (1 << (group - 1))) > 0) {
         return 1;
     } else {
@@ -60,7 +58,7 @@ attach_window_to_group(xcb_window_t window_id, unsigned int group)
         map_window(window->id);
     } else {
         /* TODO: check if any of the other groups it's attached to are mapped*/
-        if (!window_is_in_group(window->id, focused_group)) {
+        if (!window_is_in_group(window, focused_group)) {
             unmap_window(window->id);
         }
     }
@@ -100,7 +98,7 @@ focus_group(unsigned int group)
     while (element) {
         window = element->window;
 
-        if (window_is_in_group(window->id, group)) {
+        if (window_is_in_group(window, group)) {
             map_window(window->id);
         } else {
             unmap_window(window->id);
@@ -122,7 +120,7 @@ map_group(unsigned int group)
     while (element) {
         window = element->window;
 
-        if (window_is_in_group(window->id, group)) {
+        if (window_is_in_group(window, group)) {
             map_window(window->id);
         }
 
@@ -140,8 +138,8 @@ unmap_group(unsigned int group)
     while (element) {
         window = element->window;
 
-        if (window_is_in_group(window->id, group)) {
-            if (!window_is_in_group(window->id, focused_group)) {
+        if (window_is_in_group(window, group)) {
+            if (!window_is_in_group(window, focused_group)) {
                 unmap_window(window->id);
             }
         }
