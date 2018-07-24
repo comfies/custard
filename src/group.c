@@ -1,3 +1,11 @@
+#include "group.h"
+
+#include "config.h"
+#include "window.h"
+
+short unsigned int groups = 0;
+unsigned int focused_group = 1;
+
 group_state_t
 get_group_state(unsigned int group)
 {
@@ -85,8 +93,6 @@ focus_group(unsigned int group)
     if (group < 1 || group > 16 || group > Configuration->groups) {
         return;
     }
-
-    unsigned int old_group = focused_group;
 
     struct WindowLinkedListElement *element = window_list_head;
     Window *window = NULL;

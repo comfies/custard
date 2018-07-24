@@ -1,3 +1,19 @@
+#include "socket.h"
+
+#include "custard.h"
+#include "ipc.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <netinet/in.h>
+#include <sys/un.h>
+#include <unistd.h>
+
+char socket_path[32] = "/tmp/custard.sock";
+int socket_file_descriptor;
+
 unsigned short int
 initialize_socket()
 {
@@ -57,13 +73,17 @@ read_socket()
 void *
 start_socket_read_loop(void *pointer)
 {
+    (void)pointer;
+
     debug_output("start_socket_read_loop(): started socket read loop");
     while (wm_running) {
         read_socket();
     }
+
+    return NULL;
 }
 
-unsigned short int
+void
 finalize_socket()
 {
     debug_output("finalize_socket(): called");

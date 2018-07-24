@@ -1,3 +1,13 @@
+#include "handlers.h"
+
+#include "custard.h"
+#include "grid.h"
+#include "group.h"
+#include "window.h"
+#include "xcb.h"
+
+#include <xcb/xcb.h>
+
 void
 handlers_handle_event(xcb_generic_event_t *event)
 {

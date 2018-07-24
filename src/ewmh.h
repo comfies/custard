@@ -1,5 +1,13 @@
-xcb_ewmh_connection_t *ewmh_connection;
-xcb_window_t ewmh_window_id;
+#ifndef EWMH_H
+#define EWMH_H
 
-unsigned short int initialize_ewmh_connection(void);
-unsigned short int finalize_ewmh_connection(void);
+#include <xcb/xcb.h>
+#include <xcb/xcb_ewmh.h>
+
+extern xcb_ewmh_connection_t *ewmh_connection;
+extern xcb_window_t ewmh_window_id;
+
+unsigned short initialize_ewmh_connection(void);
+unsigned short finalize_ewmh_connection(void);
+
+#endif /* EWMH_H */

@@ -1,3 +1,10 @@
+#ifndef WINDOW_H
+#define WINDOW_H
+
+#include "custard.h"
+
+#include <xcb/xcb.h>
+
 struct Window {
     xcb_window_t id;
     short unsigned int mapped;
@@ -38,3 +45,5 @@ void border_update_double(xcb_window_t);
 void border_update_triple(xcb_window_t);
 void border_update_with_graphics_context(xcb_window_t, xcb_rectangle_t*,
     unsigned int);
+
+#endif /* WINDOW_H */

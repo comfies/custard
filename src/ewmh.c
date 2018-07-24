@@ -1,4 +1,16 @@
-unsigned short int
+#include "ewmh.h"
+
+#include "custard.h"
+#include "xcb.h"
+
+#include <unistd.h>
+
+#include <xcb/xcb.h>
+
+xcb_ewmh_connection_t *ewmh_connection;
+xcb_window_t ewmh_window_id;
+
+unsigned short
 initialize_ewmh_connection()
 {
     unsigned int data[1] = {
@@ -55,12 +67,14 @@ initialize_ewmh_connection()
 
     xcb_ewmh_set_supporting_wm_check(
         ewmh_connection,
-        ewmh_window_id, ewmh_window_id
+        ewmh_window_id,
+        ewmh_window_id
     );
 
     xcb_ewmh_set_supporting_wm_check(
         ewmh_connection,
-        screen->root, ewmh_window_id
+        screen->root,
+        ewmh_window_id
     );
 
     xcb_atom_t supported_atoms[] = {
@@ -93,11 +107,11 @@ initialize_ewmh_connection()
     );
 
     commit();
-    
+
     return 1;
 }
 
-unsigned short int
+unsigned short
 finalize_ewmh_connection(void)
 {
     if (ewmh_connection) {

@@ -1,3 +1,13 @@
+#include "xcb.h"
+
+#include "custard.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+
+xcb_connection_t *xcb_connection;
+xcb_screen_t *screen;
+
 unsigned short int
 initialize_xcb_connection()
 {

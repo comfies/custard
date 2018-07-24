@@ -1,3 +1,6 @@
+#ifndef CONFIG_H
+#define CONFIG_H
+
 struct Config {
     short unsigned int border_type;
     short unsigned int border_invert_colors;
@@ -19,6 +22,8 @@ struct Config {
     unsigned int groups;
 };
 
-struct Config *Configuration;
+extern struct Config *Configuration;
 void apply_config_defaults(void);
 void apply_config(void);
+
+#endif /* CONFIG_H */

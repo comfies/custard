@@ -1,3 +1,25 @@
+#include "custard.h"
+
+#include "config.h"
+#include "ewmh.h"
+#include "handlers.h"
+#include "grid.h"
+#include "socket.h"
+#include "window.h"
+#include "xcb.h"
+
+#include <xcb/xcb.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+
+unsigned short debug = 0;
+unsigned short wm_running = 0;
+
+struct WindowLinkedListElement *window_list_head = NULL;
+Window *focused_window;
+pthread_t socket_thread;
+
 short unsigned int
 window_list_append_window(Window *window)
 {
@@ -88,7 +110,7 @@ window_list_get_window(xcb_window_t window_id)
     return NULL;
 }
 
-static void *
+void
 debug_output(char *message)
 {
     if (debug) {
