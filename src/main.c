@@ -1,5 +1,3 @@
-#define _POSIX_C_SOURCE 200809L
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -26,18 +24,6 @@
 #include "grid.h"
 #include "window.h"
 #include "group.h"
-
-#include "custard.c"
-
-#include "ipc.c"
-#include "config.c"
-#include "xcb.c"
-#include "ewmh.c"
-#include "socket.c"
-#include "handlers.c"
-#include "grid.c"
-#include "window.c"
-#include "group.c"
 
 int
 main(int argc, char** argv)

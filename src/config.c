@@ -1,3 +1,12 @@
+#include "config.h"
+
+#include "custard.h"
+#include "grid.h"
+#include "window.h"
+#include "xcb.h"
+
+struct Config *Configuration;
+
 void
 apply_config_defaults()
 {

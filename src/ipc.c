@@ -1,3 +1,12 @@
+#include "ipc.h"
+
+#include "config.h"
+#include "group.h"
+#include "xcb.h"
+
+#include <stdlib.h>
+#include <string.h>
+
 void
 process_command(char *input)
 {

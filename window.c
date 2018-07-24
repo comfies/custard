@@ -8,9 +8,7 @@
 #include <xcb/xcb.h>
 #include <xcb/xcb_icccm.h>
 
-#include <stdio.h>
-
-short unsigned int
+short unsigned
 manage_window(xcb_window_t window_id)
 {
 
@@ -95,7 +93,7 @@ manage_window(xcb_window_t window_id)
 
     unsigned int data[2] = {
         XCB_EVENT_MASK_BUTTON_PRESS,
-        XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY
+
     };
 
     xcb_change_window_attributes(
@@ -132,7 +130,7 @@ manage_window(xcb_window_t window_id)
     return 1;
 }
 
-short unsigned int
+short unsigned
 unmanage_window(xcb_window_t window_id) {
     debug_output("unmanage_window(): called");
 
@@ -181,7 +179,7 @@ focus_on_window(xcb_window_t window_id)
 
     unsigned int data[2] = {
         XCB_ICCCM_WM_STATE_NORMAL,
-        XCB_NONE
+
     };
 
     xcb_change_property(
@@ -258,6 +256,9 @@ close_window(xcb_window_t window_id)
 
     if (reply) {
         delete_window_atom = reply->atom;
+    }
+
+    if (&protocols && delete_window_atom) {
 
         debug_output("close_window(): Attempting to use WM protocols to close window");
 
@@ -272,17 +273,17 @@ close_window(xcb_window_t window_id)
                     .type = ewmh_connection->WM_PROTOCOLS,
                     .data.data32 = {
                         delete_window_atom,
-                        XCB_CURRENT_TIME
+
                     }
                 };
 
                 xcb_send_event(
-                        xcb_connection,
-                        0,
-                        window_id,
-                        XCB_EVENT_MASK_NO_EVENT,
-                        (char *)&event
-                        );
+                    xcb_connection,
+                    0,
+                    window_id,
+                    XCB_EVENT_MASK_NO_EVENT,
+                    (char *)&event
+                );
 
                 xcb_icccm_get_wm_protocols_reply_wipe(&protocols);
                 return;
@@ -324,7 +325,7 @@ void
 raise_window(xcb_window_t window_id)
 {
     unsigned int data[1] = {
-        XCB_STACK_MODE_ABOVE
+
     };
 
     xcb_configure_window(
@@ -339,7 +340,7 @@ void
 lower_window(xcb_window_t window_id)
 {
     unsigned int data[1] = {
-        XCB_STACK_MODE_BELOW
+
     };
 
     xcb_configure_window(
@@ -387,7 +388,7 @@ resize_window_with_pixels(xcb_window_t window_id,
 {
 
     unsigned int data[2] = {
-        width, height
+        width,
     };
 
     xcb_configure_window(
@@ -601,7 +602,7 @@ border_update(xcb_window_t window_id)
     debug_output("border_update(): non-null geometry");
 
     void (*update_methods[3])(xcb_window_t) = {
-        border_update_single, border_update_double, border_update_triple
+        border_update_single, border_update_double,
     };
 
     unsigned int data[1] = {Configuration->border_total_size};
@@ -697,7 +698,7 @@ border_update_double(xcb_window_t window_id)
             0, (short)(geometry->height + Configuration->border_total_size +
                 Configuration->border_outer_size),
             (short unsigned)(geometry->width + Configuration->border_inner_size),
-            (short unsigned)Configuration->border_inner_size
+            (short unsigned)Configuration->
         },
 
         {
@@ -706,14 +707,14 @@ border_update_double(xcb_window_t window_id)
                 Configuration->border_total_size +
                 Configuration->border_outer_size),
             (short unsigned)Configuration->border_inner_size,
-            (short unsigned)Configuration->border_inner_size
+            (short unsigned)Configuration->
         }
     };
 
     border_update_with_graphics_context(window_id, border, 5);
 }
 
-void
+
 border_update_triple(xcb_window_t window_id)
 {
     debug_output("border_update_triple(): selected");
@@ -722,9 +723,9 @@ border_update_triple(xcb_window_t window_id)
         xcb_connection,
         xcb_get_geometry(
             xcb_connection,
-            window_id
+
         ),
-        NULL
+
     );
 
     if (!geometry) {
@@ -732,7 +733,7 @@ border_update_triple(xcb_window_t window_id)
     }
 
     xcb_rectangle_t border[8] = {
-    
+
         {
             (short)(geometry->width + Configuration->border_outer_size), 0,
             (short unsigned)Configuration->border_inner_size,
@@ -743,7 +744,7 @@ border_update_triple(xcb_window_t window_id)
         {
             0, (short)(geometry->height + Configuration->border_outer_size),
             (short unsigned)(geometry->width + Configuration->border_outer_size),
-            (short unsigned)Configuration->border_inner_size
+            (short unsigned)Configuration->
         }, /* Bottom */
 
         {
@@ -757,7 +758,7 @@ border_update_triple(xcb_window_t window_id)
             0, (short)(geometry->height + Configuration->border_total_size +
                 Configuration->border_outer_size),
             (short unsigned)(geometry->width + Configuration->border_outer_size),
-            (short unsigned)Configuration->border_inner_size
+            (short unsigned)Configuration->
         }, /* Top */
 
         {
@@ -795,14 +796,14 @@ border_update_triple(xcb_window_t window_id)
                 Configuration->border_outer_size),
             (short unsigned)(Configuration->border_inner_size +
                 Configuration->border_outer_size),
-            (short unsigned)Configuration->border_inner_size
+            (short unsigned)Configuration->
         } /* Bottom-left */
     };
 
     border_update_with_graphics_context(window_id, border, 8);
 }
 
-void
+
 border_update_with_graphics_context(xcb_window_t window_id,
     xcb_rectangle_t *inner_border, unsigned int inner_border_array_size)
 {
@@ -844,20 +845,20 @@ border_update_with_graphics_context(xcb_window_t window_id,
         xcb_connection,
         xcb_get_geometry(
             xcb_connection,
-            window_id
+
         ),
-        NULL
+
     );
 
     debug_output("border_update_with_graphics_context(): setting outer border");
 
-    xcb_rectangle_t outer_border[4] = {{
+    xcb_rectangle_t outer_border[4] = {
         0, 0,
         (short unsigned)(geometry->width +
             (Configuration->border_total_size * 2)),
         (short unsigned)(geometry->height +
             (Configuration->border_total_size * 2))
-    }};
+    };
 
     xcb_pixmap_t pixmap = xcb_generate_id(xcb_connection);
 
@@ -878,7 +879,7 @@ border_update_with_graphics_context(xcb_window_t window_id,
         xcb_connection,
         graphics_context,
         pixmap,
-        0, NULL
+        0,
     );
 
     data[0] = colors[1];
@@ -887,7 +888,7 @@ border_update_with_graphics_context(xcb_window_t window_id,
         xcb_connection,
         graphics_context,
         XCB_GC_FOREGROUND,
-        data
+
     );
 
     xcb_poly_fill_rectangle(
@@ -895,7 +896,7 @@ border_update_with_graphics_context(xcb_window_t window_id,
         pixmap,
         graphics_context,
         4,
-        outer_border
+
     );
 
     data[0] = colors[0];
@@ -904,7 +905,7 @@ border_update_with_graphics_context(xcb_window_t window_id,
         xcb_connection,
         graphics_context,
         XCB_GC_FOREGROUND,
-        data
+
     );
 
     xcb_poly_fill_rectangle(
@@ -912,7 +913,7 @@ border_update_with_graphics_context(xcb_window_t window_id,
         pixmap,
         graphics_context,
         inner_border_array_size,
-        inner_border
+
     );
 
     data[0] = pixmap;
@@ -921,17 +922,17 @@ border_update_with_graphics_context(xcb_window_t window_id,
         xcb_connection,
         window_id,
         XCB_CW_BORDER_PIXMAP,
-        data
+
     );
 
     xcb_free_pixmap(
         xcb_connection,
-        pixmap
+
     );
 
     xcb_free_gc(
         xcb_connection,
-        graphics_context
+
     );
 }
 
