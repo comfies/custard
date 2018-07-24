@@ -7,7 +7,7 @@ LDFLAGS = -lxcb -lxcb-ewmh -lxcb-icccm -lxcb-xrm -lxcb-util -lpthread
 
 TARGET = custard
 SRCS = $(wildcard src/*.c)
-OBJS = $(SRCS:.c=.o)
+OBJS = $(subst src,build,$(SRCS:.c=.o))
 PREFIX?=/usr/local
 MANPREFIX?=$(PREFIX)/share/man
 
@@ -18,8 +18,10 @@ all: $(TARGET)
 -include $(SRCS:.c=.d)
 
 $(TARGET): $(OBJS)
-	mkdir -p build
-	$(CC) $(LDFLAGS) -o $@ $^
+	$(CC) $(LDFLAGS) -o build/$@ $^
+
+build/%.o: src/%.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $^
 
 install:
 	install -m 755 -D build/$(TARGET) $(DESTDIR)$(PREFIX)/bin/$(TARGET)
@@ -28,6 +30,6 @@ install:
 
 clean:
 	$(RM) build/$(TARGET)
-	$(RM) src/*.o
-	$(RM) src/*.d
+	$(RM) build/*.o
+	$(RM) build/*.d
 
