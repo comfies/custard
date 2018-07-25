@@ -7,11 +7,14 @@ super + {_,ctrl + ,alt + }{Up,Down,Left,Right}
 super + shift + {Up,Down}
     custardctl window --{raise,lower}
 
-#super + {_,ctrl + ,alt +}{1-9,0}
-#    custardctl workspace --{focus,attach,detach} {1-9,10}
+super + {_,ctrl +,alt +}{1-9,0}
+    custardctl group --{focus,attach,detach} {1-9,10}
 
-#super + shift + {1-9,0}
-#    custardctl window --relocate {1-9,10}
+super + shift + {1-9,0}
+    custardctl window --attach_to_group {1-9,10}
+
+super + grave + {1-9,0}
+    custardctl window --detach_from_group {1-9,10}
 
 super + w
     custardctl window --close
