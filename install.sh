@@ -20,13 +20,13 @@ installandconfigure(){
 
     mkdir -p ~/.config/custard
     cp ./examples/sxhkdrc ~/.config/custard/sxhkdrc
-    cp ./examples/Xresources ~/.config/custard/Xresources
+    cp ./examples/custard.sh ~/.config/custard/rc.sh
 
     cat <<EOF>> ~/.config/custard/start.sh
 \#!/bin/bash
 echo '' > /tmp/custard.log
-xrdb -merge ~/.config/custard/Xresources
-sxhkd -c ~/.config/custard/sxhkd
+sxhkd -c ~/.config/custard/sxhkd &
+(sleep 2; sh ~/.config/custard/rc.sh) &
 custard 2>> /tmp/custard.log
 EOF
     chmod +x ~/.config/custard/start.sh
