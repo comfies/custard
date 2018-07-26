@@ -17,7 +17,7 @@ extern unsigned int focused_group;
 
 group_state_t get_group_state(unsigned int);
 
-unsigned short window_is_in_group(xcb_window_t, unsigned int);
+unsigned short window_is_in_group(Window*, unsigned int);
 
 void attach_window_to_group(xcb_window_t, unsigned int);
 void detach_window_from_group(xcb_window_t, unsigned int);

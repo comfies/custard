@@ -3,6 +3,7 @@
 #include "custard.h"
 #include "grid.h"
 #include "window.h"
+#include "ewmh.h"
 #include "xcb.h"
 
 struct Config *Configuration;
@@ -26,11 +27,15 @@ apply_config_defaults()
     Configuration->grid_margin_left = 0;
     Configuration->grid_margin_right = 0;
     Configuration->groups = 2;
+
+    xcb_ewmh_set_number_of_desktops(ewmh_connection, 0, 2);
 }
 
 void
 apply_config()
 {
+    xcb_ewmh_set_number_of_desktops(ewmh_connection, 0, Configuration->groups);
+
     if (Configuration->border_type == 0) {
         Configuration->border_total_size = 0;
     } else if (Configuration->border_type == 1) {
@@ -44,7 +49,11 @@ apply_config()
     }
 
     grid_apply_configuration();
-    /* TODO: maybe have the WM rearrange windows if the grid configuration changed? */
+    /* TODO: if windows are outside of newly assigned grid boundaries they should be moved
+        to fit within the new ones, and resized if need be. */
+
+    /* TODO: if the number of groups is less than the previous amount, move all windows
+        from non-accessible groups to the last group in the stack */
 
     struct WindowLinkedListElement *element = window_list_head;
     Window *window = NULL;

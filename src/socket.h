@@ -1,7 +1,6 @@
 #ifndef SOCKET_H
 #define SOCKET_H
 
-extern char socket_path[32];
 extern int socket_file_descriptor;
 
 unsigned short int initialize_socket(void);

@@ -2,6 +2,7 @@
 
 #include "config.h"
 #include "window.h"
+#include "ewmh.h"
 
 short unsigned int groups = 0;
 unsigned int focused_group = 1;
@@ -22,7 +23,7 @@ get_group_state(unsigned int group)
         state = UNMAPPED;
     }
 
-    if (state == MAPPED && focused_group == group) {
+    if (focused_group == group) {
         state = FOCUSED;
     }
 
@@ -30,10 +31,8 @@ get_group_state(unsigned int group)
 }
 
 short unsigned int
-window_is_in_group(xcb_window_t window_id, unsigned int group)
+window_is_in_group(Window *window, unsigned int group)
 {
-    Window *window = window_list_get_window(window_id);
-
     if ((window->groups & (1 << (group - 1))) > 0) {
         return 1;
     } else {
@@ -60,7 +59,7 @@ attach_window_to_group(xcb_window_t window_id, unsigned int group)
         map_window(window->id);
     } else {
         /* TODO: check if any of the other groups it's attached to are mapped*/
-        if (!window_is_in_group(window->id, focused_group)) {
+        if (!window_is_in_group(window, focused_group)) {
             unmap_window(window->id);
         }
     }
@@ -76,13 +75,15 @@ detach_window_from_group(xcb_window_t window_id, unsigned int group)
     Window *window = window_list_get_window(window_id);
 
     if (window) {
-        window->groups &= ~(1 << (group - 1));
-    }
+        if ((window->groups & ~(1 << (group - 1))) > 0) {
+            window->groups &= ~(1 << (group - 1));
+        }
 
-    group_state_t state = get_group_state(group);
+        group_state_t state = get_group_state(group);
 
-    if (state == UNMAPPED) {
-        unmap_window(window->id);
+        if (state == UNMAPPED) {
+            unmap_window(window->id);
+        }
     }
 }
 
@@ -100,7 +101,7 @@ focus_group(unsigned int group)
     while (element) {
         window = element->window;
 
-        if (window_is_in_group(window->id, group)) {
+        if (window_is_in_group(window, group)) {
             map_window(window->id);
         } else {
             unmap_window(window->id);
@@ -110,6 +111,7 @@ focus_group(unsigned int group)
     }
 
     focused_group = group;
+    xcb_ewmh_set_current_desktop(ewmh_connection, 0, focused_group);
 }
 
 void
@@ -122,7 +124,7 @@ map_group(unsigned int group)
     while (element) {
         window = element->window;
 
-        if (window_is_in_group(window->id, group)) {
+        if (window_is_in_group(window, group)) {
             map_window(window->id);
         }
 
@@ -137,11 +139,15 @@ unmap_group(unsigned int group)
     struct WindowLinkedListElement *element = window_list_head;
     Window *window = NULL;
 
+    if (focused_group == group) {
+        return;
+    }
+
     while (element) {
         window = element->window;
 
-        if (window_is_in_group(window->id, group)) {
-            if (!window_is_in_group(window->id, focused_group)) {
+        if (window_is_in_group(window, group)) {
+            if (!window_is_in_group(window, focused_group)) {
                 unmap_window(window->id);
             }
         }

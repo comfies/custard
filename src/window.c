@@ -814,8 +814,6 @@ border_update_with_graphics_context(xcb_window_t window_id,
         Configuration->border_background_color /* secondary */
     };
 
-    printf("%s\n", "1");
-
     unsigned int data[1];
 
     unsigned int focused = 0;
@@ -824,21 +822,20 @@ border_update_with_graphics_context(xcb_window_t window_id,
             focused = 1;
         }
     }
-    printf("%s\n", "2");
 
-    if (Configuration->border_invert_colors) {
-        if (focused) {
+    if (focused) {
+        if (Configuration->border_invert_colors) {
             colors[1] = Configuration->border_focused_color;
+            colors[0] = Configuration->border_background_color;
         } else {
-            colors[1] = Configuration->border_unfocused_color;
-        }
-        colors[0] = Configuration->border_background_color;
-    } else {
-        if (focused) {
             colors[0] = Configuration->border_focused_color;
         }
+    } else {
+        if (Configuration->border_invert_colors) {
+            colors[1] = Configuration->border_unfocused_color;
+            colors[0] = Configuration->border_background_color;
+        }
     }
-    printf("%s\n", "3");
 
     xcb_get_geometry_reply_t *geometry = xcb_get_geometry_reply(
         xcb_connection,

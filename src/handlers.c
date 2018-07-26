@@ -29,6 +29,8 @@ handlers_handle_event(xcb_generic_event_t *event)
             return;
             break;
     }
+
+    /* TODO: create setting for sloppy focus */
 }
 
 void

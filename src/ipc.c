@@ -66,6 +66,8 @@ process_command(char *input)
             } else if (strcmp(diced[2], "border_background_color") == 0) {
                 Configuration->border_background_color = parse_rgba_color(
                     diced[3]);
+            } else if (strcmp(diced[2], "border_invert_colors") == 0) {
+                Configuration->border_invert_colors = parse_boolean(diced[3]);
             } else if (strcmp(diced[2], "border_inner_size") == 0) {
                 Configuration->border_inner_size = parse_unsigned_integer(
                     diced[3]);

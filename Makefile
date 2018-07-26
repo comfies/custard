@@ -3,23 +3,28 @@ CC=gcc
 OPTFLAGS = -O2
 CFLAGS = $(OPTFLAGS) -std=c99 -Wall -Wextra -pedantic
 CPPFLAGS = -MD -MP -D_POSIX_C_SOURCE=200809L
-LDFLAGS = -lxcb -lxcb-ewmh -lxcb-icccm -lxcb-xrm -lxcb-util -lpthread
+LDFLAGS = -lxcb -lxcb-ewmh -lxcb-icccm -lxcb-util -lpthread
 
 TARGET = custard
 SRCS = $(wildcard src/*.c)
-OBJS = $(SRCS:.c=.o)
+OBJS = $(subst src,build,$(SRCS:.c=.o))
 PREFIX?=/usr/local
 MANPREFIX?=$(PREFIX)/share/man
 
 .PHONY: all install clean
 
-all: $(TARGET)
+all: prepare $(OBJS) $(TARGET)
 
 -include $(SRCS:.c=.d)
 
 $(TARGET): $(OBJS)
+	$(CC) $(LDFLAGS) -o build/$@ $^
+
+prepare:
 	mkdir -p build
-	$(CC) $(LDFLAGS) -o $@ $^
+
+build/%.o: src/%.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $^
 
 install:
 	install -m 755 -D build/$(TARGET) $(DESTDIR)$(PREFIX)/bin/$(TARGET)
@@ -27,7 +32,5 @@ install:
 #	install -m 644 -D man/custard.man $(DESTDIR)$(MANPREFIX)/man1/custard.1
 
 clean:
-	$(RM) build/$(TARGET)
-	$(RM) src/*.o
-	$(RM) src/*.d
+	$(RM) -r build
 
