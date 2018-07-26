@@ -15,7 +15,7 @@ MANPREFIX?=$(PREFIX)/share/man
 
 all: prepare $(OBJS) $(TARGET)
 
--include $(SRCS:.c=.d)
+-include $(subst src,build,$(SRCS:.c=.d))
 
 $(TARGET): $(OBJS)
 	$(CC) $(LDFLAGS) -o build/$@ $^
@@ -24,7 +24,7 @@ prepare:
 	mkdir -p build
 
 build/%.o: src/%.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $^
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
 
 install:
 	install -m 755 -D build/$(TARGET) $(DESTDIR)$(PREFIX)/bin/$(TARGET)
