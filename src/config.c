@@ -44,7 +44,11 @@ apply_config()
     }
 
     grid_apply_configuration();
-    /* TODO: maybe have the WM rearrange windows if the grid configuration changed? */
+    /* TODO: if windows are outside of newly assigned grid boundaries they should be moved
+        to fit within the new ones, and resized if need be. */
+
+    /* TODO: if the number of groups is less than the previous amount, move all windows
+        from non-accessible groups to the last group in the stack */
 
     struct WindowLinkedListElement *element = window_list_head;
     Window *window = NULL;
