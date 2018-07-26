@@ -22,7 +22,7 @@ get_group_state(unsigned int group)
         state = UNMAPPED;
     }
 
-    if (state == MAPPED && focused_group == group) {
+    if (focused_group == group) {
         state = FOCUSED;
     }
 
@@ -74,13 +74,15 @@ detach_window_from_group(xcb_window_t window_id, unsigned int group)
     Window *window = window_list_get_window(window_id);
 
     if (window) {
-        window->groups &= ~(1 << (group - 1));
-    }
+        if ((window->groups & ~(1 << (group - 1))) > 0) {
+            window->groups &= ~(1 << (group - 1));
+        }
 
-    group_state_t state = get_group_state(group);
+        group_state_t state = get_group_state(group);
 
-    if (state == UNMAPPED) {
-        unmap_window(window->id);
+        if (state == UNMAPPED) {
+            unmap_window(window->id);
+        }
     }
 }
 
