@@ -6,6 +6,12 @@
 short unsigned int groups = 0;
 unsigned int focused_group = 1;
 
+/*
+    TODO: support xcb_ewmh_set_number_of_desktops,
+        xcb_ewmh_set_current_desktop
+        (https://github.com/Sweets/custard/blob/bf8273cdd5fce2bb13dea228424cc49448f94834/src/custard.cpp)
+ */
+
 group_state_t
 get_group_state(unsigned int group)
 {
