@@ -13,7 +13,7 @@ MANPREFIX?=$(PREFIX)/share/man
 
 .PHONY: all install clean
 
-all: prepare $(TARGET)
+all: prepare $(OBJS) $(TARGET)
 
 -include $(SRCS:.c=.d)
 
