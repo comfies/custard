@@ -823,16 +823,17 @@ border_update_with_graphics_context(xcb_window_t window_id,
         }
     }
 
-    if (Configuration->border_invert_colors) {
-        if (focused) {
-            colors[1] = Configuration->border_unfocused_color;
-        } else {
+    if (focused) {
+        if (Configuration->border_invert_colors) {
             colors[1] = Configuration->border_focused_color;
-        }
-        colors[0] = Configuration->border_background_color;
-    } else {
-        if (focused) {
+            colors[0] = Configuration->border_background_color;
+        } else {
             colors[0] = Configuration->border_focused_color;
+        }
+    } else {
+        if (Configuration->border_invert_colors) {
+            colors[1] = Configuration->border_unfocused_color;
+            colors[0] = Configuration->border_background_color;
         }
     }
 
