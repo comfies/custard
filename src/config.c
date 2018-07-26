@@ -26,11 +26,15 @@ apply_config_defaults()
     Configuration->grid_margin_left = 0;
     Configuration->grid_margin_right = 0;
     Configuration->groups = 2;
+
+    xcb_ewmh_set_number_of_desktops(ewmh_connection, 0, 2);
 }
 
 void
 apply_config()
 {
+    xcb_ewmh_set_number_of_desktops(ewmh_connection, 0, Configuration->groups);
+
     if (Configuration->border_type == 0) {
         Configuration->border_total_size = 0;
     } else if (Configuration->border_type == 1) {

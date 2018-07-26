@@ -116,6 +116,7 @@ focus_group(unsigned int group)
     }
 
     focused_group = group;
+    xcb_ewmh_set_current_desktop(ewmh_connection, 0, focused_group);
 }
 
 void
