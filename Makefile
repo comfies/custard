@@ -6,8 +6,9 @@ CPPFLAGS = -MD -MP -D_POSIX_C_SOURCE=200809L
 LDFLAGS = -lxcb -lxcb-ewmh -lxcb-icccm -lxcb-util -lpthread
 
 TARGET = custard
+BUILDPREFIX=build
 SRCS = $(wildcard src/*.c)
-OBJS = $(subst src,build,$(SRCS:.c=.o))
+OBJS = $(subst src,$(BUILDPREFIX),$(SRCS:.c=.o))
 PREFIX?=/usr/local
 MANPREFIX?=$(PREFIX)/share/man
 
@@ -15,22 +16,22 @@ MANPREFIX?=$(PREFIX)/share/man
 
 all: prepare $(OBJS) $(TARGET)
 
--include $(subst src,build,$(SRCS:.c=.d))
+-include $(subst src,$(BUILDPREFIX),$(SRCS:.c=.d))
 
 $(TARGET): $(OBJS)
-	$(CC) $(LDFLAGS) -o build/$@ $^
+	$(CC) $(LDFLAGS) -o $(BUILDPREFIX)/$@ $^
 
 prepare:
-	mkdir -p build
+	mkdir -p $(BUILDPREFIX)
 
-build/%.o: src/%.c
+$(BUILDPREFIX)/%.o: src/%.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
 
 install:
-	install -m 755 -D build/$(TARGET) $(DESTDIR)$(PREFIX)/bin/$(TARGET)
+	install -m 755 -D $(BUILDPREFIX)/$(TARGET) $(DESTDIR)$(PREFIX)/bin/$(TARGET)
 	install -m 755 -D contrib/custardctl.py $(DESTDIR)$(PREFIX)/bin/custardctl
 #	install -m 644 -D man/custard.man $(DESTDIR)$(MANPREFIX)/man1/custard.1
 
 clean:
-	$(RM) -r build
+	$(RM) -r $(BUILDPREFIX)
 
