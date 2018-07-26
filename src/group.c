@@ -143,6 +143,10 @@ unmap_group(unsigned int group)
     struct WindowLinkedListElement *element = window_list_head;
     Window *window = NULL;
 
+    if (focused_group == group) {
+        return;
+    }
+
     while (element) {
         window = element->window;
 
