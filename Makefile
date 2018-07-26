@@ -1,7 +1,14 @@
-CC=gcc
+CC?=gcc
 
 OPTFLAGS = -O2
-CFLAGS = $(OPTFLAGS) -std=c99 -Wall -Wextra -pedantic
+CFLAGS = $(OPTFLAGS) -std=c99 -pedantic
+
+ifeq ($(CC), clang)
+	CFLAGS+=-Weverything
+else
+	CFLAGS+=-Wall -Wextra
+endif
+
 CPPFLAGS = -MD -MP -D_POSIX_C_SOURCE=200809L
 LDFLAGS = -lxcb -lxcb-ewmh -lxcb-icccm -lxcb-util -lpthread
 
