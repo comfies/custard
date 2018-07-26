@@ -158,12 +158,12 @@ if __name__ == '__main__':
 
             data = str(data)
 
-            output = f"{target} configure {variable} {data}"
+            output = "{0} configure {1} {2}".format(target, variable, data)
     elif target == 'window':
         if action == 'close':
             output = "window close"
         elif action in ['raise', 'lower']:
-            output = f"window {action}"
+            output = "window {0}".format(action)
         elif action in ['move', 'expand', 'contract']:
             value = arguments[0].lower()
 
@@ -190,16 +190,16 @@ if __name__ == '__main__':
             direction_number = direction_map[value]
             if action == 'move' and direction_number == 8:
                 error_out("Invalid direction specified for action")
-            output = f"{target} {action} {direction_number}"
+            output = "{0} {1} {2}".format(target, action, direction_number)
         elif action in ['attach_to_group', 'detach_from_group']:
             value = arguments[0]
             value = parse_unsigned_integer(value)
 
-            output = f"{target} {action} {value}"
+            output = "{0} {1} {2}".format(target, action, value)
     elif target == 'group':
         group = arguments[0]
         group = parse_unsigned_integer(group)
 
-        output = f"{target} {action} {group}"
+        output = "{0} {1} {2}".format(target, action, group)
 
     send_message(output)
