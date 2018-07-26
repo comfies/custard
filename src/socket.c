@@ -10,6 +10,7 @@
 #include <netinet/in.h>
 #include <sys/un.h>
 #include <unistd.h>
+#include <sys/socket.h>
 
 int socket_file_descriptor;
 
