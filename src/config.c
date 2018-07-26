@@ -3,6 +3,7 @@
 #include "custard.h"
 #include "grid.h"
 #include "window.h"
+#include "ewmh.h"
 #include "xcb.h"
 
 struct Config *Configuration;
