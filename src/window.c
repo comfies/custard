@@ -228,8 +228,11 @@ focus_on_window(xcb_window_t window_id)
 void
 close_window(xcb_window_t window_id)
 {
-
     debug_output("close_window(): called");
+
+    if (window_id == screen->root) {
+        return;
+    }
 
     Window *window = window_list_get_window(window_id);
 
