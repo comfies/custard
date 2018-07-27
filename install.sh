@@ -7,9 +7,9 @@ doesntexist(){
 }
 
 checkdepends(){
-    command -v make > /dev/null || doesntexit "make"
+    command -v make > /dev/null || doesntexist "make"
     #just in case?
-    command -v g++ > /dev/null || doesntexist "gcc"
+    (command -v gcc > /dev/null && command -v clang > /dev/null) || doesntexist "gcc"
     command -v python3 > /dev/null || doesntexist "python3"
 }
 
