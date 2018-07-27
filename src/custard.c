@@ -264,10 +264,14 @@ focus_next_window()
     Window *window = NULL;
     short unsigned passed = 0;
 
+    if (!focused_window) {
+        passed = 1;
+    }
+
     while (element) {
         window = element->window;
-
-        if (window->id == focused_window->id) {
+        
+        if (focused_window && window->id == focused_window->id) {
             passed = 1;
         } else if (passed) {
             if (window_is_in_group(window, focused_group)) {
