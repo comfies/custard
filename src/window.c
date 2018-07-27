@@ -136,6 +136,10 @@ short unsigned int
 unmanage_window(xcb_window_t window_id) {
     debug_output("unmanage_window(): called");
 
+    if (focused_window && focused_window->id == window_id) {
+        focused_window = NULL;
+    }
+
     return window_list_remove_window(window_id);
 }
 
