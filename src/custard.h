@@ -11,6 +11,7 @@ typedef struct Window Window;
 
 extern unsigned short debug;
 extern unsigned short wm_running;
+extern const char *config_path;
 
 extern pthread_t socket_thread;
 
