@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -31,7 +32,7 @@ main(int argc, char** argv)
 
     int commandline_argument;
 
-    while ((commandline_argument = getopt(argc, argv, "hd")) != -1) {
+    while ((commandline_argument = getopt(argc, argv, "hdc:")) != -1) {
         switch (commandline_argument) {
             case 'h':
                 printf("%s\n", "custard 2.0");
@@ -41,6 +42,24 @@ main(int argc, char** argv)
                 debug = 1;
                 debug_output("Debug log enabled via command-line.");
                 break;
+            case 'c':
+                config_path = optarg;
+				// Skip =
+				if (config_path[0] == '=')
+					config_path++;
+                break;
+
+            case '?':
+                if (optopt == 'c') {
+                    fprintf(stderr, "Option -c requires an argument.\n");
+                    exit(EXIT_FAILURE);
+                } else if (isprint(optopt)) {
+                    fprintf(stderr, "Unknown option -%c.\n", optopt);
+                    exit(EXIT_FAILURE);
+                } else {
+                    fprintf(stderr, "Unknown option character \\x%x.\n", optopt);
+                    exit(EXIT_FAILURE);
+                }
         }
     }
 

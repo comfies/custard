@@ -13,8 +13,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <unistd.h>
+
 unsigned short debug = 0;
 unsigned short wm_running = 0;
+const char *config_path = NULL;
 
 struct WindowLinkedListElement *window_list_head = NULL;
 Window *focused_window;
@@ -136,6 +139,20 @@ start_custard()
     xcb_generic_event_t *event;
 
     pthread_create(&socket_thread, NULL, start_socket_read_loop, NULL);
+
+    if (config_path) {
+        if (debug) {
+            fprintf(stderr, "[debug] Executing %s\n", config_path);
+        }
+
+        if (fork() == 0) {
+            execl(config_path, config_path, NULL);
+
+            // Shouldn't be reached
+            fprintf(stderr, "[error] Unable to execute %s\n", config_path);
+            exit(EXIT_FAILURE);
+        }
+    }
 
     xcb_query_tree_reply_t *tree_reply;
     tree_reply = xcb_query_tree_reply(
