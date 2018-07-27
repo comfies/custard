@@ -98,7 +98,7 @@ focus_group(unsigned int group)
     struct WindowLinkedListElement *element = window_list_head;
     Window *window = NULL;
 
-    xcb_window_t last_window = 0;
+    xcb_window_t last_window = XCB_NONE;
 
     while (element) {
         window = element->window;
