@@ -19,13 +19,13 @@ installandconfigure(){
     sudo make install
 
     mkdir -p ~/.config/custard
-    cp ./examples/sxhkdrc ~/.config/custard/sxhkdrc
+    cp ./examples/sxhkdrc ~/.config/sxhkd/sxhkdrc
     cp ./examples/custard.sh ~/.config/custard/rc.sh
 
     cat <<EOF>> ~/.config/custard/start.sh
 \#!/bin/bash
 echo '' > /tmp/custard.log
-sxhkd -c ~/.config/custard/sxhkd &
+sxhkd -c ~/.config/sxhkd/sxhkd &
 (sleep 2; sh ~/.config/custard/rc.sh) &
 custard 2>> /tmp/custard.log
 EOF
