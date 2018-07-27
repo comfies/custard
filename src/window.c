@@ -158,6 +158,10 @@ focus_on_window(xcb_window_t window_id)
 
     debug_output("focus_on_window(): called");
 
+    if (window_id == screen->root) {
+        return;
+    }
+
     if (focused_window) {
         if (focused_window->id != window_id) {
             xcb_window_t old_focused_window_id = focused_window->id;
