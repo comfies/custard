@@ -272,6 +272,7 @@ focus_next_window()
         } else if (passed) {
             if (window_is_in_group(window, focused_group)) {
                 focus_on_window(window->id);
+                raise_window(window->id);
                 return;
             }
         }
