@@ -48,6 +48,14 @@ process_command(char *input)
         if (strcmp(diced[1], "halt") == 0) {
             debug_output("process_command(): halt called");
             stop_custard();
+        } else if (strcmp(diced[1], "focus") == 0) {
+            if (!diced[2]) {
+                return;
+            }
+
+            if (strcmp(diced[2], "next") == 0) {
+                focus_next_window();
+            }
         } else if (strcmp(diced[1], "configure") == 0) {
             debug_output("process_command(): configure called");
 

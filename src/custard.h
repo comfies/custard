@@ -45,4 +45,6 @@ void debug_output(char* message);
 int start_custard(void);
 void stop_custard(void);
 
+void focus_next_window(void);
+
 #endif /* CUSTARD_H */

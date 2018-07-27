@@ -6,6 +6,7 @@
 #include "grid.h"
 #include "socket.h"
 #include "window.h"
+#include "group.h"
 #include "xcb.h"
 
 #include <xcb/xcb.h>
@@ -254,3 +255,31 @@ stop_custard()
     wm_running = 0;
 }
 
+void
+focus_next_window()
+{
+    debug_output("focus_next_window(): called");
+
+    struct WindowLinkedListElement *element = window_list_head;
+    Window *window = NULL;
+    short unsigned passed = 0;
+
+    while (element) {
+        window = element->window;
+
+        if (window->id == focused_window->id) {
+            passed = 1;
+        } else if (passed) {
+            if (window_is_in_group(window, focused_group)) {
+                focus_on_window(window->id);
+                return;
+            }
+        }
+
+        element = element->next;
+
+        if (!element) {
+            element = window_list_head;
+        }
+    }
+}

@@ -19,5 +19,8 @@ super + grave + {1-9,0}
 super + w
     custardctl window --close
 
+alt + Tab
+    custardctl --focus next
+
 super + Escape
     custardctl --stop

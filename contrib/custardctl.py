@@ -108,8 +108,12 @@ if __name__ == '__main__':
         elif action == 'stop':
             send_message("custard halt")
         elif action == 'focus':
-            # focus logic here ..
-            exit(0)
+            option = arguments[0]; print(option)
+
+            if option not in ['next']:
+                error_out("Invalid option for action focus")
+
+            output = "custard focus {0}".format(option)
         elif action == 'configure':
             variable = arguments[0]
             value = arguments[1]
