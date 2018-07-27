@@ -108,9 +108,9 @@ if __name__ == '__main__':
         elif action == 'stop':
             send_message("custard halt")
         elif action == 'focus':
-            option = arguments[0]; print(option)
+            option = arguments[0]
 
-            if option not in ['next']:
+            if option not in ['next', 'previous', 'prev']:
                 error_out("Invalid option for action focus")
 
             output = "custard focus {0}".format(option)
