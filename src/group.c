@@ -53,15 +53,8 @@ attach_window_to_group(xcb_window_t window_id, unsigned int group)
         window->groups |= (1 << (group - 1));
     }
 
-    group_state_t state = get_group_state(group);
-
-    if (state == FOCUSED || state == MAPPED) {
+    if ((window->groups & groups) > 0) {
         map_window(window->id);
-    } else {
-        /* TODO: check if any of the other groups it's attached to are mapped*/
-        if (!window_is_in_group(window, focused_group)) {
-            unmap_window(window->id);
-        }
     }
 }
 
@@ -77,12 +70,10 @@ detach_window_from_group(xcb_window_t window_id, unsigned int group)
     if (window) {
         if ((window->groups & ~(1 << (group - 1))) > 0) {
             window->groups &= ~(1 << (group - 1));
-        }
 
-        group_state_t state = get_group_state(group);
-
-        if (state == UNMAPPED) {
-            unmap_window(window->id);
+            if ((window->groups & groups) == 0) {
+                unmap_window(window->id);
+            }
         }
     }
 }
@@ -117,6 +108,8 @@ focus_group(unsigned int group)
         focus_on_window(window->id);
     }
 
+    groups = (1 << (group - 1));
+
     focused_group = group;
     xcb_ewmh_set_current_desktop(ewmh_connection, 0, focused_group);
 }
@@ -137,6 +130,8 @@ map_group(unsigned int group)
 
         element = element->next;
     }
+
+    groups |= (1 << (group - 1));
 }
 
 void
@@ -161,4 +156,6 @@ unmap_group(unsigned int group)
 
         element = element->next;
     }
+
+    groups &= ~(1 << (group - 1));
 }
