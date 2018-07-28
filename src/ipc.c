@@ -36,159 +36,223 @@ process_command(char *input)
 
     debug_output("process_command(): output split");
 
-    if (!diced[0]) {
+    if (!diced[0] || !diced[1]) {
         return;
     }
 
-    if (strcmp(diced[0], "custard") == 0) {
-        if (!diced[1]) {
-            return;
-        }
+    unsigned long hash = 5381;
+    unsigned int target = 0, action = 0;
 
-        if (strcmp(diced[1], "halt") == 0) {
-            debug_output("process_command(): halt called");
-            stop_custard();
-        } else if (strcmp(diced[1], "focus") == 0) {
+    int c;
+
+    while ((c = *diced[0]++)) {
+        hash = (hash * 33) ^ c;
+    }
+    target = hash >> target;
+    hash = 5381;
+
+    while ((c = *diced[1]++)) {
+        hash = (hash * 33) ^ c;
+    }
+    action = hash >> action;
+
+    short unsigned boolean = 0;
+    unsigned int n = 0;
+
+    switch (target) {
+        case 3938768739: /* custard */
+
+            switch (action) {
+                case 2087808148: /* halt */
+                    stop_custard();
+                    break;
+
+                case 171175241: /* focus */
+                    if (!diced[2]) {
+                        return;
+                    }
+
+                    focus_next_window();
+                    break;
+
+                case 1026323597: /* configure */
+                    if (!diced[2] || !diced[3]) {
+                        return;
+                    }
+
+                    hash = 5381;
+                    unsigned int setting = 0;
+
+                    while ((c = *diced[2]++)) {
+                        hash = (hash * 33) ^ c;
+                    }
+                    setting = hash >> setting;
+
+                    boolean = parse_boolean(diced[3]);
+                    n = parse_unsigned_integer(diced[3]);
+                    unsigned int color = parse_rgba_color(diced[3]);
+
+                    switch (setting) {
+                        case 2523544616: /* debug_mode */
+                            debug = boolean;
+                            break;
+
+                        case 232847129: /* border_focused_color */
+                            Configuration->border_focused_color = color;
+                            break;
+
+                        case 3731375234: /* border_unfocused_color */
+                            Configuration->border_unfocused_color = color;
+                            break;
+
+                        case 1539877306: /* border_background_color */
+                            Configuration->border_background_color = color;
+                            break;
+
+                        case 670643221: /* border_invert_colors */
+                            Configuration->border_invert_colors = boolean;
+                            break;
+
+                        case 374560946: /* border_inner_size */
+                            Configuration->border_inner_size = n;
+                            break;
+
+                        case 1738679797: /* border_outer_size */
+                            Configuration->border_outer_size = n;
+                            break;
+
+                        case 368571342: /* border_type */
+                            if (n > 3) {
+                                n = 3;
+                            }
+
+                            Configuration->border_type = n;
+                            break;
+
+                        case 3436447195: /* grid_rows */
+                            Configuration->grid_rows = n;
+                            break;
+
+                        case 2093021703: /* grid_columns */
+                            Configuration->grid_columns = n;
+                            break;
+
+                        case 2316679092: /* grid_gap */
+                            Configuration->grid_gap = n;
+                            break;
+
+                        case 2396801352: /* grid_margin_top */
+                            Configuration->grid_margin_top = n;
+                            break;
+
+                        case 1882181388: /* grid_margin_bottom */
+                            Configuration->grid_margin_bottom = n;
+                            break;
+
+                        case 1784735736: /* grid_margin_left */
+                            Configuration->grid_margin_left = n;
+                            break;
+
+                        case 3069105795: /* grid_margin_right */
+                            Configuration->grid_margin_right = n;
+                            break;
+
+                        case 1394395017: /* groups */
+                            Configuration->groups = n;
+                            break;
+
+                        default:
+                            return;
+                    }
+
+                    apply_config();
+                    break;
+
+                default:
+                    return;
+            }
+
+            break;
+
+        case 2016265097: /* window */
+            if (!focused_window || !diced[2]) {
+                return;
+            }
+
+            xcb_window_t window_id = focused_window->id;
+
+            n = parse_unsigned_integer(diced[2]);
+
+            cardinal_direction_t direction;
+            direction = (cardinal_direction_t)n;
+
+            switch (action) {
+                case 176908083: /* close */
+                    close_window(window_id);
+                    break;
+
+                case 194675017: /* raise */
+                    raise_window(window_id);
+                    break;
+
+                case 173263814: /* lower */
+                    lower_window(window_id);
+                    break;
+
+                case 2087699060: /* move */
+                    move_window_cardinal(window_id, direction);
+                    break;
+
+                case 1179764707: /* expand */
+                    expand_window_cardinal(window_id, direction);
+                    break;
+
+                case 2398914583: /* contract */
+                    contract_window_cardinal(window_id, direction);
+                    break;
+
+                case 1459515434: /* attach_to_group */
+                    attach_window_to_group(window_id, n);
+                    break;
+
+                case 1947222643: /* detach_from_group */
+                    detach_window_from_group(window_id, n);
+                    break;
+
+                default:
+                    return;
+            }
+
+            break;
+
+        case 172404922: /* group */
             if (!diced[2]) {
                 return;
             }
 
-            if (strcmp(diced[2], "next") == 0) {
-                focus_next_window();
-            }
-        } else if (strcmp(diced[1], "configure") == 0) {
-            debug_output("process_command(): configure called");
+            n = parse_unsigned_integer(diced[2]);
 
-            if (!diced[2] || !diced[3]) {
-                return;
-            }
+            switch (action) {
+                case 171175241: /* focus */
+                    focus_group(n);
+                    break;
 
-            if (strcmp(diced[2], "debug_mode") == 0) {
-                debug = parse_boolean(diced[3]);
-            } else if (strcmp(diced[2], "border_focused_color") == 0) {
-                Configuration->border_focused_color = parse_rgba_color(
-                    diced[3]);
-            } else if (strcmp(diced[2], "border_unfocused_color") == 0) {
-                Configuration->border_unfocused_color = parse_rgba_color(
-                    diced[3]);
-            } else if (strcmp(diced[2], "border_background_color") == 0) {
-                Configuration->border_background_color = parse_rgba_color(
-                    diced[3]);
-            } else if (strcmp(diced[2], "border_invert_colors") == 0) {
-                Configuration->border_invert_colors = parse_boolean(diced[3]);
-            } else if (strcmp(diced[2], "border_inner_size") == 0) {
-                Configuration->border_inner_size = parse_unsigned_integer(
-                    diced[3]);
-            } else if (strcmp(diced[2], "border_outer_size") == 0) {
-                Configuration->border_outer_size = parse_unsigned_integer(
-                    diced[3]);
-            } else if (strcmp(diced[2], "border_type") == 0) {
-                Configuration->border_type = parse_unsigned_integer(diced[3]);
-                if (Configuration->border_type > 3) {
-                    Configuration->border_type = 3;
-                }
-            } else if (strcmp(diced[2], "grid_rows") == 0) {
-                Configuration->grid_rows = parse_unsigned_integer(diced[3]);
-            } else if (strcmp(diced[2], "grid_columns") == 0) {
-                Configuration->grid_columns = parse_unsigned_integer(diced[3]);
-            } else if (strcmp(diced[2], "grid_gap") == 0) {
-                Configuration->grid_gap = parse_unsigned_integer(diced[3]);
-            } else if (strcmp(diced[2], "grid_margin_top") == 0) {
-                Configuration->grid_margin_top = parse_unsigned_integer(
-                    diced[3]);
-            } else if (strcmp(diced[2], "grid_margin_bottom") == 0) {
-                Configuration->grid_margin_bottom = parse_unsigned_integer(
-                    diced[3]);
-            } else if (strcmp(diced[2], "grid_margin_left") == 0) {
-                Configuration->grid_margin_left = parse_unsigned_integer(
-                    diced[3]);
-            } else if (strcmp(diced[2], "grid_margin_right") == 0) {
-                Configuration->grid_margin_right = parse_unsigned_integer(
-                    diced[3]);
-            } else if (strcmp(diced[2], "groups") == 0) {
-                Configuration->groups = parse_unsigned_integer(diced[3]);
-            } else {
-                return;
+                case 1322218894: /* attach */
+                    map_group(n);
+                    break;
+
+                case 1121335546: /* detach */
+                    unmap_group(n);
+                    break;
+
+                default:
+                    return;
             }
 
-            apply_config();
-        } else {
+            break;
+
+        default:
             return;
-        }
-
-    } else if (strcmp(diced[0], "window") == 0) {
-        if (!diced[1]) {
-            return;
-        }
-
-        if (!focused_window) {
-            return;
-        }
-
-        xcb_window_t window_id = focused_window->id;
-
-        if (strcmp(diced[1], "close") == 0) {
-            close_window(window_id);
-        } else if (strcmp(diced[1], "raise") == 0) {
-            raise_window(window_id);
-        } else if (strcmp(diced[1], "lower") == 0) {
-            lower_window(window_id);
-        } else if (strcmp(diced[1], "move") == 0 ||
-            strcmp(diced[1], "expand") == 0 ||
-            strcmp(diced[1], "contract") == 0) {
-            if (!diced[2]) {
-                return;
-            }
-
-            cardinal_direction_t direction = (
-                (cardinal_direction_t)parse_unsigned_integer(
-                    diced[2]));
-            if (strcmp(diced[1], "move") == 0) {
-                move_window_cardinal(window_id, direction);
-            } else if (strcmp(diced[1], "expand") == 0) {
-                expand_window_cardinal(window_id, direction);
-            } else if (strcmp(diced[1], "contract") == 0) {
-                contract_window_cardinal(window_id, direction);
-            } else {
-                return;
-            }
-
-        } else if (strcmp(diced[1], "attach_to_group") == 0 ||
-            strcmp(diced[1], "detach_from_group") == 0) {
-            if (!diced[2]) {
-                return;
-            }
-
-            unsigned int group = parse_unsigned_integer(diced[2]);
-
-            if (strcmp(diced[1], "attach_to_group") == 0) {
-                attach_window_to_group(window_id, group);
-            } else if (strcmp(diced[1], "detach_from_group") == 0) {
-                detach_window_from_group(window_id, group);
-            } else {
-                return;
-            }
-        } else {
-            return;
-        }
-
-    } else if (strcmp(diced[0], "group") == 0) {
-        if (!diced[1] || !diced[2]) {
-            return;
-        }
-
-        unsigned int group = parse_unsigned_integer(diced[2]);
-
-        if (strcmp(diced[1], "focus") == 0) {
-            focus_group(group);
-        } else if (strcmp(diced[1], "attach") == 0) {
-            map_group(group);
-        } else if (strcmp(diced[1], "detach") == 0) {
-            unmap_group(group);
-        }
-
-    } else {
-        return;
     }
 
     commit();
