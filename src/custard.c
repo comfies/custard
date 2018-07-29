@@ -189,7 +189,6 @@ start_custard()
             }
 
         }
-
         commit();
     }
 
