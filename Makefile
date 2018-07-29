@@ -37,6 +37,8 @@ $(BUILDPREFIX)/%.o: src/%.c
 install:
 	install -m 755 -D $(BUILDPREFIX)/$(TARGET) $(DESTDIR)$(PREFIX)/bin/$(TARGET)
 	install -m 755 -D contrib/custardctl.py $(DESTDIR)$(PREFIX)/bin/custardctl
+	cd contrib/cctl
+	make install
 #	install -m 644 -D man/custard.man $(DESTDIR)$(MANPREFIX)/man1/custard.1
 
 clean:

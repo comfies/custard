@@ -1,0 +1,3 @@
+[submodule "contrib/cctl"]
+	path = contrib/cctl
+	url = https://github.com/bmofa/cctl
