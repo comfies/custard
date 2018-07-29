@@ -26,6 +26,9 @@ handlers_handle_event(xcb_generic_event_t *event)
         case (XCB_BUTTON_PRESS):
             handlers_button_press(event);
             break;
+        case (XCB_CLIENT_MESSAGE):
+            handlers_window_message_received(event);
+            break;
         default:
             return;
             break;
@@ -91,5 +94,35 @@ handlers_button_press(xcb_generic_event_t *generic_event)
 
     focus_on_window(window_id);
     raise_window(window_id);
+    commit();
+}
+
+void
+handlers_window_message_received(xcb_generic_event_t *generic_event)
+{
+    debug_output("handlers_window_message_received(): called");
+
+    xcb_client_message_event_t *event;
+    event = (xcb_client_message_event_t *)generic_event;
+
+    xcb_window_t window_id = event->window;
+
+    if (event->type == ewmh_connection->_NET_WM_STATE) {
+        xcb_atom_t atom = event->data.data32[1];
+        unsigned int action = event->data.data32[0];
+
+        if (atom == ewmh_connection->_NET_WM_STATE_FULLSCREEN) {
+
+            if (action == XCB_EWMH_WM_STATE_ADD) {
+                fullscreen(window_id);
+            } else if (action == XCB_EWMH_WM_STATE_REMOVE) {
+                debug_output("WANTING TO MAKE NORMAL AGAIN DADDY");
+            } else if (action == XCB_EWMH_WM_STATE_TOGGLE) {
+                debug_output("WANTING THE OPPOSITE, DADDY!");
+            }
+
+        }
+
+    }
     commit();
 }
