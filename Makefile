@@ -26,7 +26,7 @@ all: prepare $(OBJS) $(TARGET)
 -include $(subst src,$(BUILDPREFIX),$(SRCS:.c=.d))
 
 $(TARGET): $(OBJS)
-	$(CC) $(LDFLAGS) -o $(BUILDPREFIX)/$@ $^
+	$(CC) -o $(BUILDPREFIX)/$@ $^ $(LDFLAGS)
 
 prepare:
 	mkdir -p $(BUILDPREFIX)
