@@ -114,11 +114,10 @@ handlers_window_message_received(xcb_generic_event_t *generic_event)
         if (atom == ewmh_connection->_NET_WM_STATE_FULLSCREEN) {
 
             if (action == XCB_EWMH_WM_STATE_ADD) {
-                fullscreen(window_id);
+/*                fullscreen(window_id);*/
             } else if (action == XCB_EWMH_WM_STATE_REMOVE) {
-                debug_output("WANTING TO MAKE NORMAL AGAIN DADDY");
+/*                window(window_id);*/
             } else if (action == XCB_EWMH_WM_STATE_TOGGLE) {
-                debug_output("WANTING THE OPPOSITE, DADDY!");
             }
 
         }
