@@ -157,6 +157,42 @@ update_window_borders() {
 }
 
 void
+unfocus_window()
+{
+    debug_output("unfocus_window(): called");
+
+    xcb_set_input_focus(
+        xcb_connection,
+        XCB_INPUT_FOCUS_POINTER_ROOT,
+        screen->root,
+        XCB_CURRENT_TIME
+    );
+
+    xcb_ewmh_set_active_window(
+        ewmh_connection,
+        0,
+        XCB_NONE
+    );
+
+    if (focused_window) {
+        xcb_window_t window_id = focused_window->id;
+        focused_window = NULL;
+
+        xcb_grab_button(
+            xcb_connection,
+            0, window_id,
+            XCB_EVENT_MASK_BUTTON_PRESS,
+            XCB_GRAB_MODE_ASYNC,
+            XCB_GRAB_MODE_ASYNC,
+            XCB_NONE, XCB_NONE,
+            XCB_BUTTON_INDEX_ANY,
+            XCB_MOD_MASK_ANY
+        );
+        border_update(window_id);
+    }
+}
+
+void
 focus_on_window(xcb_window_t window_id)
 {
 
@@ -168,20 +204,7 @@ focus_on_window(xcb_window_t window_id)
 
     if (focused_window) {
         if (focused_window->id != window_id) {
-            xcb_window_t old_focused_window_id = focused_window->id;
-            focused_window = NULL;
-
-            xcb_grab_button(
-                xcb_connection,
-                0, old_focused_window_id,
-                XCB_EVENT_MASK_BUTTON_PRESS,
-                XCB_GRAB_MODE_ASYNC,
-                XCB_GRAB_MODE_ASYNC,
-                XCB_NONE, XCB_NONE,
-                XCB_BUTTON_INDEX_ANY,
-                XCB_MOD_MASK_ANY
-            );
-            border_update(old_focused_window_id);
+            unfocus_window();
         } else {
             return;
         }

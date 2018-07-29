@@ -20,6 +20,7 @@ short unsigned int manage_window(xcb_window_t);
 short unsigned int unmanage_window(xcb_window_t);
 void update_window_borders(void);
 
+void unfocus_window(void);
 void focus_on_window(xcb_window_t);
 void close_window(xcb_window_t);
 
