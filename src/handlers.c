@@ -5,6 +5,7 @@
 #include "group.h"
 #include "window.h"
 #include "xcb.h"
+#include "ewmh.h"
 
 #include <xcb/xcb.h>
 
@@ -40,6 +41,10 @@ handlers_map_request(xcb_generic_event_t *generic_event)
 
     xcb_map_request_event_t *event = (xcb_map_request_event_t *)generic_event;
     xcb_window_t window_id = event->window;
+
+    if (window_id == ewmh_window_id) {
+        return;
+    }
 
     unsigned short int managed = manage_window(window_id);
 
