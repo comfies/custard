@@ -94,12 +94,14 @@ focus_group(unsigned int group)
 
     struct WindowLinkedListElement *element = window_list_head;
     Window *window = NULL;
+    xcb_window_t last_window = XCB_WINDOW_NONE;
 
     while (element) {
         window = element->window;
 
         if (window_is_in_group(window, group)) {
             map_window(window->id);
+            last_window = window->id;
         } else {
             unmap_window(window->id);
         }
@@ -111,6 +113,11 @@ focus_group(unsigned int group)
 
     focused_group = group;
     xcb_ewmh_set_current_desktop(ewmh_connection, 0, focused_group);
+
+    if (last_window != XCB_WINDOW_NONE) {
+        focus_on_window(last_window);
+        raise_window(last_window);
+    }
 }
 
 void
