@@ -73,7 +73,7 @@ window_list_remove_window(xcb_window_t window_id)
             element = window_list_head;
 
             window_list_head = element->next;
-/*            free(element->window);*/
+            free(element->window);
             free(element);
 
             return 1;
@@ -87,7 +87,7 @@ window_list_remove_window(xcb_window_t window_id)
             old_element = element->next;
 
             element->next = element->next->next;
-/*            free(old_element->window);*/
+            free(old_element->window);
             free(old_element);
             return 1;
         }
