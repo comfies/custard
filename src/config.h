@@ -1,7 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define TEMP_PATH "/tmp/custard.sock"
+#define SOCKET_PATH "/tmp/custard.sock"
 
 struct Config {
     short unsigned int border_type;
