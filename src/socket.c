@@ -21,8 +21,8 @@ initialize_socket()
 
     memset(&address, 0, sizeof(address));
     address.sun_family = AF_UNIX;
-    snprintf(address.sun_path, sizeof(address.sun_path), "/tmp/custard.sock");
-    unlink("/tmp/custard.sock");
+    snprintf(address.sun_path, sizeof(address.sun_path), TEMP_PATH);
+    unlink(TEMP_PATH);
 
     socket_file_descriptor = socket(AF_UNIX, SOCK_STREAM, 0);
 
@@ -87,6 +87,6 @@ void
 finalize_socket()
 {
     debug_output("finalize_socket(): called");
-    unlink("/tmp/custard.sock");
+    unlink(TEMP_PATH);
 }
 
