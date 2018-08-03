@@ -1,6 +1,8 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#define SOCKET_PATH "/tmp/custard.sock"
+
 struct Config {
     short unsigned int border_type;
     short unsigned int border_invert_colors;
