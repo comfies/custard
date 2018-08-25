@@ -1,6 +1,7 @@
 #include "socket.h"
 
 #include "custard.h"
+#include "config.h"
 #include "ipc.h"
 
 #include <stdio.h>
