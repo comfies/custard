@@ -143,8 +143,6 @@ start_custard()
 
     xcb_generic_event_t *event;
 
-/*    pthread_create(&socket_thread, NULL, start_socket_read_loop, NULL);*/
-
     if (config_path) {
         if (debug) {
             fprintf(stderr, "[debug] Executing %s\n", config_path);
@@ -197,17 +195,6 @@ start_custard()
     }
 
     debug_output("main(): starting event loop");
-
-/*    while (wm_running) {
-        event = xcb_wait_for_event(xcb_connection);
-        if (event) {
-            handlers_handle_event(event);*/
-/*            free(event);*/
-/*        } else {
-            stop_custard();
-        }
-    }*/
-
     fd_set descriptor_set;
     int max_file_descriptor;
 
@@ -283,15 +270,12 @@ stop_custard()
 
     commit();
 
-//    pthread_join(socket_thread, NULL);
-
     finalize_socket();
     finalize_ewmh_connection();
     finalize_xcb_connection();
 
     free(Configuration);
 
-//    wm_running = 0;
 }
 
 void
