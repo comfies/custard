@@ -64,7 +64,7 @@ process_command(char *input)
 
             switch (action) {
                 case 2087808148: /* halt */
-                    stop_custard();
+                    wm_running = 0;
                     break;
 
                 case 171175241: /* focus */
