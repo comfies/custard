@@ -3,8 +3,6 @@
 
 #include <xcb/xcb.h>
 
-#include <pthread.h>
-
 #define event_mask XCB_CW_EVENT_MASK
 
 typedef struct Window Window;
@@ -14,8 +12,6 @@ extern unsigned short wm_running;
 extern const char *config_path;
 
 extern int xcb_file_descriptor;
-
-extern pthread_t socket_thread;
 
 struct WindowLinkedListElement {
     struct WindowLinkedListElement *next;

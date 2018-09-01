@@ -9,7 +9,6 @@
 #include <sys/select.h>
 #include <sys/types.h>
 #include <sys/un.h>
-#include <pthread.h>
 
 #include <xcb/xcb.h>
 #include <xcb/xcb_ewmh.h>
