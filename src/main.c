@@ -6,6 +6,7 @@
 #include <math.h>
 #include <getopt.h>
 #include <sys/socket.h>
+#include <sys/select.h>
 #include <sys/types.h>
 #include <sys/un.h>
 #include <pthread.h>

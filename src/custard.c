@@ -13,12 +13,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/select.h>
 
 #include <unistd.h>
 
 unsigned short debug = 0;
 unsigned short wm_running = 0;
 const char *config_path = NULL;
+int xcb_file_descriptor;
 
 struct WindowLinkedListElement *window_list_head = NULL;
 Window *focused_window;
@@ -131,6 +133,8 @@ start_custard()
         return EXIT_FAILURE;
     }
 
+    xcb_file_descriptor = xcb_get_file_descriptor(xcb_connection);
+
     Configuration = (struct Config *)malloc(sizeof(struct Config));
     apply_config_defaults();
     grid_apply_configuration();
@@ -139,7 +143,7 @@ start_custard()
 
     xcb_generic_event_t *event;
 
-    pthread_create(&socket_thread, NULL, start_socket_read_loop, NULL);
+/*    pthread_create(&socket_thread, NULL, start_socket_read_loop, NULL);*/
 
     if (config_path) {
         if (debug) {
@@ -194,15 +198,51 @@ start_custard()
 
     debug_output("main(): starting event loop");
 
-    while (wm_running) {
+/*    while (wm_running) {
         event = xcb_wait_for_event(xcb_connection);
         if (event) {
-            handlers_handle_event(event);
+            handlers_handle_event(event);*/
 /*            free(event);*/
-        } else {
+/*        } else {
             stop_custard();
         }
+    }*/
+
+    fd_set descriptor_set;
+    int max_file_descriptor;
+
+    while (wm_running) {
+        FD_ZERO(&descriptor_set);
+        FD_SET(socket_file_descriptor, &descriptor_set);
+        FD_SET(xcb_file_descriptor, &descriptor_set);
+
+        max_file_descriptor = xcb_file_descriptor;
+
+        if (xcb_file_descriptor < socket_file_descriptor) {
+            max_file_descriptor = socket_file_descriptor;
+        }
+
+        max_file_descriptor++;
+
+        if (select(max_file_descriptor, &descriptor_set,
+            NULL, NULL, NULL)> 0) {
+            if (FD_ISSET(socket_file_descriptor, &descriptor_set)) {
+                read_socket();
+            }
+            
+            if (FD_ISSET(xcb_file_descriptor, &descriptor_set)) {
+                while ((event = xcb_poll_for_event(xcb_connection))) {
+                    if (event) {
+                        handlers_handle_event(event);
+                    } else {
+                        stop_custard();
+                    }
+                }
+            }
+        }
     }
+
+    stop_custard();
 
     debug_output("main(): event loop stopped, shutting down");
 
@@ -214,9 +254,9 @@ stop_custard()
 {
     debug_output("stop_custard(): called, joining socket thread and finalizing");
 
-    if (!wm_running) {
+/*    if (!wm_running) {
         return;
-    }
+    }*/
 
     xcb_query_tree_reply_t *tree_reply;
     tree_reply = xcb_query_tree_reply(
@@ -243,7 +283,7 @@ stop_custard()
 
     commit();
 
-    pthread_join(socket_thread, NULL);
+//    pthread_join(socket_thread, NULL);
 
     finalize_socket();
     finalize_ewmh_connection();
@@ -251,7 +291,7 @@ stop_custard()
 
     free(Configuration);
 
-    wm_running = 0;
+//    wm_running = 0;
 }
 
 void

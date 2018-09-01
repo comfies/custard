@@ -13,6 +13,8 @@ extern unsigned short debug;
 extern unsigned short wm_running;
 extern const char *config_path;
 
+extern int xcb_file_descriptor;
+
 extern pthread_t socket_thread;
 
 struct WindowLinkedListElement {
