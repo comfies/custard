@@ -120,10 +120,14 @@ manage_window(xcb_window_t window_id)
     window->id = window_id;
     window->mapped = 0;
     window->fullscreen = 0;
-    window->x = grid_window_default_x;
-    window->y = grid_window_default_y;
-    window->height = grid_window_default_height;
-    window->width = grid_window_default_width;
+
+    window->x = grid_get_offset_x(grid_window_default_x) +
+        Configuration->grid_margin_left;
+    window->y = grid_get_offset_y(grid_window_default_y) +
+        Configuration->grid_margin_top;
+
+    window->height = grid_get_span_y(grid_window_default_height);
+    window->width = grid_get_span_x(grid_window_default_width);
 
     window_list_append_window(window);
 
