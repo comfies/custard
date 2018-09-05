@@ -121,13 +121,11 @@ manage_window(xcb_window_t window_id)
     window->mapped = 0;
     window->fullscreen = 0;
 
-    window->x = grid_get_offset_x(grid_window_default_x) +
-        Configuration->grid_margin_left;
-    window->y = grid_get_offset_y(grid_window_default_y) +
-        Configuration->grid_margin_top;
+    window->x = grid_window_default_x;
+    window->y = grid_window_default_y;
 
-    window->height = grid_get_span_y(grid_window_default_height);
-    window->width = grid_get_span_x(grid_window_default_width);
+    window->height = grid_window_default_height;
+    window->width = grid_window_default_width;
 
     window_list_append_window(window);
 
@@ -389,16 +387,54 @@ lower_window(xcb_window_t window_id)
 }
 
 void
-move_window_to_pixel_coordinate(xcb_window_t window_id,
-    unsigned int x, unsigned int y)
+fullscreen(xcb_window_t window_id)
 {
     Window *window = window_list_get_window(window_id);
 
-    if (window) {
-        window->x = x;
-        window->y = y;
+    if (!window) {
+        return;
+    } /* Change this to support all windows later */
+
+    if (window->fullscreen) {
+        return;
     }
 
+    window->fullscreen = 1;
+
+    move_window_to_pixel_coordinate(window_id, 0, 0);
+    resize_window_with_pixels(window_id, screen->height_in_pixels,
+        screen->width_in_pixels);
+
+    unsigned int border_width[1] = {0};
+
+    xcb_configure_window(xcb_connection, window_id,
+        XCB_CONFIG_WINDOW_BORDER_WIDTH, border_width);
+}
+
+void
+window(xcb_window_t window_id)
+{
+    Window *window = window_list_get_window(window_id);
+
+    if (!window) {
+        return;
+    }
+
+    if (!window->fullscreen) {
+        return;
+    }
+
+    window->fullscreen = 0;
+
+    move_window_to_grid_coordinate(window_id, window->x, window->y);
+    resize_window_with_grid_units(window_id, window->height, window->width);
+    border_update(window_id);
+}
+
+void
+move_window_to_pixel_coordinate(xcb_window_t window_id,
+    unsigned int x, unsigned int y)
+{
     unsigned int data[2] = {x, y};
 
     xcb_configure_window(
@@ -413,6 +449,12 @@ void
 move_window_to_grid_coordinate(xcb_window_t window_id,
     unsigned int x, unsigned int y)
 {
+    Window *window = window_list_get_window(window_id);
+
+    if (window) {
+        window->x = x;
+        window->y = y;
+    }
 
     unsigned int x_in_pixels = grid_get_offset_x(x) +
         Configuration->grid_margin_left;
@@ -429,13 +471,6 @@ void
 resize_window_with_pixels(xcb_window_t window_id,
     unsigned int height, unsigned int width)
 {
-    Window *window = window_list_get_window(window_id);
-
-    if (window) {
-        window->height = height;
-        window->width = width;
-    }
-
     unsigned int data[2] = {
         width, height
     };
@@ -452,6 +487,12 @@ void
 resize_window_with_grid_units(xcb_window_t window_id,
     unsigned int height, unsigned int width)
 {
+    Window *window = window_list_get_window(window_id);
+
+    if (window) {
+        window->height = height;
+        window->width = width;
+    }
 
     unsigned int height_in_pixels = grid_get_span_y(height);
     unsigned int width_in_pixels = grid_get_span_x(width);
