@@ -30,6 +30,9 @@ void unmap_window(xcb_window_t);
 void raise_window(xcb_window_t);
 void lower_window(xcb_window_t);
 
+void fullscreen(xcb_window_t);
+void window(xcb_window_t);
+
 void move_window_to_pixel_coordinate(xcb_window_t, unsigned int, unsigned int);
 void move_window_to_grid_coordinate(xcb_window_t, unsigned int, unsigned int);
 
