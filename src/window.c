@@ -392,6 +392,12 @@ void
 move_window_to_pixel_coordinate(xcb_window_t window_id,
     unsigned int x, unsigned int y)
 {
+    Window *window = window_list_get_window(window_id);
+
+    if (window) {
+        window->x = x;
+        window->y = y;
+    }
 
     unsigned int data[2] = {x, y};
 
@@ -423,6 +429,12 @@ void
 resize_window_with_pixels(xcb_window_t window_id,
     unsigned int height, unsigned int width)
 {
+    Window *window = window_list_get_window(window_id);
+
+    if (window) {
+        window->height = height;
+        window->width = width;
+    }
 
     unsigned int data[2] = {
         width, height
