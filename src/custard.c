@@ -288,15 +288,21 @@ focus_next_window()
     short unsigned passed = 0;
 
     if (!focused_window) {
-        passed = 1;
+        focus_on_window(element->window->id);
+        raise_window(element->window->id);
+        return;
     }
 
     while (element) {
         window = element->window;
-        
-        if (focused_window && window->id == focused_window->id) {
-            passed = 1;
+
+        if (!passed && window->id == focused_window->id) {
+            passed++;
         } else if (passed) {
+            if (passed > 1) {
+                return;
+            }
+
             if (window_is_in_group(window, focused_group)) {
                 focus_on_window(window->id);
                 raise_window(window->id);
@@ -309,5 +315,7 @@ focus_next_window()
         if (!element) {
             element = window_list_head;
         }
+
     }
+
 }
