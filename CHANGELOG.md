@@ -1,4 +1,18 @@
-# 1.2
+# 0.4
+
+## Fixes
+
+1. custardctl raising error for Python < v3.6
+2. -Wformat-security, -Wint-conversion, -Wmaybe-uninitialized
+
+## Changes
+
+1. Rewritten in C
+2. Groups replace workspaces
+3. No longer multithreaded (socket is single threaded)
+4. IPC uses hashed strings with switches, instead of testing everything with ifs
+
+# 0.3
 
 ## Fixes
 
@@ -18,7 +32,7 @@
 2. EWMH active window property is now set when focusing on a winow
 3. `_NET_WM_STATE` is now set when focusing on a window
 
-# 1.1
+# 0.2
 
 ## Fixes
 
@@ -39,6 +53,6 @@
 1. Synchronous updates
 2. Debug data outputs to STDERR rather than STDOUT
 
-# 1.0
+# 0.1
 
 Initial release.
