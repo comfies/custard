@@ -4,6 +4,7 @@
 #include "group.h"
 #include "xcb.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -98,27 +99,27 @@ process_command(char *input)
                             break;
 
                         case 232847129: /* border_focused_color */
-                            Configuration->border_focused_color = color;
+//                            border_focused_color = color;
                             break;
 
                         case 3731375234: /* border_unfocused_color */
-                            Configuration->border_unfocused_color = color;
+//                            border_unfocused_color = color;
                             break;
 
                         case 1539877306: /* border_background_color */
-                            Configuration->border_background_color = color;
+//                            border_background_color = color;
                             break;
 
                         case 670643221: /* border_invert_colors */
-                            Configuration->border_invert_colors = boolean;
+//                            border_invert_colors = boolean;
                             break;
 
                         case 374560946: /* border_inner_size */
-                            Configuration->border_inner_size = n;
+//                            border_inner_size = n;
                             break;
 
                         case 1738679797: /* border_outer_size */
-                            Configuration->border_outer_size = n;
+//                            border_outer_size = n;
                             break;
 
                         case 368571342: /* border_type */
@@ -126,46 +127,46 @@ process_command(char *input)
                                 n = 3;
                             }
 
-                            Configuration->border_type = n;
+//                            border_type = n;
                             break;
 
                         case 3436447195: /* grid_rows */
-                            Configuration->grid_rows = n;
+//                            grid_rows = n;
                             break;
 
                         case 2093021703: /* grid_columns */
-                            Configuration->grid_columns = n;
+//                            grid_columns = n;
                             break;
 
                         case 2316679092: /* grid_gap */
-                            Configuration->grid_gap = n;
+//                            grid_gap = n;
                             break;
 
                         case 2396801352: /* grid_margin_top */
-                            Configuration->grid_margin_top = n;
+//                            grid_margin_top = n;
                             break;
 
                         case 1882181388: /* grid_margin_bottom */
-                            Configuration->grid_margin_bottom = n;
+//                            grid_margin_bottom = n;
                             break;
 
                         case 1784735736: /* grid_margin_left */
-                            Configuration->grid_margin_left = n;
+//                            grid_margin_left = n;
                             break;
 
                         case 3069105795: /* grid_margin_right */
-                            Configuration->grid_margin_right = n;
+//                            grid_margin_right = n;
                             break;
 
                         case 1394395017: /* groups */
-                            Configuration->groups = n;
+//                            groups = n;
                             break;
 
                         default:
                             return;
                     }
 
-                    apply_config();
+/*                    apply_config();*/
                     break;
 
                 default:
@@ -217,6 +218,27 @@ process_command(char *input)
 
                 case 1947222643: /* detach_from_group */
                     detach_window_from_group(window_id, n);
+                    break;
+
+                case 2605769987: /* use_geometry */ {
+                        struct NamedGeometry geometry;
+
+                        for (unsigned int index = 0; index < 3; index++) {
+                            geometry = geometries[index];
+
+                            if (strcmp(geometry.name, diced[2]) == 0) {
+                                move_window_to_grid_coordinate(window_id,
+                                    geometry.geometry.x, geometry.geometry.y);
+                                resize_window_with_grid_units(window_id,
+                                    geometry.geometry.height,
+                                    geometry.geometry.width);
+                                commit();
+                                return;
+                            }
+                        }
+
+                    }
+
                     break;
 
                 default:
