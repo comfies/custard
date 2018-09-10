@@ -29,6 +29,7 @@ $(TARGET): $(OBJS)
 	$(CC) -o $(BUILDPREFIX)/$@ $^ $(LDFLAGS)
 
 prepare:
+	cp config.c src/config.c
 	mkdir -p $(BUILDPREFIX)
 
 $(BUILDPREFIX)/%.o: src/%.c

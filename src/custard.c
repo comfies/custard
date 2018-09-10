@@ -135,8 +135,8 @@ start_custard()
 
     xcb_file_descriptor = xcb_get_file_descriptor(xcb_connection);
 
-    Configuration = (struct Config *)malloc(sizeof(struct Config));
-    apply_config_defaults();
+/*    Configuration = (struct Config *)malloc(sizeof(struct Config));*/
+/*    apply_config_defaults();*/
     grid_apply_configuration();
 
     wm_running = 1;
@@ -274,7 +274,7 @@ stop_custard()
     finalize_ewmh_connection();
     finalize_xcb_connection();
 
-    free(Configuration);
+/*    free(Configuration);*/
 
 }
 

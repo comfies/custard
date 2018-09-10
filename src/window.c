@@ -457,10 +457,10 @@ move_window_to_grid_coordinate(xcb_window_t window_id,
     }
 
     unsigned int x_in_pixels = grid_get_offset_x(x) +
-        Configuration->grid_margin_left;
+        grid_margin_left;
 
     unsigned int y_in_pixels = grid_get_offset_y(y) +
-        Configuration->grid_margin_top;
+        grid_margin_top;
 
     move_window_to_pixel_coordinate(window_id,
         x_in_pixels, y_in_pixels);
@@ -524,8 +524,8 @@ move_window_cardinal(xcb_window_t window_id,
 
     if (direction == SOUTH || direction == SOUTHWEST ||
         direction == SOUTHEAST) {
-        if (window->y == Configuration->grid_rows ||
-            window->y + window->height > Configuration->grid_rows) {
+        if (window->y == grid_rows ||
+            window->y + window->height > grid_rows) {
             return;
         }
 
@@ -543,8 +543,8 @@ move_window_cardinal(xcb_window_t window_id,
 
     if (direction == EAST || direction == NORTHEAST ||
         direction == SOUTHEAST) {
-        if (window->x == Configuration->grid_columns ||
-            window->x + window->width > Configuration->grid_columns) {
+        if (window->x == grid_columns ||
+            window->x + window->width > grid_columns) {
             return;
         }
 
@@ -578,7 +578,7 @@ expand_window_cardinal(xcb_window_t window_id,
     if (direction == ALL || direction == SOUTH ||
         direction == SOUTHWEST || direction == SOUTHEAST) {
         if (window->y + (window->height + 1) >
-            (Configuration->grid_rows + 1)) {
+            (grid_rows + 1)) {
             return;
         }
 
@@ -598,7 +598,7 @@ expand_window_cardinal(xcb_window_t window_id,
     if (direction == ALL || direction == EAST ||
         direction == NORTHEAST || direction == SOUTHEAST) {
             if (window->x + (window->width + 1) >
-                (Configuration->grid_columns + 1)) {
+                (grid_columns + 1)) {
                 return;
             }
 
@@ -670,7 +670,7 @@ border_update(xcb_window_t window_id)
 {
     debug_output("border_update(): called");
 
-    if (Configuration->border_type == 0) {
+    if (border_type == 0) {
         return;
     }
 
@@ -695,7 +695,7 @@ border_update(xcb_window_t window_id)
         border_update_single, border_update_double, border_update_triple
     };
 
-    unsigned int data[1] = {Configuration->border_total_size};
+    unsigned int data[1] = {border_total_size};
 
     xcb_configure_window(
         xcb_connection,
@@ -706,7 +706,7 @@ border_update(xcb_window_t window_id)
 
     debug_output("border_update(): Selecting update method");
 
-    update_methods[Configuration->border_type - 1](window_id);
+    update_methods[border_type - 1](window_id);
 }
 
 void
@@ -724,16 +724,16 @@ border_update_single(xcb_window_t window_id)
     }
 
     if (focused) {
-        if (Configuration->border_invert_colors) {
-            data[0] = Configuration->border_unfocused_color;
+        if (border_invert_colors) {
+            data[0] = border_unfocused_color;
         } else {
-            data[0] = Configuration->border_focused_color;
+            data[0] = border_focused_color;
         }
     } else {
-        if (Configuration->border_invert_colors) {
-            data[0] = Configuration->border_focused_color;
+        if (border_invert_colors) {
+            data[0] = border_focused_color;
         } else {
-            data[0] = Configuration->border_unfocused_color;
+            data[0] = border_unfocused_color;
         }
     }
 
@@ -767,37 +767,37 @@ border_update_double(xcb_window_t window_id)
 
         {
             (short)geometry->width, 0,
-            (short unsigned)Configuration->border_inner_size,
-            (short unsigned)(geometry->height + Configuration->border_inner_size)
+            (short unsigned)border_inner_size,
+            (short unsigned)(geometry->height + border_inner_size)
         },
 
         {
             0, (short)geometry->height,
-            (short unsigned)(geometry->width + Configuration->border_inner_size),
-            (short unsigned)Configuration->border_inner_size
+            (short unsigned)(geometry->width + border_inner_size),
+            (short unsigned)border_inner_size
         },
 
         {
-            (short)(geometry->width + Configuration->border_total_size +
-                Configuration->border_outer_size), 0,
-            (short unsigned)Configuration->border_inner_size,
-            (short unsigned)(geometry->height + Configuration->border_inner_size)
+            (short)(geometry->width + border_total_size +
+                border_outer_size), 0,
+            (short unsigned)border_inner_size,
+            (short unsigned)(geometry->height + border_inner_size)
         },
 
         {
-            0, (short)(geometry->height + Configuration->border_total_size +
-                Configuration->border_outer_size),
-            (short unsigned)(geometry->width + Configuration->border_inner_size),
-            (short unsigned)Configuration->border_inner_size
+            0, (short)(geometry->height + border_total_size +
+                border_outer_size),
+            (short unsigned)(geometry->width + border_inner_size),
+            (short unsigned)border_inner_size
         },
 
         {
-            (short)(geometry->width + Configuration->border_total_size +
-                Configuration->border_outer_size), (short)(geometry->height +
-                Configuration->border_total_size +
-                Configuration->border_outer_size),
-            (short unsigned)Configuration->border_inner_size,
-            (short unsigned)Configuration->border_inner_size
+            (short)(geometry->width + border_total_size +
+                border_outer_size), (short)(geometry->height +
+                border_total_size +
+                border_outer_size),
+            (short unsigned)border_inner_size,
+            (short unsigned)border_inner_size
         }
     };
 
@@ -825,68 +825,68 @@ border_update_triple(xcb_window_t window_id)
     xcb_rectangle_t border[8] = {
     
         {
-            (short)(geometry->width + Configuration->border_outer_size), 0,
-            (short unsigned)Configuration->border_inner_size,
-            (short unsigned)(geometry->height + Configuration->border_outer_size +
-                Configuration->border_inner_size)
+            (short)(geometry->width + border_outer_size), 0,
+            (short unsigned)border_inner_size,
+            (short unsigned)(geometry->height + border_outer_size +
+                border_inner_size)
         }, /* Right */
 
         {
-            0, (short)(geometry->height + Configuration->border_outer_size),
-            (short unsigned)(geometry->width + Configuration->border_outer_size),
-            (short unsigned)Configuration->border_inner_size
+            0, (short)(geometry->height + border_outer_size),
+            (short unsigned)(geometry->width + border_outer_size),
+            (short unsigned)border_inner_size
         }, /* Bottom */
 
         {
-            (short)(geometry->width + Configuration->border_total_size +
-                Configuration->border_outer_size), 0,
-            (short unsigned)Configuration->border_inner_size,
-            (short unsigned)(geometry->height + Configuration->border_outer_size)
+            (short)(geometry->width + border_total_size +
+                border_outer_size), 0,
+            (short unsigned)border_inner_size,
+            (short unsigned)(geometry->height + border_outer_size)
         }, /* Left */
 
         {
-            0, (short)(geometry->height + Configuration->border_total_size +
-                Configuration->border_outer_size),
-            (short unsigned)(geometry->width + Configuration->border_outer_size),
-            (short unsigned)Configuration->border_inner_size
+            0, (short)(geometry->height + border_total_size +
+                border_outer_size),
+            (short unsigned)(geometry->width + border_outer_size),
+            (short unsigned)border_inner_size
         }, /* Top */
 
         {
-            (short)(geometry->width + Configuration->border_total_size +
-                Configuration->border_outer_size), (short)(geometry->height +
-                Configuration->border_total_size +
-                Configuration->border_outer_size),
-            (short unsigned)Configuration->border_inner_size,
-            (short unsigned)(Configuration->border_outer_size +
-                Configuration->border_inner_size)
+            (short)(geometry->width + border_total_size +
+                border_outer_size), (short)(geometry->height +
+                border_total_size +
+                border_outer_size),
+            (short unsigned)border_inner_size,
+            (short unsigned)(border_outer_size +
+                border_inner_size)
         }, /* Top-left, first fragment */
 
         {
-            (short)(geometry->width + Configuration->border_total_size +
-                Configuration->border_outer_size), (short)(geometry->height +
-                Configuration->border_total_size +
-                Configuration->border_outer_size),
-            (short unsigned)(Configuration->border_outer_size +
-                Configuration->border_inner_size),
-            (short unsigned)Configuration->border_inner_size,
+            (short)(geometry->width + border_total_size +
+                border_outer_size), (short)(geometry->height +
+                border_total_size +
+                border_outer_size),
+            (short unsigned)(border_outer_size +
+                border_inner_size),
+            (short unsigned)border_inner_size,
         }, /* Top-left, second fragment */
 
         {
-            (short)(geometry->width + Configuration->border_outer_size), (short)(
-                geometry->height + Configuration->border_total_size +
-                Configuration->border_outer_size),
-            (short unsigned)Configuration->border_inner_size,
-            (short unsigned)(Configuration->border_inner_size +
-                Configuration->border_outer_size)
+            (short)(geometry->width + border_outer_size), (short)(
+                geometry->height + border_total_size +
+                border_outer_size),
+            (short unsigned)border_inner_size,
+            (short unsigned)(border_inner_size +
+                border_outer_size)
         }, /* Top-right */
 
         {
-            (short)(geometry->width + Configuration->border_total_size +
-                Configuration->border_outer_size), (short)(geometry->height +
-                Configuration->border_outer_size),
-            (short unsigned)(Configuration->border_inner_size +
-                Configuration->border_outer_size),
-            (short unsigned)Configuration->border_inner_size
+            (short)(geometry->width + border_total_size +
+                border_outer_size), (short)(geometry->height +
+                border_outer_size),
+            (short unsigned)(border_inner_size +
+                border_outer_size),
+            (short unsigned)border_inner_size
         } /* Bottom-left */
     };
 
@@ -901,8 +901,8 @@ border_update_with_graphics_context(xcb_window_t window_id,
     debug_output("border_update_with_graphics_context(): Using graphics context for border");
 
     unsigned int colors[2] = {
-        Configuration->border_unfocused_color, /* primary */
-        Configuration->border_background_color /* secondary */
+        border_unfocused_color, /* primary */
+        border_background_color /* secondary */
     };
 
     unsigned int data[1];
@@ -915,16 +915,16 @@ border_update_with_graphics_context(xcb_window_t window_id,
     }
 
     if (focused) {
-        if (Configuration->border_invert_colors) {
-            colors[1] = Configuration->border_focused_color;
-            colors[0] = Configuration->border_background_color;
+        if (border_invert_colors) {
+            colors[1] = border_focused_color;
+            colors[0] = border_background_color;
         } else {
-            colors[0] = Configuration->border_focused_color;
+            colors[0] = border_focused_color;
         }
     } else {
-        if (Configuration->border_invert_colors) {
-            colors[1] = Configuration->border_unfocused_color;
-            colors[0] = Configuration->border_background_color;
+        if (border_invert_colors) {
+            colors[1] = border_unfocused_color;
+            colors[0] = border_background_color;
         }
     }
 
@@ -942,9 +942,9 @@ border_update_with_graphics_context(xcb_window_t window_id,
     xcb_rectangle_t outer_border[4] = {{
         0, 0,
         (short unsigned)(geometry->width +
-            (Configuration->border_total_size * 2)),
+            (border_total_size * 2)),
         (short unsigned)(geometry->height +
-            (Configuration->border_total_size * 2))
+            (border_total_size * 2))
     }};
 
     xcb_pixmap_t pixmap = xcb_generate_id(xcb_connection);
@@ -955,9 +955,9 @@ border_update_with_graphics_context(xcb_window_t window_id,
         pixmap,
         screen->root,
         (short unsigned)(geometry->width +
-            (Configuration->border_total_size * 2)),
+            (border_total_size * 2)),
         (short unsigned)(geometry->height +
-            (Configuration->border_total_size * 2))
+            (border_total_size * 2))
     );
 
     xcb_gcontext_t graphics_context = xcb_generate_id(xcb_connection);

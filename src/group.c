@@ -13,7 +13,7 @@ get_group_state(unsigned int group)
     debug_output("get_group_state(): called");
     group_state_t state;
 
-    if (group < 1 || group > 16 || group > Configuration->groups) {
+    if (group < 1 || group > 16 || group > groups) {
         return UNMAPPED;
     }
 
@@ -44,7 +44,7 @@ void
 attach_window_to_group(xcb_window_t window_id, unsigned int group)
 {
     debug_output("attach_window_to_group(): called");
-    if (group < 1 || group > 16 || group > Configuration->groups) {
+    if (group < 1 || group > 16 || group > groups) {
         return;
     }
     Window *window = window_list_get_window(window_id);
@@ -62,7 +62,7 @@ void
 detach_window_from_group(xcb_window_t window_id, unsigned int group)
 {
     debug_output("detach_window_to_group(): called");
-    if (group < 1 || group > 16 || group > Configuration->groups) {
+    if (group < 1 || group > 16 || group > groups) {
         return;
     }
     Window *window = window_list_get_window(window_id);
@@ -82,7 +82,7 @@ void
 focus_group(unsigned int group)
 {
     debug_output("focus_group(): called");
-    if (group < 1 || group > 16 || group > Configuration->groups) {
+    if (group < 1 || group > 16 || group > groups) {
         return;
     }
 
