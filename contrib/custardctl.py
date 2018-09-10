@@ -84,6 +84,7 @@ if __name__ == '__main__':
         'raise': ['window'],
         'lower': ['window'],
         'relocate': ['window'],
+        'use_geometry': ['window'],
         'attach_to_group': ['window'],
         'detach_from_group': ['window'],
         'close': ['window'],
@@ -166,6 +167,8 @@ if __name__ == '__main__':
     elif target == 'window':
         if action == 'close':
             output = "window close"
+        elif action == 'use_geometry':
+            output = "window use_geometry {0}".format(arguments[0])
         elif action in ['raise', 'lower']:
             output = "window {0}".format(action)
         elif action in ['move', 'expand', 'contract']:
