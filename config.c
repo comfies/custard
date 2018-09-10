@@ -22,6 +22,8 @@ unsigned int grid_margin_right = 0;
 
 unsigned int workspaces = 2;
 
+/* when modifying the geometries array make sure the NULL stays at the
+   end of the array because that's how custard knows to stop */
 struct NamedGeometry geometries[] = {
     { .name = "top_left", .geometry = {
         .x = 1, .y = 1, .height = 1, .width = 1 } },
@@ -35,5 +37,6 @@ struct NamedGeometry geometries[] = {
     { .name = "bottom_mid", .geometry = {
         .x = 2, .y = 2, .height = 1, .width = 1 } },
     { .name = "bottom_right", .geometry = {
-        .x = 3, .y = 2, .height = 1, .width = 1 } }
+        .x = 3, .y = 2, .height = 1, .width = 1 } },
+    NULL
 };

@@ -223,7 +223,7 @@ process_command(char *input)
                 case 2605769987: /* use_geometry */ {
                         struct NamedGeometry geometry;
 
-                        for (unsigned int index = 0; index < 3; index++) {
+                        for (unsigned int index = 0; geometries[index]; index++) {
                             geometry = geometries[index];
 
                             if (strcmp(geometry.name, diced[2]) == 0) {
