@@ -7,9 +7,9 @@ unsigned int border_inner_size = 0;
 unsigned int border_outer_size = 0;
 unsigned int border_total_size = 0;
 
-unsigned int border_focused_color = 0xFFFFFFff;
-unsigned int border_unfocused_color = 0x676767ff;
-unsigned int border_background_color = 0x000000ff;
+unsigned int border_focused_color = 0xFFFFFF;
+unsigned int border_unfocused_color = 0x676767;
+unsigned int border_background_color = 0x000000;
 
 unsigned grid_rows = 2;
 unsigned grid_columns = 3;
