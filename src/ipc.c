@@ -187,6 +187,8 @@ process_command(char *input)
             cardinal_direction_t direction;
             direction = (cardinal_direction_t)n;
 
+            /* TODO: debug this */
+
             switch (action) {
                 case 176908083: /* close */
                     close_window(window_id);
@@ -223,7 +225,8 @@ process_command(char *input)
                 case 2605769987: /* use_geometry */ {
                         struct NamedGeometry geometry;
 
-                        for (unsigned int index = 0; geometries[index].name; index++) {
+                        for (unsigned int index = 0;
+                            geometries[index].name; index++) {
                             geometry = geometries[index];
 
                             if (strcmp(geometry.name, diced[2]) == 0) {
