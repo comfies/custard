@@ -1,3 +1,4 @@
 build/
 tags
 config.c
+src/config.c
