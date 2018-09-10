@@ -3,29 +3,40 @@
 
 #define SOCKET_PATH "/tmp/custard.sock"
 
-struct Config {
-    short unsigned int border_type;
-    short unsigned int border_invert_colors;
-    unsigned int border_inner_size;
-    unsigned int border_outer_size;
-    unsigned int border_total_size;
-    unsigned int border_focused_color;
-    unsigned int border_unfocused_color;
-    unsigned int border_background_color;
+extern short unsigned border_type;
+extern short unsigned border_invert_colors;
 
-    unsigned int grid_rows;
-    unsigned int grid_columns;
-    unsigned int grid_gap;
-    unsigned int grid_margin_top;
-    unsigned int grid_margin_bottom;
-    unsigned int grid_margin_left;
-    unsigned int grid_margin_right;
+extern unsigned int border_inner_size;
+extern unsigned int border_outer_size;
+extern unsigned int border_total_size;
 
-    unsigned int groups;
+extern unsigned int border_focused_color;
+extern unsigned int border_unfocused_color;
+extern unsigned int border_background_color;
+
+extern unsigned int grid_rows;
+extern unsigned int grid_columns;
+
+extern unsigned int grid_gap;
+extern unsigned int grid_margin_top;
+extern unsigned int grid_margin_bottom;
+extern unsigned int grid_margin_left;
+extern unsigned int grid_margin_right;
+
+extern unsigned int workspaces;
+
+struct Geometry {
+    unsigned int x;
+    unsigned int y;
+    unsigned int height;
+    unsigned int width;
 };
 
-extern struct Config *Configuration;
-void apply_config_defaults(void);
-void apply_config(void);
+struct NamedGeometry {
+    char *name;
+    struct Geometry geometry;
+};
+
+extern struct NamedGeometry geometries[];
 
 #endif /* CONFIG_H */

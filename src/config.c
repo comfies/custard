@@ -1,71 +1,32 @@
 #include "config.h"
 
-#include "custard.h"
-#include "grid.h"
-#include "window.h"
-#include "ewmh.h"
-#include "xcb.h"
+short unsigned border_type = 1;
+short unsigned border_invert_colors = 0;
 
-struct Config *Configuration;
+unsigned int border_inner_size = 0;
+unsigned int border_outer_size = 3;
+unsigned int border_total_size = 3;
 
-void
-apply_config_defaults()
-{
-    Configuration->border_type = 0;
-    Configuration->border_invert_colors = 0;
-    Configuration->border_inner_size = 0;
-    Configuration->border_outer_size = 0;
-    Configuration->border_total_size = 0;
-    Configuration->border_focused_color = 0xFFFFFFFF;
-    Configuration->border_unfocused_color = 0xFF676767;
-    Configuration->border_background_color = 0xFF000000;
-    Configuration->grid_rows = 2;
-    Configuration->grid_columns = 3;
-    Configuration->grid_gap = 0;
-    Configuration->grid_margin_top = 0;
-    Configuration->grid_margin_bottom = 0;
-    Configuration->grid_margin_left = 0;
-    Configuration->grid_margin_right = 0;
-    Configuration->groups = 2;
+unsigned int border_focused_color = 0x888888;
+unsigned int border_unfocused_color = 0x333333;
+unsigned int border_background_color = 0x000000;
 
-    xcb_ewmh_set_number_of_desktops(ewmh_connection, 0, 2);
-}
+unsigned grid_rows = 6;
+unsigned grid_columns = 8;
 
-void
-apply_config()
-{
-    xcb_ewmh_set_number_of_desktops(ewmh_connection, 0, Configuration->groups);
+unsigned int grid_gap = 32;
+unsigned int grid_margin_top = 0;
+unsigned int grid_margin_bottom = 0;
+unsigned int grid_margin_left = 0;
+unsigned int grid_margin_right = 0;
 
-    if (Configuration->border_type == 0) {
-        Configuration->border_total_size = 0;
-    } else if (Configuration->border_type == 1) {
-        Configuration->border_total_size = Configuration->border_outer_size;
-    } else if (Configuration->border_type == 2) {
-        Configuration->border_total_size = Configuration->border_inner_size +
-            Configuration->border_outer_size;
-    } else if (Configuration->border_type == 3) {
-        Configuration->border_total_size = Configuration->border_inner_size + (
-            Configuration->border_outer_size * 2);
-    }
+unsigned int workspaces = 2;
 
-    grid_apply_configuration();
-    /* TODO: if windows are outside of newly assigned grid boundaries they should be moved
-        to fit within the new ones, and resized if need be. */
-
-    /* TODO: if the number of groups is less than the previous amount, move all windows
-        from non-accessible groups to the last group in the stack */
-
-    struct WindowLinkedListElement *element = window_list_head;
-    Window *window = NULL;
-
-    while (element) {
-        window = element->window;
-        move_window_to_grid_coordinate(window->id, window->x, window->y);
-        resize_window_with_grid_units(window->id,
-            window->height, window->width);
-        border_update(window->id);
-        element = element->next;
-    }
-
-    commit();
-}
+struct NamedGeometry geometries[] = {
+    { .name = "display_left", .geometry = {
+        .x = 2, .y = 2, .height = 4, .width = 3 } },
+    { .name = "display_top_right", .geometry = {
+        .x = 5, .y = 2, .height = 2, .width = 3 } },
+    { .name = "display_bottom_right", .geometry = {
+        .x = 5, .y = 4, .height = 2, .width = 3 } }
+};
