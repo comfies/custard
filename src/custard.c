@@ -126,7 +126,8 @@ _debug(const char *file, const char *func, const int line, char *fmt, ...)
     va_list ap;
     va_start(ap, fmt);
     vfprintf(stderr, fmt, ap);
-    puts("");
+    va_end(ap);
+    fputs("\n", stderr);
 }
 
 void
