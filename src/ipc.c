@@ -2,7 +2,7 @@
 
 #include "config.h"
 #include "group.h"
-/#include "xcb.h"
+#include "xcb.h"
 
 #include <stdio.h>
 #include <stdlib.h>
