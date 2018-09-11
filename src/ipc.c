@@ -2,7 +2,7 @@
 
 #include "config.h"
 #include "group.h"
-#include "xcb.h"
+/#include "xcb.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,9 +11,7 @@
 void
 process_command(char *input)
 {
-    debug_output("process_command(): beginning of received input");
-    debug_output(input);
-    debug_output("process_command(): end of received input");
+    debug_output("beginning of received input >>\n %s <<end of received input", input);
 
     char *diced[4];
     char *token;
@@ -26,7 +24,7 @@ process_command(char *input)
     } else {
         while (token) {
             diced[index] = token;
-            index++;
+            ++index;
             if (index < 5) {
                 token = strtok(NULL, " ");
             } else {
@@ -62,7 +60,6 @@ process_command(char *input)
 
     switch (target) {
         case 3938768739: /* custard */
-
             switch (action) {
                 case 2087808148: /* halt */
                     wm_running = 0;
@@ -184,11 +181,6 @@ process_command(char *input)
 
             n = parse_unsigned_integer(diced[2]);
 
-            cardinal_direction_t direction;
-            direction = (cardinal_direction_t)n;
-
-            /* TODO: debug this */
-
             switch (action) {
                 case 176908083: /* close */
                     close_window(window_id);
@@ -200,26 +192,6 @@ process_command(char *input)
 
                 case 173263814: /* lower */
                     lower_window(window_id);
-                    break;
-
-                case 2087699060: /* move */
-                    move_window_cardinal(window_id, direction);
-                    break;
-
-                case 1179764707: /* expand */
-                    expand_window_cardinal(window_id, direction);
-                    break;
-
-                case 2398914583: /* contract */
-                    contract_window_cardinal(window_id, direction);
-                    break;
-
-                case 1459515434: /* attach_to_group */
-                    attach_window_to_group(window_id, n);
-                    break;
-
-                case 1947222643: /* detach_from_group */
-                    detach_window_from_group(window_id, n);
                     break;
 
                 case 2605769987: /* use_geometry */ {
@@ -250,38 +222,11 @@ process_command(char *input)
 
             break;
 
-        case 172404922: /* group */
-            if (!diced[2]) {
-                return;
-            }
-
-            n = parse_unsigned_integer(diced[2]);
-
-            switch (action) {
-                case 171175241: /* focus */
-                    focus_group(n);
-                    break;
-
-                case 1322218894: /* attach */
-                    map_group(n);
-                    break;
-
-                case 1121335546: /* detach */
-                    unmap_group(n);
-                    break;
-
-                default:
-                    return;
-            }
-
-            break;
-
         default:
             return;
     }
 
     commit();
-
     debug_output("process_command(): end of call");
 }
 

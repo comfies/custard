@@ -38,7 +38,9 @@ unsigned short window_list_append_window(Window*);
 unsigned short window_list_remove_window(xcb_window_t);
 Window *window_list_get_window(xcb_window_t);
 
-void debug_output(char* message);
+void _debug(const char*, const char*, const int, char*, ...);
+//#define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
+#define debug_output(...) _debug(__FILE__, __func__, __LINE__, __VA_ARGS__)
 
 int start_custard(void);
 void stop_custard(void);

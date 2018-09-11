@@ -13,6 +13,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <sys/select.h>
 
 #include <unistd.h>
@@ -117,7 +118,19 @@ window_list_get_window(xcb_window_t window_id)
 }
 
 void
-debug_output(char *message)
+_debug(const char *file, const char *func, const int line, char *fmt, ...)
+{
+    if (!debug)
+        return;
+    fprintf(stderr, "%-14s :%-4d (%s) - ", file, line, func);
+    va_list ap;
+    va_start(ap, fmt);
+    vfprintf(stderr, fmt, ap);
+    puts("");
+}
+
+void
+debug_output_old(char *message)
 {
     if (debug) {
         fprintf(stderr, "[debug] %s\n", message);
