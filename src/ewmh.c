@@ -39,7 +39,7 @@ initialize_ewmh_connection()
 
     if (!ewmh_connection)
     {
-        debug_output("initialize_ewmh_connection(): Unable to establish EWMH connection");
+        debug_output("Unable to establish EWMH connection");
         free(ewmh_connection);
         return 0;
     }
@@ -49,7 +49,7 @@ initialize_ewmh_connection()
             xcb_connection,
             ewmh_connection
         ), NULL)) {
-        debug_output("initialize_ewmh_connection(): Unable to init EWMH atoms");
+        debug_output("Unable to init EWMH atoms");
         return 0;
     }
 
@@ -115,14 +115,14 @@ unsigned short
 finalize_ewmh_connection(void)
 {
     if (ewmh_connection) {
-        debug_output("finalize_ewmh_connection(): called");
+        debug_output("Called");
 
         xcb_ewmh_connection_wipe(ewmh_connection);
 
         return 1;
     }
 
-    debug_output("finalize_ewmh_connection(): Connection already closed");
+    debug_output("Connection already closed");
 
     return 0;
 }

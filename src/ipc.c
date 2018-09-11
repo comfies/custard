@@ -33,7 +33,7 @@ process_command(char *input)
         }
     }
 
-    debug_output("process_command(): output split");
+    debug_output("Input split");
 
     if (!diced[0] || !diced[1]) {
         return;
@@ -227,7 +227,7 @@ process_command(char *input)
     }
 
     commit();
-    debug_output("process_command(): end of call");
+    debug_output("End of call");
 }
 
 unsigned short int

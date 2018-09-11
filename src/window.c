@@ -129,14 +129,14 @@ manage_window(xcb_window_t window_id)
 
     window_list_append_window(window);
 
-    debug_output("manage_window(): Window created and added to linked list");
+    debug_output("Window created and added to linked list");
 
     return 1;
 }
 
 short unsigned int
 unmanage_window(xcb_window_t window_id) {
-    debug_output("unmanage_window(): called");
+    debug_output("Called");
 
     if (focused_window && focused_window->id == window_id) {
         focused_window = NULL;
@@ -147,11 +147,11 @@ unmanage_window(xcb_window_t window_id) {
 
 void
 update_window_borders() {
-    debug_output("update_window_borders(): called");
+    debug_output("Called");
     struct WindowLinkedListElement *element = window_list_head;
 
     while (element) {
-        debug_output("update_window_borders(): window iterated");
+        debug_output("Window iterated");
         border_update(element->window->id);
         element = element->next;
     }
@@ -161,7 +161,7 @@ update_window_borders() {
 void
 unfocus_window()
 {
-    debug_output("unfocus_window(): called");
+    debug_output("Called");
 
     xcb_set_input_focus(
         xcb_connection,
@@ -198,7 +198,7 @@ void
 focus_on_window(xcb_window_t window_id)
 {
 
-    debug_output("focus_on_window(): called");
+    debug_output("Called");
 
     if (window_id == screen->root) {
         return;
@@ -257,7 +257,7 @@ focus_on_window(xcb_window_t window_id)
 void
 close_window(xcb_window_t window_id)
 {
-    debug_output("close_window(): called");
+    debug_output("Called");
 
     if (window_id == screen->root) {
         return;
@@ -295,7 +295,7 @@ close_window(xcb_window_t window_id)
     if (reply) {
         delete_window_atom = reply->atom;
 
-        debug_output("close_window(): Attempting to use WM protocols to close window");
+        debug_output("Attempting to use WM protocols to close window");
 
         for (unsigned int index = 0; index < protocols.atoms_len; index++) {
             if (protocols.atoms[index] == delete_window_atom) {
@@ -332,14 +332,14 @@ close_window(xcb_window_t window_id)
         window_id
     );
 
-    debug_output("close_window(): Window closed via xcb_kill_client(...)");
+    debug_output("Window closed via xcb_kill_client(...)");
 
 }
 
 void
 map_window(xcb_window_t window_id)
 {
-    debug_output("map_window(): called");
+    debug_output("Called");
     xcb_map_window(
         xcb_connection,
         window_id
@@ -349,7 +349,7 @@ map_window(xcb_window_t window_id)
 void
 unmap_window(xcb_window_t window_id)
 {
-    debug_output("unmap_window(): called");
+    debug_output("Called");
     xcb_unmap_window(
         xcb_connection,
         window_id
@@ -558,7 +558,7 @@ void
 expand_window_cardinal(xcb_window_t window_id,
     cardinal_direction_t direction)
 {
-    debug_output("expand_window_cardinal(): called");
+    debug_output("Called");
     Window *window = window_list_get_window(window_id);
 
     if (!window) {
@@ -605,11 +605,11 @@ expand_window_cardinal(xcb_window_t window_id,
             window->width++;
     }
 
-    debug_output("expand_window_cardinal(): applying changes");
+    debug_output("Applying changes");
     move_window_to_grid_coordinate(window_id, window->x, window->y);
     resize_window_with_grid_units(window_id, window->height, window->width);
     border_update(window_id);
-    debug_output("expand_window_cardinal(): changes applied");
+    debug_output("Changes applied");
 }
 
 void
@@ -668,13 +668,13 @@ contract_window_cardinal(xcb_window_t window_id,
 void
 border_update(xcb_window_t window_id)
 {
-    debug_output("border_update(): called");
+    debug_output("Called");
 
     if (border_type == 0) {
         return;
     }
 
-    debug_output("border_output(): non-zero border type");
+    debug_output("Non-zero border type");
 
     xcb_get_geometry_reply_t *geometry = xcb_get_geometry_reply(
         xcb_connection,
@@ -689,7 +689,7 @@ border_update(xcb_window_t window_id)
         return;
     }
 
-    debug_output("border_update(): non-null geometry");
+    debug_output("Non-null geometry");
 
     void (*update_methods[3])(xcb_window_t) = {
         border_update_single, border_update_double, border_update_triple
@@ -704,7 +704,7 @@ border_update(xcb_window_t window_id)
         data
     );
 
-    debug_output("border_update(): Selecting update method");
+    debug_output("Selecting update method");
 
     update_methods[border_type - 1](window_id);
 }
@@ -712,7 +712,7 @@ border_update(xcb_window_t window_id)
 void
 border_update_single(xcb_window_t window_id)
 {
-    debug_output("border_update_single(): selected");
+    debug_output("Selected");
 
     unsigned int data[1];
 
@@ -748,7 +748,7 @@ border_update_single(xcb_window_t window_id)
 void
 border_update_double(xcb_window_t window_id)
 {
-    debug_output("border_update_double(): selected");
+    debug_output("Selected");
 
     xcb_get_geometry_reply_t *geometry = xcb_get_geometry_reply(
         xcb_connection,
@@ -807,7 +807,7 @@ border_update_double(xcb_window_t window_id)
 void
 border_update_triple(xcb_window_t window_id)
 {
-    debug_output("border_update_triple(): selected");
+    debug_output("Selected");
 
     xcb_get_geometry_reply_t *geometry = xcb_get_geometry_reply(
         xcb_connection,
@@ -898,7 +898,7 @@ border_update_with_graphics_context(xcb_window_t window_id,
     xcb_rectangle_t *inner_border, unsigned int inner_border_array_size)
 {
 
-    debug_output("border_update_with_graphics_context(): Using graphics context for border");
+    debug_output("Using graphics context for border");
 
     unsigned int colors[2] = {
         border_unfocused_color, /* primary */
@@ -936,8 +936,6 @@ border_update_with_graphics_context(xcb_window_t window_id,
         ),
         NULL
     );
-
-    debug_output("border_update_with_graphics_context(): setting outer border");
 
     xcb_rectangle_t outer_border[4] = {{
         0, 0,
@@ -978,6 +976,8 @@ border_update_with_graphics_context(xcb_window_t window_id,
         data
     );
 
+    debug_output("Setting outer border");
+
     xcb_poly_fill_rectangle(
         xcb_connection,
         pixmap,
@@ -994,6 +994,8 @@ border_update_with_graphics_context(xcb_window_t window_id,
         XCB_GC_FOREGROUND,
         data
     );
+
+    debug_output("Setting inner border");
 
     xcb_poly_fill_rectangle(
         xcb_connection,

@@ -14,7 +14,7 @@ handlers_handle_event(xcb_generic_event_t *event)
 {
     unsigned int event_type = event->response_type & ~0x80;
 
-    debug_output("handlers_handle_event(): event received");
+    debug_output("Event received");
 
     switch (event_type) {
         case (XCB_MAP_REQUEST):
@@ -40,7 +40,7 @@ handlers_handle_event(xcb_generic_event_t *event)
 void
 handlers_map_request(xcb_generic_event_t *generic_event)
 {
-    debug_output("handlers_map_request(): called");
+    debug_output("Called");
 
     xcb_map_request_event_t *event = (xcb_map_request_event_t *)generic_event;
     xcb_window_t window_id = event->window;
@@ -69,7 +69,7 @@ handlers_map_request(xcb_generic_event_t *generic_event)
 void
 handlers_window_destroyed(xcb_generic_event_t *generic_event)
 {
-    debug_output("handlers_window_destroyed(): called");
+    debug_output("Called");
 
     xcb_destroy_notify_event_t *event;
     event = (xcb_destroy_notify_event_t *)generic_event;
@@ -85,7 +85,7 @@ handlers_window_destroyed(xcb_generic_event_t *generic_event)
 void
 handlers_button_press(xcb_generic_event_t *generic_event)
 {
-    debug_output("handlers_button_press(): called");
+    debug_output("Called");
 
     xcb_button_press_event_t *event;
     event = (xcb_button_press_event_t *)generic_event;
@@ -100,7 +100,7 @@ handlers_button_press(xcb_generic_event_t *generic_event)
 void
 handlers_window_message_received(xcb_generic_event_t *generic_event)
 {
-    debug_output("handlers_window_message_received(): called");
+    debug_output("Called");
 
     xcb_client_message_event_t *event;
     event = (xcb_client_message_event_t *)generic_event;

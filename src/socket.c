@@ -28,18 +28,18 @@ initialize_socket()
     socket_file_descriptor = socket(AF_UNIX, SOCK_STREAM, 0);
 
     if (socket_file_descriptor == -1) {
-        debug_output("initialize_socket(): Invalid file descriptor, unable to create socket");
+        debug_output("Invalid file descriptor, unable to create socket");
         return 0;
     }
 
     if (bind(socket_file_descriptor,
         (struct sockaddr *)&address, sizeof(address)) == -1) {
-        debug_output("initialize_socket(): Unable to bind socket");
+        debug_output("Unable to bind socket");
         return 0;
     }
 
     if (listen(socket_file_descriptor, 1) == -1) {
-        debug_output("initialize_socket(): Unable to listen to socket");
+        debug_output("Unable to listen to socket");
         return 0;
     }
 
@@ -52,11 +52,11 @@ read_socket()
     int command_file_descriptor = accept(socket_file_descriptor, NULL, 0);
 
     if (command_file_descriptor == -1) {
-        debug_output("read_socket(): Unable to accept connection");
+        debug_output("Unable to accept connection");
         return;
     }
 
-    debug_output("read_socket(): reading from socket");
+    debug_output("Reading from socket");
 
     char *data = calloc(1025, sizeof(char));
 
@@ -76,7 +76,7 @@ start_socket_read_loop(void *pointer)
 {
     (void)pointer;
 
-    debug_output("start_socket_read_loop(): started socket read loop");
+    debug_output("Started socket read loop");
     while (wm_running) {
         read_socket();
     }
@@ -87,7 +87,7 @@ start_socket_read_loop(void *pointer)
 void
 finalize_socket()
 {
-    debug_output("finalize_socket(): called");
+    debug_output("Called");
     unlink(SOCKET_PATH);
 }
 

@@ -37,7 +37,7 @@ window_list_append_window(Window *window)
     struct WindowLinkedListElement *element = window_list_head;
 
     if (!element) {
-        debug_output("window_list_append_window(): No head, making window head");
+        debug_output("No head, making window head");
 
         window_list_head = (struct WindowLinkedListElement *)malloc(
             sizeof(struct WindowLinkedListElement)
@@ -46,7 +46,7 @@ window_list_append_window(Window *window)
         window_list_head->window = window;
 
     } else {
-        debug_output("window_list_append_window(): Head found, making tail");
+        debug_output("Head found, making tail");
 
         while (element->next) {
             element = element->next;
@@ -208,7 +208,7 @@ start_custard()
         commit();
     }
 
-    debug_output("main(): starting event loop");
+    debug_output("Starting event loop");
     fd_set descriptor_set;
     int max_file_descriptor;
 
@@ -245,7 +245,7 @@ start_custard()
 
     stop_custard();
 
-    debug_output("main(): event loop stopped, shutting down");
+    debug_output("Event loop stopped, shutting down");
 
     return EXIT_SUCCESS;
 }
@@ -253,7 +253,7 @@ start_custard()
 void
 stop_custard()
 {
-    debug_output("stop_custard(): called, joining socket thread and finalizing");
+    debug_output("Ending custard");
 
 /*    if (!wm_running) {
         return;
@@ -295,7 +295,7 @@ stop_custard()
 void
 focus_next_window()
 {
-    debug_output("focus_next_window(): called");
+    debug_output("Called");
 
     struct WindowLinkedListElement *element = window_list_head;
     Window *window = NULL;

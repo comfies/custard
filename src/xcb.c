@@ -24,7 +24,7 @@ initialize_xcb_connection()
 
     if (xcb_connection_has_error(xcb_connection))
     {
-        debug_output("initialize_xcb_connection(): Error opening XCB connection.");
+        debug_output("Error opening XCB connection.");
         return 0;
     }
 
@@ -41,7 +41,7 @@ initialize_xcb_connection()
     );
 
     if (xcb_error != NULL) {
-        debug_output("initialize_xcb_connection(): Unable to open XCB connection, a window manager may already be running.");
+        debug_output("Unable to open XCB connection, a window manager may already be running.");
         printf("%s\n", "Unable to start custard, it appears that another window manager may be running.");
         free(xcb_error);
         return 0;
@@ -72,7 +72,7 @@ initialize_xcb_connection()
 void
 commit()
 {
-    debug_output("commit(): Flushed to X");
+    debug_output("Flushed to X");
     xcb_flush(xcb_connection);
 }
 
@@ -80,14 +80,14 @@ unsigned short int
 finalize_xcb_connection()
 {
     if (xcb_connection) {
-        debug_output("finalize_xcb_connection(): called");
+        debug_output("Called");
 
         xcb_disconnect(xcb_connection);
 
         return 1;
     }
 
-    debug_output("finalize_xcb_connection(): Connection already closed");
+    debug_output("Connection already closed");
 
     return 0;
 }
