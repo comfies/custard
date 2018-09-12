@@ -13,221 +13,97 @@ process_command(char *input)
 {
     debug_output("beginning of received input >>\n %s <<end of received input", input);
 
-    char *diced[4];
+    unsigned int target = 0;
+    unsigned int action = 0;
+    char *arguments[8];
+
     char *token;
     unsigned int index = 0;
 
     token = strtok(input, " ");
 
-    if (!token) {
-        diced[0] = input;
-    } else {
-        while (token) {
-            diced[index] = token;
-            ++index;
-            if (index < 5) {
-                token = strtok(NULL, " ");
-            } else {
-                token = NULL;
-            }
+    while (token) {
+        if (index == 0) {
+            target = parse_unsigned_integer(token);
+        } else if (index == 1) {
+            action = parse_unsigned_integer(token);
+        } else {
+            arguments[index - 2] = token;
         }
+
+        token = NULL;
+        if (++index < 10) {
+            token = strtok(NULL, " ");
+        }
+    }
+
+    if (!target || !action) {
+        return;
     }
 
     debug_output("Input split");
 
-    if (!diced[0] || !diced[1]) {
-        return;
-    }
+    if (target == 0xEAC4D763) {
+        /* target: custard */
 
-    unsigned long hash = 5381;
-    unsigned int target = 0, action = 0;
+        switch (action) {
+            case 0x7C716C94: /* halt */
+                wm_running = 0;
+                break;
 
-    int c;
-
-    while ((c = *diced[0]++)) {
-        hash = (hash * 33) ^ c;
-    }
-    target = hash >> target;
-    hash = 5381;
-
-    while ((c = *diced[1]++)) {
-        hash = (hash * 33) ^ c;
-    }
-    action = hash >> action;
-
-    short unsigned boolean = 0;
-    unsigned int n = 0;
-
-    switch (target) {
-        case 3938768739: /* custard */
-            switch (action) {
-                case 2087808148: /* halt */
-                    wm_running = 0;
-                    break;
-
-                case 171175241: /* focus */
-                    if (!diced[2]) {
-                        return;
-                    }
-
-                    focus_next_window();
-                    break;
-
-                case 1026323597: /* configure */
-                    if (!diced[2] || !diced[3]) {
-                        return;
-                    }
-
-                    hash = 5381;
-                    unsigned int setting = 0;
-
-                    while ((c = *diced[2]++)) {
-                        hash = (hash * 33) ^ c;
-                    }
-                    setting = hash >> setting;
-
-                    boolean = parse_boolean(diced[3]);
-                    n = parse_unsigned_integer(diced[3]);
-                    unsigned int color = parse_rgba_color(diced[3]);
-
-                    switch (setting) {
-                        case 2523544616: /* debug_mode */
-                            debug = boolean;
-                            break;
-
-                        case 232847129: /* border_focused_color */
-//                            border_focused_color = color;
-                            break;
-
-                        case 3731375234: /* border_unfocused_color */
-//                            border_unfocused_color = color;
-                            break;
-
-                        case 1539877306: /* border_background_color */
-//                            border_background_color = color;
-                            break;
-
-                        case 670643221: /* border_invert_colors */
-//                            border_invert_colors = boolean;
-                            break;
-
-                        case 374560946: /* border_inner_size */
-//                            border_inner_size = n;
-                            break;
-
-                        case 1738679797: /* border_outer_size */
-//                            border_outer_size = n;
-                            break;
-
-                        case 368571342: /* border_type */
-                            if (n > 3) {
-                                n = 3;
-                            }
-
-//                            border_type = n;
-                            break;
-
-                        case 3436447195: /* grid_rows */
-//                            grid_rows = n;
-                            break;
-
-                        case 2093021703: /* grid_columns */
-//                            grid_columns = n;
-                            break;
-
-                        case 2316679092: /* grid_gap */
-//                            grid_gap = n;
-                            break;
-
-                        case 2396801352: /* grid_margin_top */
-//                            grid_margin_top = n;
-                            break;
-
-                        case 1882181388: /* grid_margin_bottom */
-//                            grid_margin_bottom = n;
-                            break;
-
-                        case 1784735736: /* grid_margin_left */
-//                            grid_margin_left = n;
-                            break;
-
-                        case 3069105795: /* grid_margin_right */
-//                            grid_margin_right = n;
-                            break;
-
-                        case 1394395017: /* groups */
-//                            groups = n;
-                            break;
-
-                        default:
-                            return;
-                    }
-
-/*                    apply_config();*/
-                    break;
-
-                default:
-                    return;
-            }
-
-            break;
-
-        case 2016265097: /* window */
-            if (!focused_window || !diced[2]) {
+            default:
                 return;
-            }
+        }
 
-            xcb_window_t window_id = focused_window->id;
+    } else if (target == 0x782DC389) {
+        /* target: window */
 
-            n = parse_unsigned_integer(diced[2]);
-
-            switch (action) {
-                case 176908083: /* close */
-                    close_window(window_id);
-                    break;
-
-                case 194675017: /* raise */
-                    raise_window(window_id);
-                    break;
-
-                case 173263814: /* lower */
-                    lower_window(window_id);
-                    break;
-
-                case 2605769987: /* use_geometry */ {
-                        struct NamedGeometry geometry;
-
-                        for (unsigned int index = 0;
-                            geometries[index].name; index++) {
-                            geometry = geometries[index];
-
-                            if (strcmp(geometry.name, diced[2]) == 0) {
-                                move_window_to_grid_coordinate(window_id,
-                                    geometry.geometry.x, geometry.geometry.y);
-                                resize_window_with_grid_units(window_id,
-                                    geometry.geometry.height,
-                                    geometry.geometry.width);
-                                commit();
-                                return;
-                            }
-                        }
-
-                    }
-
-                    break;
-
-                default:
-                    return;
-            }
-
-            break;
-
-        default:
+        if (!focused_window) {
             return;
+        }
+
+        xcb_window_t window_id = focused_window->id;
+
+        switch (action) {
+            case 0xA8B6733:
+                close_window(window_id);
+                break;
+
+            case 0xB9A8149:
+                raise_window(window_id);
+                break;
+
+            case 0xA53CBC6:
+                lower_window(window_id);
+                break;
+
+            case 0x5769B7BF: {
+                    struct NamedGeometry geometry;
+
+                    for (unsigned int index = 0;
+                        geometries[index].name; index++) {
+                        geometry = geometries[index];
+
+                        if (strcmp(geometry.name, arguments[0]) == 0) {
+                            move_window_to_grid_coordinate(window_id,
+                                geometry.geometry.x, geometry.geometry.y);
+                            resize_window_with_grid_units(window_id,
+                                geometry.geometry.height,
+                                geometry.geometry.width);
+                            commit();
+                            return;
+                        }
+                    }
+                }
+                break;
+
+            default:
+                return;
+        }
+
     }
 
     commit();
-    debug_output("End of call");
 }
 
 unsigned short int
