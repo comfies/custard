@@ -84,7 +84,7 @@ if __name__ == '__main__':
         'raise': ['window'],
         'lower': ['window'],
         'relocate': ['window'],
-        'use_geometry': ['window'],
+        'geometry': ['window'],
         'attach_to_group': ['window'],
         'detach_from_group': ['window'],
         'close': ['window'],
@@ -107,7 +107,7 @@ if __name__ == '__main__':
         if action == 'help':
             show_help()
         elif action == 'stop':
-            send_message("custard halt")
+            send_message("3938768739 2087808148")
         elif action == 'focus':
             option = arguments[0]
 
@@ -166,9 +166,9 @@ if __name__ == '__main__':
             output = "{0} configure {1} {2}".format(target, variable, data)
     elif target == 'window':
         if action == 'close':
-            output = "window close"
-        elif action == 'use_geometry':
-            output = "window use_geometry {0}".format(arguments[0])
+            output = "2016265097 176908083"
+        elif action == 'geometry':
+            output = "2016265097 1466546111 {0}".format(arguments[0])
         elif action in ['raise', 'lower']:
             output = "window {0}".format(action)
         elif action in ['move', 'expand', 'contract']:
