@@ -5,208 +5,168 @@ import re
 import socket
 import sys
 
-dry = False
+from typing import List
 
-def show_help():
-    print("[...] show help")
+SOCKET_PATH  = '/tmp/custard.sock'
+dry = False
+option_target_map = dict()
+
+def help() -> None:
+    print("help(): stub")
     exit(0)
 
-def error_out(message):
-    print(message)
-    exit(1)
+def send(message: str) -> None:
+    global SOCKET_PATH
 
-def send_message(message):
-    message = message.lower()
-    if dry:
-        print(message)
-        exit(0)
-    socket_path = '/tmp/custard.sock'
+    message = str(message).lower()
     try:
-        open_socket = socket.socket(socket.AF_UNIX)
-        open_socket.settimeout(1)
-        open_socket.connect(socket_path)
-        open_socket.send(str(message).encode())
-        open_socket.close()
-        exit(0)
+        unix_socket = socket.socket(socket.AF_UNIX)
+        unix_socket.settimeout(1)
+        unix_socket.connect(SOCKET_PATH)
+        unix_socket.send(message.encode())
+        unix_socket.close()
     except (ConnectionRefusedError, FileNotFoundError):
-        error_out("Unable to connect to UNIX socket; " + \
-            "custard may not be running")
+        exit(1)
 
-# parse ...
+def hash_string(string: str) -> int:
+    assert type(string) is str, "Argument for hash_string() is not a string"
+    MAGIC_NUMBER = 5381
+    BITMASK = 0xFFFFFFFF
 
-def parse_boolean(user_input):
-    if user_input in ['True', 'true']:
-        return True
-    elif user_input in ['False', 'false']:
-        return False
-    return False
+    output = MAGIC_NUMBER
 
-def parse_unsigned_integer(user_input):
-    if user_input.isdigit():
-        return int(user_input)
-    return 0
+    def recurse(nth: int = 0) -> None:
+        nonlocal string, output
 
-def parse_rgba_color(user_input):
-    return user_input # ... for now
+        if len(string) - 1 < nth:
+            return
+        else:
+            output = (output * 33) ^ ord(string[nth])
+            recurse(nth + 1)
 
-# main
+    recurse()
+
+    output = (output >> 0) & BITMASK
+    return output
+
+def c_target(*args, **kwargs):
+    def decorator(method):
+        nonlocal args, kwargs
+
+        target_name = 'custard'
+        action_name = method.__name__.lower()
+
+        if kwargs.get('target', False):
+            target_name = kwargs.get('target').lower()
+
+        if kwargs.get('command', False):
+            action_name = kwargs.get('command').lower()
+
+        def wrapper(*args, **kwargs):
+            global dry
+            nonlocal method, target_name, action_name
+            try:
+                method_output = method(*args, **kwargs)
+                socket_output = "{0} {1}".format(hash_string(target_name),
+                                                 hash_string(action_name))
+
+                if method_output:
+                    socket_output += " " + method_output
+
+                if dry:
+                    print(socket_output)
+                else:
+                    send(socket_output)
+            except TypeError:
+                exit(1) # Error: insufficient arguments
+
+
+        if option_target_map.get(target_name, False):
+            option_target_map.get(target_name).setdefault(action_name, wrapper)
+        else:
+            option_target_map.setdefault(target_name, {action_name: wrapper})
+    return decorator
+
+def call(target: str, action: str, *args, **kwargs) -> None:
+    if option_target_map.get(target, False):
+        if option_target_map.get(target).get(action, False):
+            option_target_map.get(target).get(action)(*args, **kwargs)
+
+class Parse:
+    def boolean(user_input: str) -> bool:
+        user_input = user_input.lower()
+        return (user_input == 'true')
+
+    def unsigned_integer(user_input: str) -> int:
+        if user_input.isdigit():
+            return int(user_input)
+        return 0
+
+    def rgba_color(user_input: str) -> None:
+        return
+
+
+class SocketCommands:
+    @c_target(command='stop')
+    def halt():
+        pass
+
+    @c_target()
+    def configure():
+        return 'no'
+
+    @c_target(target='window')
+    def geometry(name):
+        return name
+
+    @c_target(target='window')
+    def close():
+        pass
 
 if __name__ == '__main__':
-    if len(sys.argv[1:]) == 0:
-        show_help()
+    command_line_arguments = sys.argv[1:]
+    if len(command_line_arguments) == 0:
+        help()
 
-    targets = [
-        'custard',
-        'window',
-        'group'
-    ]
+    targets = list(option_target_map.keys())
+    actions = list()
+
+    for key, value in option_target_map.items():
+        for action in list(value.keys()):
+            if action not in actions:
+                actions.append(action)
 
     target = 'custard'
 
-    command_line_arguments = sys.argv[1:]
     if command_line_arguments[0] in targets:
         target = command_line_arguments[0]
         command_line_arguments = command_line_arguments[1:]
     else:
         if command_line_arguments[0][0:2] != '--':
-            error_out("Invalid target specified: " + command_line_arguments[0])
+            exit(1)
 
-    option_target_map = {
-        'configure': ['custard'],
-        'help': ['custard'],
-        'stop': ['custard'],
-        'focus': ['custard', 'group'],
-        'move': ['window'],
-        'expand': ['window'],
-        'contract': ['window'],
-        'maximize': ['window'],
-        'minimize': ['window'],
-        'raise': ['window'],
-        'lower': ['window'],
-        'relocate': ['window'],
-        'geometry': ['window'],
-        'attach_to_group': ['window'],
-        'detach_from_group': ['window'],
-        'close': ['window'],
-        'attach': ['group'],
-        'detach': ['group']
-    }
+    optionlist, arguments = getopt.getopt(command_line_arguments, '', actions +
+                                          ['help', 'dry'])
 
-    optionlist, arguments = getopt.getopt(command_line_arguments,
-        '', list(option_target_map.keys()))
+    options = list()
+    for option, value in optionlist:
+        if option == '--help':
+            help()
+        elif option == '--dry':
+            dry = True
+        else:
+            if option[0:2] == '--':
+                option = option[2:]
+            options.append(option)
 
-    if 'dry' in arguments:
-        dry = True
+    if len(options) > 1:
+        exit(1) # Error: more than one action?
+    action = options[0]
 
-    action = optionlist[0][0][2:]
+    if target not in targets:
+        exit(1) # Error: non-existent target
 
-    if target not in option_target_map[action]:
-        error_out("Invalid option for target " + target + ": " + argument)
+    if action not in actions:
+        exit(1) # Error: non-existent action (how did you get here?)
 
-    if target == 'custard':
-        if action == 'help':
-            show_help()
-        elif action == 'stop':
-            send_message("3938768739 2087808148")
-        elif action == 'focus':
-            option = arguments[0]
-
-            if option not in ['next', 'previous', 'prev']:
-                error_out("Invalid option for action focus")
-
-            output = "custard focus {0}".format(option)
-        elif action == 'configure':
-            variable = arguments[0]
-            value = arguments[1]
-
-            rgba_vars = [
-                'border_focused_color',
-                'border_unfocused_color',
-                'border_background_color'
-            ]
-
-            uint_vars = [
-                'border_inner_size',
-                'border_outer_size',
-                'border_type',
-                'grid_rows',
-                'grid_columns',
-                'grid_gap',
-                'grid_margin_top',
-                'grid_margin_bottom',
-                'grid_margin_left',
-                'grid_margin_right',
-                'groups'
-            ]
-
-            bool_vars = [
-                'border_invert_colors',
-                'debug_mode'
-            ]
-
-            valid_variables = rgba_vars + uint_vars + bool_vars
-
-            if variable not in valid_variables:
-                error_out("Invalid variable for --configure: " + variable)
-
-            data = None
-            if variable in rgba_vars:
-                data = parse_rgba_color(value)
-            elif variable in uint_vars:
-                data = parse_unsigned_integer(value)
-            elif variable in bool_vars:
-                data = parse_boolean(value)
-
-            if variable == 'groups':
-                if not 1 <= data <= 16:
-                    error_out("Invalid number of groups: 1 <= groups <= 16")
-
-            data = str(data)
-
-            output = "{0} configure {1} {2}".format(target, variable, data)
-    elif target == 'window':
-        if action == 'close':
-            output = "2016265097 176908083"
-        elif action == 'geometry':
-            output = "2016265097 1466546111 {0}".format(arguments[0])
-        elif action in ['raise', 'lower']:
-            output = "window {0}".format(action)
-        elif action in ['move', 'expand', 'contract']:
-            value = arguments[0].lower()
-
-            direction_map = {
-                'north': 0,
-                'northwest': 4,
-                'north-west': 4,
-                'north_west': 4,
-                'northeast': 5,
-                'north-east': 5,
-                'north_east': 5,
-                'south': 1,
-                'southwest': 6,
-                'south-west': 6,
-                'south_west': 6,
-                'southeast': 7,
-                'south-east': 7,
-                'south_east': 7,
-                'west': 2,
-                'east': 3,
-                'all': 8
-            }
-
-            direction_number = direction_map[value]
-            if action == 'move' and direction_number == 8:
-                error_out("Invalid direction specified for action")
-            output = "{0} {1} {2}".format(target, action, direction_number)
-        elif action in ['attach_to_group', 'detach_from_group']:
-            value = arguments[0]
-            value = parse_unsigned_integer(value)
-
-            output = "{0} {1} {2}".format(target, action, value)
-    elif target == 'group':
-        group = arguments[0]
-        group = parse_unsigned_integer(group)
-
-        output = "{0} {1} {2}".format(target, action, group)
-
-    send_message(output)
+    call(target, action, *arguments)
