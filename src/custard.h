@@ -5,6 +5,7 @@
 
 #define event_mask XCB_CW_EVENT_MASK
 
+typedef struct Geometry Geometry;
 typedef struct Window Window;
 
 extern unsigned short debug;

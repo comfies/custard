@@ -33,8 +33,6 @@ struct Geometry {
     unsigned int width;
 };
 
-typedef struct Geometry Geometry;
-
 extern struct LinkedListElement *geometry_list_head;
 unsigned short new_geometry(char*, unsigned int, unsigned int,
     unsigned int, unsigned int); /* Potential memory leak: be sure to free allocated pointers at custard end*/
