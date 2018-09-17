@@ -1,6 +1,7 @@
 #include "ipc.h"
 
 #include "config.h"
+#include "grid.h"
 #include "group.h"
 #include "xcb.h"
 
@@ -47,8 +48,34 @@ process_command(char *input)
         /* target: custard */
 
         switch (action) {
-            case 0x7C716C94: /* halt */
+            case 0x7C79369D: /* halt */
                 wm_running = 0;
+                break;
+
+            case 0x3D2C748D: /* configure */
+
+                if (strcmp("grid_rows", arguments[0]) == 0) {
+                    grid_rows = parse_unsigned_integer(arguments[1]);
+                } else if (strcmp("grid_columns", arguments[0]) == 0) {
+                    grid_columns = parse_unsigned_integer(arguments[1]);
+                } else if (strcmp("grid_gap", arguments[0]) == 0) {
+                    grid_gap = parse_unsigned_integer(arguments[1]);
+                }
+
+                grid_apply_configuration();
+
+                return; /* Don't unnecessarily commit to X */
+                break;
+
+            case 0xEC16043C: /* new_geometry */
+
+                new_geometry(arguments[0],
+                    parse_unsigned_integer(arguments[1]),
+                    parse_unsigned_integer(arguments[2]),
+                    parse_unsigned_integer(arguments[3]),
+                    parse_unsigned_integer(arguments[4]));
+
+                return;
                 break;
 
             default:
@@ -78,7 +105,30 @@ process_command(char *input)
                 break;
 
             case 0x5769B7BF: {
-                    struct NamedGeometry geometry;
+                struct GeometryLinkedListElement *element = geometry_list_head;
+
+                if (!element) {
+                    return;
+                }
+
+                while (element) {
+                    debug_output("Testing geometry %s to %s.",
+                        element->geometry->name, arguments[0]);
+                    if (strcmp(element->geometry->name, arguments[0]) == 0) {
+
+                        move_window_to_grid_coordinate(window_id,
+                            element->geometry->x, element->geometry->y);
+                        resize_window_with_grid_units(window_id,
+                            element->geometry->height,
+                            element->geometry->width);
+
+                        commit();
+                        return;
+                    }
+
+                    element = element->next;
+                }
+/*                    struct NamedGeometry geometry;
 
                     for (unsigned int index = 0;
                         geometries[index].name; index++) {
@@ -93,7 +143,7 @@ process_command(char *input)
                             commit();
                             return;
                         }
-                    }
+                    }*/
                 }
                 break;
 
