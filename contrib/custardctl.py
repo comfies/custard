@@ -112,8 +112,14 @@ class SocketCommands:
         pass
 
     @c_target()
-    def configure():
-        return 'no'
+    def configure(variable, value):
+        return "{0} {1}".format(variable, value)
+
+    @c_target()
+    def new_geometry(name, x, y, height, width):
+        x, y, height, width = \
+            list(map(Parse.unsigned_integer, [x, y, height, width]))
+        return "{0} {1} {2} {3} {4}".format(name, x, y, height, width)
 
     @c_target(target='window')
     def geometry(name):
