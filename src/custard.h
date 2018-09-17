@@ -13,12 +13,12 @@ extern const char *config_path;
 
 extern int xcb_file_descriptor;
 
-struct WindowLinkedListElement {
-    struct WindowLinkedListElement *next;
-    Window *window;
+struct LinkedListElement {
+    void *next;
+    void *data;
 };
 
-extern struct WindowLinkedListElement *window_list_head;
+extern struct LinkedListElement *window_list_head;
 extern Window *focused_window;
 
 typedef enum {

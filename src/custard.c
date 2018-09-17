@@ -23,7 +23,7 @@ unsigned short wm_running = 0;
 const char *config_path = NULL;
 int xcb_file_descriptor;
 
-struct WindowLinkedListElement *window_list_head = NULL;
+struct LinkedListElement *window_list_head = NULL;
 Window *focused_window;
 pthread_t socket_thread;
 
@@ -34,16 +34,15 @@ window_list_append_window(Window *window)
         return 0;
     }
 
-    struct WindowLinkedListElement *element = window_list_head;
+    struct LinkedListElement *element = window_list_head;
 
     if (!element) {
         debug_output("No head, making window head");
 
-        window_list_head = (struct WindowLinkedListElement *)malloc(
-            sizeof(struct WindowLinkedListElement)
-        );
+        window_list_head = (struct LinkedListElement *)malloc(
+            sizeof(struct LinkedListElement));
         window_list_head->next = NULL;
-        window_list_head->window = window;
+        window_list_head->data = window;
 
     } else {
         debug_output("Head found, making tail");
@@ -52,11 +51,11 @@ window_list_append_window(Window *window)
             element = element->next;
         }
         
-        struct WindowLinkedListElement *next_element;
-        next_element = (struct WindowLinkedListElement *)malloc(
-            sizeof(struct WindowLinkedListElement)
+        struct LinkedListElement *next_element;
+        next_element = (struct LinkedListElement *)malloc(
+            sizeof(struct LinkedListElement)
         );
-        next_element->window = window;
+        next_element->data = window;
         next_element->next = NULL;
 
         element->next = next_element;
@@ -68,15 +67,15 @@ window_list_append_window(Window *window)
 short unsigned int
 window_list_remove_window(xcb_window_t window_id)
 {
-    struct WindowLinkedListElement *element = window_list_head;
-    struct WindowLinkedListElement *old_element = NULL;
+    struct LinkedListElement *element = window_list_head;
+    struct LinkedListElement *old_element = NULL;
 
     if (window_list_head) {
-        if (window_list_head->window->id == window_id) {
+        if (((Window *)window_list_head->data)->id == window_id) {
             element = window_list_head;
 
             window_list_head = element->next;
-            free(element->window);
+            free(element->data);
             free(element);
 
             return 1;
@@ -86,11 +85,12 @@ window_list_remove_window(xcb_window_t window_id)
     }
 
     while (element) {
-        if (element->next->window->id == window_id) {
+        if (((Window *)((struct LinkedListElement *)element->next)->data)->id
+            == window_id) {
             old_element = element->next;
 
-            element->next = element->next->next;
-            free(old_element->window);
+            element->next = ((struct LinkedListElement *)element->next)->next;
+            free(old_element->data);
             free(old_element);
             return 1;
         }
@@ -104,11 +104,11 @@ window_list_remove_window(xcb_window_t window_id)
 Window *
 window_list_get_window(xcb_window_t window_id)
 {
-    struct WindowLinkedListElement *last_window_element = window_list_head;
+    struct LinkedListElement *last_window_element = window_list_head;
 
     while (last_window_element) {
-        if (last_window_element->window->id == window_id) {
-            return last_window_element->window;
+        if (((Window *)last_window_element->data)->id == window_id) {
+            return last_window_element->data;
         }
 
         last_window_element = last_window_element->next;
@@ -299,18 +299,18 @@ focus_next_window()
 {
     debug_output("Called");
 
-    struct WindowLinkedListElement *element = window_list_head;
+    struct LinkedListElement *element = window_list_head;
     Window *window = NULL;
     short unsigned passed = 0;
 
     if (!focused_window) {
-        focus_on_window(element->window->id);
-        raise_window(element->window->id);
+        focus_on_window(((Window *)element->data)->id);
+        raise_window(((Window *)element->data)->id);
         return;
     }
 
     while (element) {
-        window = element->window;
+        window = (Window *)element->data;
 
         if (!passed && window->id == focused_window->id) {
             passed++;

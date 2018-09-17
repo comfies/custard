@@ -92,12 +92,12 @@ focus_group(unsigned int group)
         }
     }
 
-    struct WindowLinkedListElement *element = window_list_head;
+    struct LinkedListElement *element = window_list_head;
     Window *window = NULL;
     xcb_window_t last_window = XCB_WINDOW_NONE;
 
     while (element) {
-        window = element->window;
+        window = element->data;
 
         if (window_is_in_group(window, group)) {
             map_window(window->id);
@@ -124,11 +124,11 @@ void
 map_group(unsigned int group)
 {
     debug_output("map_group(): called");
-    struct WindowLinkedListElement *element = window_list_head;
+    struct LinkedListElement *element = window_list_head;
     Window *window = NULL;
 
     while (element) {
-        window = element->window;
+        window = element->data;
 
         if (window_is_in_group(window, group)) {
             map_window(window->id);
@@ -144,7 +144,7 @@ void
 unmap_group(unsigned int group)
 {
     debug_output("unmap_group(): called");
-    struct WindowLinkedListElement *element = window_list_head;
+    struct LinkedListElement *element = window_list_head;
     Window *window = NULL;
 
     if (focused_group == group) {
@@ -152,7 +152,7 @@ unmap_group(unsigned int group)
     }
 
     while (element) {
-        window = element->window;
+        window = element->data;
 
         if (window_is_in_group(window, group)) {
             if (!window_is_in_group(window, focused_group)) {

@@ -148,11 +148,11 @@ unmanage_window(xcb_window_t window_id) {
 void
 update_window_borders() {
     debug_output("Called");
-    struct WindowLinkedListElement *element = window_list_head;
+    struct LinkedListElement *element = window_list_head;
 
     while (element) {
         debug_output("Window iterated");
-        border_update(element->window->id);
+        border_update(((Window *)element->data)->id);
         element = element->next;
     }
 
