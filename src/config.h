@@ -26,17 +26,21 @@ extern unsigned int grid_margin_right;
 extern unsigned int workspaces;
 
 struct Geometry {
+    char *name;
     unsigned int x;
     unsigned int y;
     unsigned int height;
     unsigned int width;
 };
 
-struct NamedGeometry {
-    char *name;
-    struct Geometry geometry;
+struct GeometryLinkedListElement {
+    struct GeometryLinkedListElement *next;
+    struct Geometry *geometry;
 };
 
-extern struct NamedGeometry geometries[];
+extern struct GeometryLinkedListElement *geometry_list_head;
+unsigned short new_geometry(char*, unsigned int, unsigned int,
+    unsigned int, unsigned int); /* Potential memory leak: be sure to free allocated pointers at custard end*/
+unsigned short clear_geometry_list(void);
 
 #endif /* CONFIG_H */
