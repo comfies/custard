@@ -62,7 +62,7 @@ initialize_ewmh_connection()
     xcb_ewmh_set_wm_name(
         ewmh_connection,
         ewmh_window_id,
-        8, "custard"
+        7, "custard"
     );
 
     xcb_ewmh_set_supporting_wm_check(
