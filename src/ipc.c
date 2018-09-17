@@ -105,7 +105,7 @@ process_command(char *input)
                 break;
 
             case 0x5769B7BF: {
-                struct GeometryLinkedListElement *element = geometry_list_head;
+                struct LinkedListElement *element = geometry_list_head;
 
                 if (!element) {
                     return;
@@ -113,14 +113,16 @@ process_command(char *input)
 
                 while (element) {
                     debug_output("Testing geometry %s to %s.",
-                        element->geometry->name, arguments[0]);
-                    if (strcmp(element->geometry->name, arguments[0]) == 0) {
+                        ((Geometry *)element->data)->name, arguments[0]);
+                    if (strcmp(((Geometry *)element->data)->name,
+                        arguments[0]) == 0) {
 
                         move_window_to_grid_coordinate(window_id,
-                            element->geometry->x, element->geometry->y);
+                            ((Geometry *)element->data)->x,
+                            ((Geometry *)element->data)->y);
                         resize_window_with_grid_units(window_id,
-                            element->geometry->height,
-                            element->geometry->width);
+                            ((Geometry *)element->data)->height,
+                            ((Geometry *)element->data)->width);
 
                         commit();
                         return;

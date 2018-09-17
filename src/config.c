@@ -26,7 +26,7 @@ unsigned int grid_margin_right = 0;
 
 unsigned int workspaces = 2;
 
-struct GeometryLinkedListElement *geometry_list_head = NULL;
+struct LinkedListElement *geometry_list_head = NULL;
 
 unsigned short
 new_geometry(char *name, unsigned int x, unsigned int y,
@@ -34,9 +34,9 @@ new_geometry(char *name, unsigned int x, unsigned int y,
 
     /* Almost like window_list_append_window */
 
-    struct GeometryLinkedListElement *element = geometry_list_head;
-    struct Geometry *geometry = (struct Geometry *)malloc(
-        sizeof(struct Geometry));
+    struct LinkedListElement *element = geometry_list_head;
+    struct Geometry *geometry = (Geometry *)malloc(
+        sizeof(Geometry));
 
     geometry->name = (char *)malloc(sizeof(char));
 
@@ -49,10 +49,10 @@ new_geometry(char *name, unsigned int x, unsigned int y,
     if (!element) {
         debug_output("No head geometry, making head");
 
-        geometry_list_head = (struct GeometryLinkedListElement *)malloc(
-            sizeof(struct GeometryLinkedListElement));
+        geometry_list_head = (struct LinkedListElement *)malloc(
+            sizeof(struct LinkedListElement));
 
-        geometry_list_head->geometry = geometry;
+        geometry_list_head->data = geometry;
         geometry_list_head->next = NULL;
     } else {
         debug_output("Head geometry found, making tail");
@@ -61,12 +61,12 @@ new_geometry(char *name, unsigned int x, unsigned int y,
             element = element->next;
         }
 
-        struct GeometryLinkedListElement *next_element;
-        next_element = (struct GeometryLinkedListElement *)malloc(
-            sizeof(struct GeometryLinkedListElement));
+        struct LinkedListElement *next_element;
+        next_element = (struct LinkedListElement *)malloc(
+            sizeof(struct LinkedListElement));
 
         next_element->next = NULL;
-        next_element->geometry = geometry;
+        next_element->data = geometry;
 
         element->next = next_element;
     }
@@ -80,15 +80,15 @@ new_geometry(char *name, unsigned int x, unsigned int y,
 
 unsigned short
 clear_geometry_list() {
-    struct GeometryLinkedListElement *element = geometry_list_head;
-    struct GeometryLinkedListElement *old_element = NULL;
+    struct LinkedListElement *element = geometry_list_head;
+    struct LinkedListElement *old_element = NULL;
 
     while (element) {
         old_element = element;
         element = element->next;
 
-        free(old_element->geometry->name);
-        free(old_element->geometry);
+        free(((Geometry *)old_element->data)->name);
+        free(old_element->data);
         free(old_element);
     }
 

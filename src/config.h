@@ -33,12 +33,9 @@ struct Geometry {
     unsigned int width;
 };
 
-struct GeometryLinkedListElement {
-    struct GeometryLinkedListElement *next;
-    struct Geometry *geometry;
-};
+typedef struct Geometry Geometry;
 
-extern struct GeometryLinkedListElement *geometry_list_head;
+extern struct LinkedListElement *geometry_list_head;
 unsigned short new_geometry(char*, unsigned int, unsigned int,
     unsigned int, unsigned int); /* Potential memory leak: be sure to free allocated pointers at custard end*/
 unsigned short clear_geometry_list(void);
