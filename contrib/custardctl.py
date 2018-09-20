@@ -67,11 +67,11 @@ def c_target(*args, **kwargs):
             nonlocal method, target_name, action_name
             try:
                 method_output = method(*args, **kwargs)
-                socket_output = "{0} {1}".format(hash_string(target_name),
+                socket_output = "{0};{1}".format(hash_string(target_name),
                                                  hash_string(action_name))
 
                 if method_output:
-                    socket_output += " " + method_output
+                    socket_output += ";" + method_output
 
                 if dry:
                     print(socket_output)
@@ -113,13 +113,30 @@ class SocketCommands:
 
     @c_target()
     def configure(variable, value):
-        return "{0} {1}".format(variable, value)
+        return "{0};{1}".format(variable, value)
 
     @c_target()
     def new_geometry(name, x, y, height, width):
         x, y, height, width = \
             list(map(Parse.unsigned_integer, [x, y, height, width]))
-        return "{0} {1} {2} {3} {4}".format(name, x, y, height, width)
+        return "{0};{1};{2};{3};{4}".format(name, x, y, height, width)
+
+    @c_target()
+    def new_geometry_rule(attribute, rule, geometry):
+        attribute_map = {
+            'window_first_class': 0,
+            'window_second_class': 1,
+            'window_name': 2
+        }
+
+        attribute = attribute.lower()
+
+        if not attribute_map.get(attribute, False):
+            exit(1) # Error: invalid attribute type
+
+        attribute = attribute_map.get(attribute)
+
+        return "{0};{1};{2}".format(attribute, rule, geometry)
 
     @c_target(target='window')
     def geometry(name):
