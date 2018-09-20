@@ -21,7 +21,7 @@ process_command(char *input)
     char *token;
     unsigned int index = 0;
 
-    token = strtok(input, " ");
+    token = strtok(input, ";");
 
     while (token) {
         if (index == 0) {
@@ -34,7 +34,7 @@ process_command(char *input)
 
         token = NULL;
         if (++index < 10) {
-            token = strtok(NULL, " ");
+            token = strtok(NULL, ";");
         }
     }
 
@@ -74,6 +74,15 @@ process_command(char *input)
                     parse_unsigned_integer(arguments[2]),
                     parse_unsigned_integer(arguments[3]),
                     parse_unsigned_integer(arguments[4]));
+
+                return;
+                break;
+
+            case 0xCD252BAD: /* new_geometry_rule */
+                new_geometry_rule(
+                    (window_attribute_t)parse_unsigned_integer(arguments[0]),
+                    arguments[1],
+                    arguments[2]);
 
                 return;
                 break;
