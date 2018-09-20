@@ -27,6 +27,7 @@ unsigned int grid_margin_right = 0;
 unsigned int workspaces = 2;
 
 struct LinkedListElement *geometry_list_head = NULL;
+struct LinkedListElement *geometry_rules_list_head = NULL;
 
 unsigned short
 new_geometry(char *name, unsigned int x, unsigned int y,
@@ -79,8 +80,48 @@ new_geometry(char *name, unsigned int x, unsigned int y,
 }
 
 unsigned short
-clear_geometry_list() {
-    struct LinkedListElement *element = geometry_list_head;
+new_geometry_rule(window_attribute_t attribute, char *match, char *geometry) {
+
+    struct LinkedListElement *element = geometry_rules_list_head;
+
+    struct GeometryRule *rule = (struct GeometryRule *)malloc(
+        sizeof(struct GeometryRule));
+
+    rule->match = (char *)malloc(sizeof(char));
+    rule->geometry = (char *)malloc(sizeof(char));
+
+    strcpy(rule->match, match);
+    strcpy(rule->geometry, geometry);
+
+    rule->attribute_type = attribute;
+
+    if (!element) {
+        geometry_rules_list_head = (struct LinkedListElement *)malloc(
+            sizeof(struct LinkedListElement));
+
+        geometry_rules_list_head->data = rule;
+        geometry_rules_list_head->next = NULL;
+    } else {
+        while (element->next) {
+            element = element->next;
+        }
+
+        struct LinkedListElement *next_element;
+        next_element = (struct LinkedListElement *)malloc(
+            sizeof(struct LinkedListElement));
+
+        next_element->data = rule;
+        next_element->next = NULL;
+
+        element->next = next_element;
+    }
+
+    return 1;
+}
+
+unsigned short
+finalize_configuration() {
+    struct LinkedListElement *element = geometry_rules_list_head;
     struct LinkedListElement *old_element = NULL;
 
     while (element) {
@@ -88,6 +129,19 @@ clear_geometry_list() {
         element = element->next;
 
         free(((Geometry *)old_element->data)->name);
+        free(old_element->data);
+        free(old_element);
+    }
+
+    element = geometry_rules_list_head;
+    old_element = NULL;
+
+    while (element) {
+        old_element = element;
+        element = element->next;
+
+        free(((struct GeometryRule *)old_element->data)->match);
+        free(((struct GeometryRule *)old_element->data)->geometry);
         free(old_element->data);
         free(old_element);
     }

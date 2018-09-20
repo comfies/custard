@@ -33,9 +33,25 @@ struct Geometry {
     unsigned int width;
 };
 
+typedef enum {
+    WINDOW_FIRST_CLASS,
+    WINDOW_SECOND_CLASS,
+    WINDOW_NAME
+} window_attribute_t;
+
+struct GeometryRule {
+    window_attribute_t attribute_type;
+    char *match;
+    char *geometry;
+};
+
 extern struct LinkedListElement *geometry_list_head;
+extern struct LinkedListElement *geometry_rules_list_head;
+
 unsigned short new_geometry(char*, unsigned int, unsigned int,
     unsigned int, unsigned int); /* Potential memory leak: be sure to free allocated pointers at custard end*/
-unsigned short clear_geometry_list(void);
+unsigned short new_geometry_rule(window_attribute_t, char*, char*);
+
+unsigned short finalize_configuration(void);
 
 #endif /* CONFIG_H */
