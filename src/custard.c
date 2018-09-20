@@ -284,11 +284,10 @@ stop_custard()
 
     commit();
 
-    clear_geometry_list();
-
     finalize_socket();
     finalize_ewmh_connection();
     finalize_xcb_connection();
+    finalize_configuration();
 
 /*    free(Configuration);*/
 
