@@ -6,7 +6,7 @@
 #include "grid.h"
 #include "socket.h"
 #include "window.h"
-#include "group.h"
+#include "workspace.h"
 #include "xcb.h"
 
 #include <xcb/xcb.h>
@@ -16,16 +16,13 @@
 #include <stdarg.h>
 #include <sys/select.h>
 
-#include <unistd.h>
-
 unsigned short debug = 0;
 unsigned short wm_running = 0;
 const char *config_path = NULL;
 int xcb_file_descriptor;
 
 struct LinkedListElement *window_list_head = NULL;
-Window *focused_window;
-pthread_t socket_thread;
+Window *focused_window = NULL;
 
 short unsigned int
 window_list_append_window(Window *window)
@@ -147,6 +144,8 @@ start_custard()
         return EXIT_FAILURE;
     }
 
+    initialize_configuration();
+
     xcb_file_descriptor = xcb_get_file_descriptor(xcb_connection);
 
 /*    Configuration = (struct Config *)malloc(sizeof(struct Config));*/
@@ -157,7 +156,7 @@ start_custard()
 
     xcb_generic_event_t *event;
 
-    if (config_path) {
+/*    if (config_path) {
         if (debug) {
             fprintf(stderr, "[debug] Executing %s\n", config_path);
         }
@@ -169,7 +168,7 @@ start_custard()
             fprintf(stderr, "[error] Unable to execute %s\n", config_path);
             exit(EXIT_FAILURE);
         }
-    }
+    }*/
 
     xcb_query_tree_reply_t *tree_reply;
     tree_reply = xcb_query_tree_reply(
@@ -200,8 +199,8 @@ start_custard()
                     grid_window_default_height, grid_window_default_width);
                 map_window(window_id);
                 focus_on_window(window_id);
-                border_update(window_id);
                 raise_window(window_id);
+                border_update(window_id);
             }
 
         }
@@ -237,6 +236,8 @@ start_custard()
                         handlers_handle_event(event);
                     } else {
                         stop_custard();
+                        debug_output("Loop stopped during iteration.");
+                        return EXIT_FAILURE;
                     }
                 }
             }
@@ -318,7 +319,7 @@ focus_next_window()
                 return;
             }
 
-            if (window_is_in_group(window, focused_group)) {
+            if (window_is_in_workspace(window, focused_workspace)) {
                 focus_on_window(window->id);
                 raise_window(window->id);
                 return;
