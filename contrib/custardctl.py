@@ -146,6 +146,10 @@ class SocketCommands:
     def close():
         pass
 
+    @c_target(target='workspace')
+    def focus(workspace):
+        return "{0}".format(workspace)
+
 if __name__ == '__main__':
     command_line_arguments = sys.argv[1:]
     if len(command_line_arguments) == 0:
