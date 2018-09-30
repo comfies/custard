@@ -32,17 +32,17 @@ grid_apply_configuration()
             (grid_gap * (grid_rows + 1))
         )) / grid_rows);
 
+    grid_window_default_x = (grid_columns / 2) - 1;
     if (grid_columns % 2) {
-        grid_window_default_x = (grid_columns / 2) + 1;
+        grid_window_default_x--;
     } else {
-        grid_window_default_x = grid_columns / 2;
         grid_window_default_width = 2;
     }
 
+    grid_window_default_y = (grid_rows / 2) - 1;
     if (grid_rows % 2) {
-        grid_window_default_y = (grid_rows / 2) + 1;
+        grid_window_default_y--;
     } else {
-        grid_window_default_y = grid_rows / 2;
         grid_window_default_height = 2;
     }
 
@@ -74,9 +74,9 @@ unsigned
 grid_get_offset(unsigned int unit_size_in_pixels, unsigned int amount)
 {
     return (
-        grid_gap * (amount)
-    ) + (unit_size_in_pixels * (amount - 1)) + (
-        (border_total_size * 2) * (amount - 1)
+        grid_gap * (amount + 1)
+    ) + (unit_size_in_pixels * amount) + (
+        (border_total_size * 2) * amount
     );
 }
 
