@@ -24,7 +24,7 @@
 #include "handlers.h"
 #include "grid.h"
 #include "window.h"
-#include "group.h"
+#include "workspace.h"
 
 int
 main(int argc, char** argv)

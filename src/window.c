@@ -120,7 +120,7 @@ manage_window(xcb_window_t window_id)
     window->id = window_id;
     window->mapped = 0;
     window->fullscreen = 0;
-
+    /* Check geometry rules for matching geometry */
     window->x = grid_window_default_x;
     window->y = grid_window_default_y;
 

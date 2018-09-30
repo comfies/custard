@@ -2,7 +2,8 @@
 
 #include "config.h"
 #include "grid.h"
-#include "group.h"
+#include "window.h"
+#include "workspace.h"
 #include "xcb.h"
 
 #include <stdio.h>
@@ -60,7 +61,50 @@ process_command(char *input)
                     grid_columns = parse_unsigned_integer(arguments[1]);
                 } else if (strcmp("grid_gap", arguments[0]) == 0) {
                     grid_gap = parse_unsigned_integer(arguments[1]);
+                } else if (strcmp("grid_margin_top", arguments[0]) == 0) {
+                    grid_margin_top = parse_unsigned_integer(arguments[1]);
+                } else if (strcmp("grid_margin_bottom", arguments[0]) == 0) {
+                    grid_margin_bottom = parse_unsigned_integer(arguments[1]);
+                } else if (strcmp("grid_margin_left", arguments[0]) == 0) {
+                    grid_margin_left = parse_unsigned_integer(arguments[1]);
+                } else if (strcmp("grid_margin_right", arguments[0]) == 0) {
+                    grid_margin_right = parse_unsigned_integer(arguments[1]);
+                } else if (strcmp("border_type", arguments[0]) == 0) {
+                    border_type = parse_unsigned_integer(arguments[1]);
+
+                    if (border_type > 3) {
+                        border_type = 3;
+                    }
+                } else if (strcmp("border_inner_size", arguments[0]) == 0) {
+                    border_inner_size = parse_unsigned_integer(arguments[1]);
+
+                    if (border_type == 0) {
+                        border_total_size = 0;
+                    } else {
+                        border_total_size = border_inner_size +
+                            ((border_type - 1) * border_outer_size);
+                    }
+                } else if (strcmp("border_outer_size", arguments[0]) == 0) {
+                    border_outer_size = parse_unsigned_integer(arguments[1]);
+
+                    if (border_type == 0) {
+                        border_total_size = 0;
+                    } else {
+                        border_total_size = border_inner_size +
+                            ((border_type - 1) * border_outer_size);
+                    }
+
+                } else if (strcmp("border_focused_color", arguments[0]) == 0) {
+                    border_focused_color = parse_rgba_color(arguments[1]);
+                } else if (
+                    strcmp("border_unfocused_color", arguments[0]) == 0) {
+                    border_unfocused_color = parse_rgba_color(arguments[1]);
+                } else if (
+                    strcmp("border_background_color", arguments[0]) == 0) {
+                    border_background_color = parse_rgba_color(arguments[1]);
                 }
+
+                /* Missing: border_invert_colors, workspaces */
 
                 grid_apply_configuration();
 
@@ -132,6 +176,7 @@ process_command(char *input)
                         resize_window_with_grid_units(window_id,
                             ((Geometry *)element->data)->height,
                             ((Geometry *)element->data)->width);
+                        border_update(window_id);
 
                         commit();
                         return;
@@ -162,6 +207,19 @@ process_command(char *input)
                 return;
         }
 
+    } else if (target == 0x72FE3CE0) {
+        /* target: workspace */
+
+        unsigned int workspace = parse_unsigned_integer(arguments[0]);
+
+        switch (action) {
+            case 0xA33ED49:
+                focus_on_workspace(workspace);
+                break;
+
+            default:
+                return;
+        }
     }
 
     commit();

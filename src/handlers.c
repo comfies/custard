@@ -2,8 +2,8 @@
 
 #include "custard.h"
 #include "grid.h"
-#include "group.h"
 #include "window.h"
+#include "workspace.h"
 #include "xcb.h"
 #include "ewmh.h"
 
@@ -56,7 +56,7 @@ handlers_map_request(xcb_generic_event_t *generic_event)
             grid_window_default_y);
         resize_window_with_grid_units(window_id, grid_window_default_height,
             grid_window_default_width);
-        attach_window_to_group(window_id, focused_group);
+        attach_window_to_workspace(window_id, focused_workspace);
 
         map_window(window_id);
         focus_on_window(window_id);
