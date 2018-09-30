@@ -10,7 +10,7 @@ else
 endif
 
 CPPFLAGS = -MD -MP -D_POSIX_C_SOURCE=200809L
-LDFLAGS = -lxcb -lxcb-ewmh -lxcb-icccm -lxcb-util
+LDFLAGS = -lxcb -lxcb-ewmh -lxcb-icccm -lxcb-util -lconfig
 
 TARGET = custard
 BUILDPREFIX=build
