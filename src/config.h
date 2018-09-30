@@ -23,7 +23,7 @@ extern unsigned int grid_margin_bottom;
 extern unsigned int grid_margin_left;
 extern unsigned int grid_margin_right;
 
-extern unsigned int workspaces;
+extern unsigned int num_workspaces;
 
 struct Geometry {
     char *name;
@@ -52,6 +52,7 @@ unsigned short new_geometry(char*, unsigned int, unsigned int,
     unsigned int, unsigned int); /* Potential memory leak: be sure to free allocated pointers at custard end*/
 unsigned short new_geometry_rule(window_attribute_t, char*, char*);
 
+unsigned short initialize_configuration(void);
 unsigned short finalize_configuration(void);
 
 #endif /* CONFIG_H */
