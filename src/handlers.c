@@ -57,12 +57,15 @@ handlers_map_request(xcb_generic_event_t *generic_event)
         resize_window_with_grid_units(window_id, grid_window_default_height,
             grid_window_default_width);
         attach_window_to_group(window_id, focused_group);
+
+        map_window(window_id);
         focus_on_window(window_id);
+        raise_window(window_id);
+    } else {
+        map_window(window_id);
+        raise_window(window_id);
     }
 
-    map_window(window_id);
-
-    raise_window(window_id);
     commit();
 }
 
