@@ -13,7 +13,4 @@ custard is based on subtle, 2bwm, swm, and howm. Some of the codebase was based 
 Contributions are greatly appreciated! Ensure that your contribution meets the requirements set in contributing.md before beginning to modify any of the code-base, though, so that you don't have to make corrections later.
 
 # Documentation
-
-All of the documentation for this project has been moved to the Wiki page. In the footer, you will see when the information on the Wiki was last checked and updated as needed (all of the Wiki, not just a single page).
-
-https://github.com/Sweets/custard/wiki
+lol what docs
