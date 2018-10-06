@@ -33,7 +33,7 @@ struct LinkedListElement *geometry_list_head = NULL;
 struct LinkedListElement *geometry_rules_list_head = NULL;
 
 unsigned short
-new_geometry(char *name, unsigned int x, unsigned int y,
+new_geometry(const char *name, unsigned int x, unsigned int y,
     unsigned int height, unsigned int width) {
 
     /* Almost like window_list_append_window */
@@ -221,7 +221,7 @@ initialize_configuration() {
         for (index = 0; index < config_setting_length(setting); ++index) {
             geometry = config_setting_get_elem(setting, index);
 
-            char *name;
+            const char *name;
             int x, y, height, width;
 
             if (!(config_setting_lookup_string(geometry, "name", &name) &&

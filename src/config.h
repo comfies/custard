@@ -48,7 +48,7 @@ struct GeometryRule {
 extern struct LinkedListElement *geometry_list_head;
 extern struct LinkedListElement *geometry_rules_list_head;
 
-unsigned short new_geometry(char*, unsigned int, unsigned int,
+unsigned short new_geometry(const char*, unsigned int, unsigned int,
     unsigned int, unsigned int); /* Potential memory leak: be sure to free allocated pointers at custard end*/
 unsigned short new_geometry_rule(window_attribute_t, char*, char*);
 
