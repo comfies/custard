@@ -1,44 +1,48 @@
-CC?=gcc
+CC ?= gcc
+LD  = $(CC)
 
-OPTFLAGS = -O2
-CFLAGS = $(OPTFLAGS) -std=c99 -pedantic
+CFLAGS   = -Wall -Wextra -pedantic -std=c99 -O2
+CPPFLAGS = -MD -MP -D_POSIX_C_SOURCE=200809L
+LDFLAGS  = -lxcb -xcb-ewmh -lxcb-icccm -lxcb-util -lconfig
 
-ifeq ($(CC), clang)
-	CFLAGS+=-Weverything
-else
-	CFLAGS+=-Wall -Wextra
+PREFIX    = /usr/local
+BINPREFIX = $(PREFIX)/bin
+MANPREFIX = $(PREFIX)/share/man
+
+# Needed so that $(SRCPREFIX)/something won't go to somewhere in the root dir
+ifeq ($(SRCPREFIX),)
+	SRCPREFIX=.
 endif
 
-CPPFLAGS = -MD -MP -D_POSIX_C_SOURCE=200809L
-LDFLAGS = -lxcb -lxcb-ewmh -lxcb-icccm -lxcb-util -lconfig
-
 TARGET = custard
-BUILDPREFIX=build
-SRCS = $(wildcard src/*.c)
-OBJS = $(subst src,$(BUILDPREFIX),$(SRCS:.c=.o))
-PREFIX?=/usr/local
-MANPREFIX?=$(PREFIX)/share/man
+SRC    = $(wildcard $(SRCPREFIX)/src/*.c)
+OBJ    = $(subst $(SRCPREFIX)/src/,,$(SRC:.c=.o))
+DEPS   = $(OBJ:.o=.d)
+VPATH  = $(SRCPREFIX)/src
 
-.PHONY: all install clean
+.PHONY: all clean install uninstall
 
-all: prepare $(OBJS) $(TARGET)
+all: $(TARGET)
 
--include $(subst src,$(BUILDPREFIX),$(SRCS:.c=.d))
+-include $(DEPS)
 
-$(TARGET): $(OBJS)
-	$(CC) -o $(BUILDPREFIX)/$@ $^ $(LDFLAGS)
+$(TARGET): $(OBJ)
+	$(LD) -o "$@" "$^" $(LDFLAGS)
 
-prepare:
-	mkdir -p $(BUILDPREFIX)
-
-$(BUILDPREFIX)/%.o: src/%.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
-
-install:
-	install -m 755 -D $(BUILDPREFIX)/$(TARGET) $(DESTDIR)$(PREFIX)/bin/$(TARGET)
-	install -m 755 -D contrib/custardctl.py $(DESTDIR)$(PREFIX)/bin/custardctl
-#	install -m 644 -D man/custard.man $(DESTDIR)$(MANPREFIX)/man1/custard.1
+.c.o:
+	$(CC) -o "$@" $(CFLAGS) $(CPPFLAGS) -c "$<"
 
 clean:
-	$(RM) -r $(BUILDPREFIX)
+	$(RM) $(TARGET)
+	$(RM) $(OBJ)
+	$(RM) $(DEPS)
 
+install: all
+	install -Dm755 $(TARGET) "$(DESTDIR)$(BINPREFIX)/$(TARGET)"
+	install -Dm755 "$(SRCPREFIX)/contrib/custardctl.py" "$(DESTDIR)$(BINPREFIX)/custardctl"
+#	install -Dm644 "$(SRCPREFIX)/man/custard.man" "$(DESTDIR)$(MANPREFIX)/man1/custard.1"
+
+uninstall:
+	$(RM) "$(DESTDIR)$(BINPREFIX)/$(TARGET)"
+	$(RM) "$(DESTDIR)$(BINPREFIX)/custardctl"
+#	$(RM) "$(DESTDIR)$(MANPREFIX)/man1/custardctl.1"
