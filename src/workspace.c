@@ -64,6 +64,10 @@ focus_on_workspace(unsigned int workspace) {
         return;
     }
 
+    if (workspace == focused_workspace) {
+        return;
+    }
+
     if (focused_window) {
         if (!window_is_in_workspace(focused_window, workspace)) {
             unfocus_window();
