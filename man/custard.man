@@ -1,0 +1,222 @@
+.TH CUSTARD 1 "2018-04-17" "1.2" "Custard WM"
+.SH NAME
+custard \- A stacking window manager that sizes and moves windows based on a virtual grid
+
+.SH SYNOPSIS
+
+.B custard
+
+.B custarctl
+[target] [-action] [argument]
+
+.SH DESCRIPTION
+.B custard
+is a floating window manager written over the XCB library based on 2bwm, howm, swm, and subtle. Window size and location are relative to a grid on the screen. It is configured via the X resource manager.
+.SH CONFIGURATION
+custard is configured via the XRM (X Resource Manager, i.e., your Xresources config). 
+
+.I custard.rows
+\- Sets the number of rows for the grid. Default value is 2.
+
+.I custard.columns
+\- Sets the number of columns for the grid. Default value is 3.
+
+.I custard.border_type
+\- Sets the type of border for windows. Valid types are "Triple", "Double", "Single", or "None". Default value is None.
+
+.I custard.border_size
+\- Sets the border size for windows. If border size is 0, border_type is implied to be None. For border types Double and Triple, all borders are of border_size. Default value is 0.
+
+.I custard.focused_color
+\- Sets the focused color for the borders. Valid colors are in hexadecimal notation (#rrggbb). Default value is #FFFFFF.
+
+.I custard.unfocused_color
+\- Sets the unfocused color for the borders. Valid colors are in hexadecimal notation (#rrggbb). Default value is #676767.
+
+.I custard.background_color
+\- Sets the background color for the borders of type Double and Triple. Valid colors are in hexadecimal notation (#rrggbb). Default value is #000000.
+
+.I custard.invert_colors
+\- Switches border colors. Varies based on type. If border_type is Single, the focused_color and unfocused_color are swapped. If border_type is set to Double or Triple, the background_color is swapped with the focused_color or unfocused_color, and the focused_color and unfocused_color are swapped for the background_color. Default value is False.
+
+.I custard.margin
+\- Sets the margin between windows on the grid. Default value is 0.
+
+.I custard.margin_top
+\- Offsets the grid by X pixels from the top of the screen. Default value is 0.
+
+.I custard.margin_left
+\- Offsets the grid by X pixels from the left of the screen. Default value is 0.
+
+.I custard.margin_right
+\- Offsets the grid by X pixels from the right of the screen. Default value is 0.
+
+.I custard.margin_bottom
+\- Offsets the grid by X pixels from the bottom of the screen. Default value is 0.
+
+.I custard.workspaces
+\- Number of workspaces custard initializes when it starts. Default value is 2.
+
+.SH CONFIGURATION EXAMPLE
+
+In ~/.Xresources
+
+    custard.rows: 2
+    custard.columns: 3
+
+    custard.border_type: None
+    custard.border_size: 0
+
+    custard.focused_color: #FFFFFF
+    custard.unfocused_color: #676767
+    custard.background_color: #000000
+    custard.invert_colors: False
+
+    custard.margin: 0
+    custard.margin_top: 0
+    custard.margin_bottom: 0
+    custard.margin_left: 0
+    custard.margin_right: 0
+
+    custard.workspaces: 2
+
+.SH USAGE
+
+custard is controlled via a helper program called custardctl. You can use a hot-key daemon like
+.I sxhkd
+to bind keys to commands.
+
+The basic usage for custardctl is
+.B custardctl
+[target] [-action] [argument]
+
+Each target has specific actions that they can do, and the argument is supplied for the action if required.
+
+All possible targets are listed below. If no target is specified, it is assumed that the
+.B custard
+target was wanted.
+
+.B custard
+
+.I
+    \-help
+        
+        Shows the help dialogue.
+
+.I
+    \-stop
+
+        Stops custard.
+
+.I
+    \-focus
+[
+.B north
+|
+.B south
+|
+.B west
+|
+.B east
+]
+
+        Cycles focus towards the specified cardinal direction.
+
+.B window
+
+.I
+    \-move
+[
+.B north
+|
+.B south
+|
+.B west
+|
+.B east
+]
+
+        Moves the window in the specified direction.
+
+.I
+    \-expand
+[
+.B north
+|
+.B south
+|
+.B west
+|
+.B east
+]
+
+        Expands the window in the specified direction.
+
+.I
+    \-contract
+[
+.B north
+|
+.B south
+|
+.B west
+|
+.B east
+]
+
+        Contracts the window in the specified direction.
+
+.I
+    \-maximize
+
+        Resizes the focused window to the maximum possible size on the grid.
+
+.I
+    \-minimize
+
+        Resizes the focused window to the minimum possible size on the grid.
+
+.I
+    \-close
+
+        Closes the focused window.
+
+.B workspace
+
+.I
+    \-focus [n]
+
+        Focuses on the specified workspace.
+
+.I
+
+    \-attach [n]
+
+        Attaches the specified workspace. See
+.B WORKSPACE ATTACHING
+
+.I
+
+    \-detach [n]
+
+        Detaches the specified workspace. See
+.B WORKSPACE ATTACHING
+
+.SH EXAMPLES
+
+.B custardctl -stop
+    Stops custard.
+
+.B custardctl window -move down
+    Moves the focused window down by one grid unit.
+
+.B custardctl workspace -focus 3
+    Focuses on the third workspace.
+
+.SH WORKSPACE ATTACHING
+
+custard has a feature called "workspace attaching" that somewhat resembles that of groups. By attaching a workspace (see USAGE), you map windows in that workspace to the screen. This allows for greater and more efficient multitasking. You can also detach a workspace, which will make the windows that are managed by the workspace in question unmap.
+
+You can also go to these workspaces without attaching or detaching others. If there are any attached workspaces, they will be detached from the screen before mapping the workspace which you are going to.
+
+You may also send windows between workspaces. When sending windows between workspaces, the workspace you are sending the window to does not have to be attached to or detached from the screen.
