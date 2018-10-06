@@ -2,25 +2,19 @@ super + Return
     urxvt
 
 super + {_,ctrl + ,alt + }{Up,Down,Left,Right}
-    custardctl window --{move,expand,contract} {north,south,west,east}
+    custardctl window -{move,expand,contract} {up,down,left,right}
 
-super + shift + {Up,Down}
-    custardctl window --{raise,lower}
+super + {_,ctrl + ,alt +}{1-9,0}
+    custardctl workspace -{focus,attach,detach} {1-9,10}
 
-super + {_,ctrl +,alt +}{1-9,0}
-    custardctl group --{focus,attach,detach} {1-9,10}
+super + shift + {Up,Down,Left,Right}
+    custardctl -focus {north,south,west,east}
 
 super + shift + {1-9,0}
-    custardctl window --attach_to_group {1-9,10}
-
-super + grave + {1-9,0}
-    custardctl window --detach_from_group {1-9,10}
+    custardctl window -relocate {1-9,10}
 
 super + w
-    custardctl window --close
-
-alt + Tab
-    custardctl --focus next
+    custardctl window -close
 
 super + Escape
-    custardctl --stop
+    custardctl -stop

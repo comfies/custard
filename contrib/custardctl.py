@@ -1,199 +1,180 @@
 #!/usr/bin/env python3
 
-import getopt
-import re
-import socket
 import sys
 
-from typing import List
+FIFO_PATH = "/tmp/custard.fifo"
 
-SOCKET_PATH  = '/tmp/custard.sock'
-dry = False
-option_target_map = dict()
+def usage():
+    print("""
+    custard v1.3
 
-def help() -> None:
-    print("help(): stub")
-    exit(0)
+    custardctl [target] [-action] [argument]
 
-def send(message: str) -> None:
-    global SOCKET_PATH
+    Possible targets and their respective actions
+        custard
+            -help
+            -stop
+            -focus [north|south|west|east]
+        window
+            -move [north|south|west|east]
+            -expand [north|south|west|east]
+            -contract [north|south|west|east]
+            -maximize
+            -minimize
+            -close
+        workspace
+            -focus [n]
+            -attach [n]
+            -detach [n]
 
-    message = str(message).lower()
-    try:
-        unix_socket = socket.socket(socket.AF_UNIX)
-        unix_socket.settimeout(1)
-        unix_socket.connect(SOCKET_PATH)
-        unix_socket.send(message.encode())
-        unix_socket.close()
-    except (ConnectionRefusedError, FileNotFoundError):
-        exit(1)
+    For more information, see the `custard' man page, or navigate to the GitHub page.
 
-def hash_string(string: str) -> int:
-    assert type(string) is str, "Argument for hash_string() is not a string"
-    MAGIC_NUMBER = 5381
-    BITMASK = 0xFFFFFFFF
+    https://github.com/Sweets/custard
+    """)
+    exit(1)
 
-    output = MAGIC_NUMBER
+def write_command(command):
+    fifo = open(FIFO_PATH, "w")
+    fifo.write(command)
+    fifo.close()
 
-    def recurse(nth: int = 0) -> None:
-        nonlocal string, output
+def create_output(alpha, beta, gamma):
+    output = list()
 
-        if len(string) - 1 < nth:
-            return
-        else:
-            output = (output * 33) ^ ord(string[nth])
-            recurse(nth + 1)
+    if alpha not in ("custard", "window", "workspace"):
+        usage()
 
-    recurse()
+    if alpha == "custard":
+        output.append(0)
 
-    output = (output >> 0) & BITMASK
-    return output
+        if beta not in ("stop", "focus", "help"):
+            usage()
 
-def c_target(*args, **kwargs):
-    def decorator(method):
-        nonlocal args, kwargs
+        if beta == "help":
+            usage() # Technically didn't need to test for `help` explicitly
 
-        target_name = 'custard'
-        action_name = method.__name__.lower()
+        if beta == "stop":
+            output += list((0, 0))
+            return output
 
-        if kwargs.get('target', False):
-            target_name = kwargs.get('target').lower()
+        if beta == "focus":
+            output.append(2)
 
-        if kwargs.get('command', False):
-            action_name = kwargs.get('command').lower()
+            if gamma not in ("north", "south", "west", "east"):
+                usage()
 
-        def wrapper(*args, **kwargs):
-            global dry
-            nonlocal method, target_name, action_name
-            try:
-                method_output = method(*args, **kwargs)
-                socket_output = "{0};{1}".format(hash_string(target_name),
-                                                 hash_string(action_name))
+            if gamma == "north":
+                output.append(0)
+            if gamma == "south":
+                output.append(1)
+            if gamma == "west":
+                output.append(2)
+            if gamma == "east":
+                output.append(3)
 
-                if method_output:
-                    socket_output += ";" + method_output
+            return output
 
-                if dry:
-                    print(socket_output)
-                else:
-                    send(socket_output)
-            except TypeError:
-                exit(1) # Error: insufficient arguments
+    if alpha == "window":
+        output.append(1)
 
+        if beta not in ("move", "expand", "contract", "relocate", "close", "maximize", "minimize"):
+            usage()
 
-        if option_target_map.get(target_name, False):
-            option_target_map.get(target_name).setdefault(action_name, wrapper)
-        else:
-            option_target_map.setdefault(target_name, {action_name: wrapper})
-    return decorator
+        if beta == "move":
+            output.append(0)
+        if beta == "expand":
+            output.append(1)
+        if beta == "contract":
+            output.append(2)
+        if beta == "relocate":
+            if not gamma.isdigit():
+                usage()
 
-def call(target: str, action: str, *args, **kwargs) -> None:
-    if option_target_map.get(target, False):
-        if option_target_map.get(target).get(action, False):
-            option_target_map.get(target).get(action)(*args, **kwargs)
+            output += list((3, gamma))
+            return output
 
-class Parse:
-    def boolean(user_input: str) -> bool:
-        user_input = user_input.lower()
-        return (user_input == 'true')
+        if beta == "maximize":
+            output += list((5, 0))
+            return output
 
-    def unsigned_integer(user_input: str) -> int:
-        if user_input.isdigit():
-            return int(user_input)
-        return 0
+        if beta == "minimize":
+            output += list((6, 0))
+            return output
 
-    def rgba_color(user_input: str) -> None:
-        return
+        if beta == "close":
+            output += list((4, 0))
+            return output
 
+        if gamma not in ("north", "south", "west", "east"):
+            usage()
 
-class SocketCommands:
-    @c_target(command='stop')
-    def halt():
-        pass
+        if gamma == "north":
+            output.append(0)
+        if gamma == "south":
+            output.append(1)
+        if gamma == "west":
+            output.append(2)
+        if gamma == "east":
+            output.append(3)
 
-    @c_target()
-    def configure(variable, value):
-        return "{0};{1}".format(variable, value)
+        return output
 
-    @c_target()
-    def new_geometry(name, x, y, height, width):
-        x, y, height, width = \
-            list(map(Parse.unsigned_integer, [x, y, height, width]))
-        return "{0};{1};{2};{3};{4}".format(name, x, y, height, width)
+    if alpha == "workspace":
+        output.append(2)
 
-    @c_target()
-    def new_geometry_rule(attribute, rule, geometry):
-        attribute_map = {
-            'window_first_class': 0,
-            'window_second_class': 1,
-            'window_name': 2
-        }
+        if beta not in ("focus", "attach", "detach"):
+            usage()
 
-        attribute = attribute.lower()
+        if not gamma.isdigit():
+            usage()
 
-        if not attribute_map.get(attribute, False):
-            exit(1) # Error: invalid attribute type
+        if beta == "attach":
+            output += list((0, gamma))
+        if beta == "detach":
+            output += list((1, gamma))
+        if beta == "focus":
+            output += list((2, gamma))
 
-        attribute = attribute_map.get(attribute)
+        return output
 
-        return "{0};{1};{2}".format(attribute, rule, geometry)
+def parse(args):
+    if len(args) > 3 or len(args) == 0:
+        usage()
 
-    @c_target(target='window')
-    def geometry(name):
-        return name
+    elif len(args) == 3:
+        alpha, beta, gamma = args
 
-    @c_target(target='window')
-    def close():
-        pass
+    elif len(args) == 2:
+        alpha = "custard"
+        beta, gamma = args
 
-    @c_target(target='workspace')
-    def focus(workspace):
-        return "{0}".format(workspace)
+        if beta[0] != "-":
+            if gamma[0] != "-":
+                usage()
+            alpha = beta
+            beta = gamma
+            gamma = ""
 
-if __name__ == '__main__':
-    command_line_arguments = sys.argv[1:]
-    if len(command_line_arguments) == 0:
-        help()
+    elif len(args) == 1:
+        alpha = "custard"
+        beta = args[0]
+        gamma = ""
 
-    targets = list(option_target_map.keys())
-    actions = list()
-
-    for key, value in option_target_map.items():
-        for action in list(value.keys()):
-            if action not in actions:
-                actions.append(action)
-
-    target = 'custard'
-
-    if command_line_arguments[0] in targets:
-        target = command_line_arguments[0]
-        command_line_arguments = command_line_arguments[1:]
+    if beta[0] != "-":
+        usage()
     else:
-        if command_line_arguments[0][0:2] != '--':
-            exit(1)
+        beta = beta[1:]
 
-    optionlist, arguments = getopt.getopt(command_line_arguments, '', actions +
-                                          ['help', 'dry'])
+    alpha, beta, gamma = alpha.lower(), beta.lower(), gamma.lower()
 
-    options = list()
-    for option, value in optionlist:
-        if option == '--help':
-            help()
-        elif option == '--dry':
-            dry = True
-        else:
-            if option[0:2] == '--':
-                option = option[2:]
-            options.append(option)
+    output = create_output(alpha, beta, gamma)
 
-    if len(options) > 1:
-        exit(1) # Error: more than one action?
-    action = options[0]
+    if len(output) < 3:
+        usage()
 
-    if target not in targets:
-        exit(1) # Error: non-existent target
+    output = "+{}.{}.{};".format(*output)
 
-    if action not in actions:
-        exit(1) # Error: non-existent action (how did you get here?)
+    write_command(output)
 
-    call(target, action, *arguments)
+if __name__ == "__main__":
+    parse(sys.argv[1:])

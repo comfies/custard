@@ -9,7 +9,7 @@ doesntexist(){
 checkdepends(){
     command -v make > /dev/null || doesntexit "make"
     #just in case?
-    command -v g++ > /dev/null || doesntexist "gcc"
+    command -v g++ > /dev/null || doesntexist "g++"
     command -v python3 > /dev/null || doesntexist "python3"
 }
 
@@ -20,13 +20,13 @@ installandconfigure(){
 
     mkdir -p ~/.config/custard
     cp ./examples/sxhkdrc ~/.config/custard/sxhkdrc
-    cp ./examples/custard.sh ~/.config/custard/rc.sh
+    cp ./examples/Xresources ~/.config/custard/Xresources
 
     cat <<EOF>> ~/.config/custard/start.sh
 \#!/bin/bash
 echo '' > /tmp/custard.log
-sxhkd -c ~/.config/custard/sxhkd &
-(sleep 2; sh ~/.config/custard/rc.sh) &
+xrdb -merge ~/.config/custard/Xresources
+sxhkd -c ~/.config/custard/sxhkd
 custard 2>> /tmp/custard.log
 EOF
     chmod +x ~/.config/custard/start.sh

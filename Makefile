@@ -1,44 +1,24 @@
-CC?=gcc
 
-OPTFLAGS = -O2
-CFLAGS = $(OPTFLAGS) -std=c99 -pedantic
+CC=g++
 
-ifeq ($(CC), clang)
-	CFLAGS+=-Weverything
-else
-	CFLAGS+=-Wall -Wextra
-endif
-
-CPPFLAGS = -MD -MP -D_POSIX_C_SOURCE=200809L
-LDFLAGS = -lxcb -lxcb-ewmh -lxcb-icccm -lxcb-util -lconfig
+OPTFLAGS = -O3
+CFLAGS = $(OPTFLAGS) -std=c++14 -lxcb -lxcb-ewmh -lxcb-icccm -lxcb-xrm -lxcb-util -lpthread -Wno-unused-result
 
 TARGET = custard
-BUILDPREFIX=build
-SRCS = $(wildcard src/*.c)
-OBJS = $(subst src,$(BUILDPREFIX),$(SRCS:.c=.o))
 PREFIX?=/usr/local
 MANPREFIX?=$(PREFIX)/share/man
 
-.PHONY: all install clean
+all: $(TARGET)
 
-all: prepare $(OBJS) $(TARGET)
-
--include $(subst src,$(BUILDPREFIX),$(SRCS:.c=.d))
-
-$(TARGET): $(OBJS)
-	$(CC) -o $(BUILDPREFIX)/$@ $^ $(LDFLAGS)
-
-prepare:
-	mkdir -p $(BUILDPREFIX)
-
-$(BUILDPREFIX)/%.o: src/%.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
+$(TARGET): src/main.cpp
+	mkdir -p build
+	$(CC) src/main.cpp $(CFLAGS) -o build/$(TARGET)
 
 install:
-	install -m 755 -D $(BUILDPREFIX)/$(TARGET) $(DESTDIR)$(PREFIX)/bin/$(TARGET)
+	install -m 755 -D build/$(TARGET) $(DESTDIR)$(PREFIX)/bin/$(TARGET)
 	install -m 755 -D contrib/custardctl.py $(DESTDIR)$(PREFIX)/bin/custardctl
-#	install -m 644 -D man/custard.man $(DESTDIR)$(MANPREFIX)/man1/custard.1
+	install -m 644 -D man/custard.man $(DESTDIR)$(MANPREFIX)/man1/custard.1
 
 clean:
-	$(RM) -r $(BUILDPREFIX)
+	$(RM) build/$(TARGET)
 
