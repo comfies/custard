@@ -27,10 +27,10 @@ all: $(TARGET)
 -include $(DEPS)
 
 $(TARGET): $(OBJ)
-	$(LD) -o "$@" "$^" $(LDFLAGS)
+	$(LD) -o $@ $^ $(LDFLAGS)
 
 .c.o:
-	$(CC) -o "$@" $(CFLAGS) $(CPPFLAGS) -c "$<"
+	$(CC) -o $@ $(CFLAGS) $(CPPFLAGS) -c "$<"
 
 clean:
 	$(RM) $(TARGET)
