@@ -253,25 +253,36 @@ parse_unsigned_integer(const char *input)
 unsigned int
 parse_rgba_color(const char *input)
 {
+    unsigned int RGBA = 0x000000FF;
     if (input) {
-        unsigned int RGBA;
 
         char groups[9] = {
-            input[7], /* A */
-            input[8], /* A */
             input[1], /* R */
             input[2], /* R */
             input[3], /* G */
             input[4], /* G */
             input[5], /* B */
             input[6], /* B */
+            input[7], /* A */
+            input[8], /* A */
             '\0'
         };
 
         RGBA = strtol(groups, NULL, 16);
-
-        return RGBA;
     }
 
-    return 0x000000FF;
+    unsigned int alpha = RGBA & 0x000000FF;
+    unsigned int red = (RGBA & 0xFF000000) / 0x1000000;
+    unsigned int green = (RGBA & 0x00FF0000) / 0x10000;
+    unsigned int blue = (RGBA & 0x0000FF00) / 0x100;
+
+    red = (red * alpha) / 255;
+    green = (green * alpha) / 255;
+    blue = (blue * alpha) / 255;
+
+    unsigned int value = 0x0;
+
+    value = (alpha * 0x1000000) | (red * 0x10000) | (green * 0x100) | blue;
+
+    return value;
 }
