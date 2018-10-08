@@ -7,6 +7,7 @@
 
 struct Window {
     xcb_window_t id;
+    xcb_window_t parent;
     short unsigned int mapped;
     short unsigned int fullscreen;
     unsigned int x;
