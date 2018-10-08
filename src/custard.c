@@ -72,7 +72,6 @@ window_list_remove_window(xcb_window_t window_id)
             element = window_list_head;
 
             window_list_head = element->next;
-            free(element->data);
             free(element);
 
             return 1;
@@ -87,7 +86,6 @@ window_list_remove_window(xcb_window_t window_id)
             old_element = element->next;
 
             element->next = ((struct LinkedListElement *)element->next)->next;
-            free(old_element->data);
             free(old_element);
             return 1;
         }
@@ -233,6 +231,7 @@ start_custard()
             if (FD_ISSET(xcb_file_descriptor, &descriptor_set)) {
                 while ((event = xcb_poll_for_event(xcb_connection))) {
                     if (event) {
+                        debug_output("Event poll received event");
                         handlers_handle_event(event);
                     } else {
                         stop_custard();

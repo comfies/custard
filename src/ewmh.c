@@ -84,6 +84,8 @@ initialize_ewmh_connection()
         ewmh_connection->_NET_SUPPORTING_WM_CHECK,
         ewmh_connection->_NET_WM_PID,
         ewmh_connection->_NET_WM_STATE,
+        ewmh_connection->_NET_CLOSE_WINDOW,
+        ewmh_connection->_NET_WM_ACTION_CLOSE,
 
         ewmh_connection->_NET_WM_WINDOW_TYPE,
         ewmh_connection->_NET_WM_WINDOW_TYPE_DOCK,
@@ -97,12 +99,12 @@ initialize_ewmh_connection()
         ewmh_connection->_NET_WM_WINDOW_TYPE_DND,
 
         ewmh_connection->WM_PROTOCOLS
-    };
+    }; /* len: 19 */
 
     xcb_ewmh_set_supported(
         ewmh_connection,
         0,
-        17,
+        19,
         supported_atoms
     );
 
