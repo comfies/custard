@@ -282,7 +282,12 @@ parse_rgba_color(const char *input)
 
     unsigned int value = 0x0;
 
-    value = (alpha * 0x1000000) | (red * 0x10000) | (green * 0x100) | blue;
+    value = (alpha * 0x1000000);
+    value |= (red * 0x10000);
+    value |= (green * 0x100);
+    value |= blue;
+
+    debug_output("Color parsed (%s -> %08x)", input, value);
 
     return value;
 }
