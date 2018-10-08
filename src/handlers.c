@@ -30,7 +30,7 @@ handlers_handle_event(xcb_generic_event_t *event)
             handlers_window_message_received(event);
             break;
         default:
-            return;
+            debug_output("Unhandled event %d\n", event_type);
             break;
     }
 
@@ -79,7 +79,7 @@ handlers_window_destroyed(xcb_generic_event_t *generic_event)
 
     xcb_window_t window_id = event->window;
 
-    if (window_list_get_window(window_id)) {
+    if(window_list_get_window(window_id)) {
         unmanage_window(window_id);
         commit();
     }
@@ -125,6 +125,13 @@ handlers_window_message_received(xcb_generic_event_t *generic_event)
 
         }
 
+    } else if (event->type == ewmh_connection->_NET_CLOSE_WINDOW) {
+        Window *window = window_list_get_window(window_id);
+
+        if (window) {
+            unmanage_window(window_id);
+        }
     }
+
     commit();
 }
