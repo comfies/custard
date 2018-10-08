@@ -114,7 +114,6 @@ manage_window(xcb_window_t window_id)
     xcb_reparent_window(xcb_connection, window_id, window->parent, 0, 0);
     xcb_change_window_attributes(xcb_connection, window->parent, event_mask,
         data);
-    border_update(window->parent);
 
     /* End test code */
 
@@ -156,7 +155,6 @@ unfocus_window()
 
     if (focused_window) {
         xcb_window_t window_id = focused_window->id;
-        xcb_window_t parent_window_id = focused_window->parent;
         focused_window = NULL;
 
         xcb_grab_button(xcb_connection, 0, window_id,
@@ -164,7 +162,7 @@ unfocus_window()
             XCB_GRAB_MODE_ASYNC, XCB_NONE, XCB_NONE, XCB_BUTTON_INDEX_ANY,
             XCB_MOD_MASK_ANY);
 
-        border_update(parent_window_id);
+        border_update(window_id);
     }
 }
 
@@ -201,7 +199,7 @@ focus_on_window(xcb_window_t window_id)
         focused_window = window;
         xcb_ungrab_button(xcb_connection, XCB_BUTTON_INDEX_ANY, window_id,
             XCB_MOD_MASK_ANY);
-        border_update(window->parent);
+        border_update(window_id);
     }
 }
 
