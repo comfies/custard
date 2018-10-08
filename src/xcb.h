@@ -5,6 +5,8 @@
 
 extern xcb_connection_t *xcb_connection;
 extern xcb_screen_t *screen;
+extern xcb_visualtype_t *visual;
+extern xcb_colormap_t colormap;
 
 void commit(void);
 unsigned short int initialize_xcb_connection(void);
