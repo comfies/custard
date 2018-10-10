@@ -44,9 +44,9 @@ main(int argc, char** argv)
                 break;
             case 'c':
                 config_path = optarg;
-				// Skip =
-				if (config_path[0] == '=')
-					config_path++;
+                if (config_path[0] == '=') {
+                    config_path++;
+                }
                 break;
 
             case '?':

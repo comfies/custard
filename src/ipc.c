@@ -158,48 +158,32 @@ process_command(char *input)
                 break;
 
             case 0x5769B7BF: {
-                struct LinkedListElement *element = geometry_list_head;
+                    struct LinkedListElement *element = geometry_list_head;
 
-                if (!element) {
-                    return;
-                }
-
-                while (element) {
-                    debug_output("Testing geometry %s to %s.",
-                        ((Geometry *)element->data)->name, arguments[0]);
-                    if (strcmp(((Geometry *)element->data)->name,
-                        arguments[0]) == 0) {
-
-                        move_window_to_grid_coordinate(window_id,
-                            ((Geometry *)element->data)->x,
-                            ((Geometry *)element->data)->y);
-                        resize_window_with_grid_units(window_id,
-                            ((Geometry *)element->data)->height,
-                            ((Geometry *)element->data)->width);
-                        border_update(window_id);
-
-                        commit();
+                    if (!element) {
                         return;
                     }
 
-                    element = element->next;
-                }
-/*                    struct NamedGeometry geometry;
+                    while (element) {
+                        debug_output("Testing geometry %s to %s.",
+                            ((Geometry *)element->data)->name, arguments[0]);
+                        if (strcmp(((Geometry *)element->data)->name,
+                            arguments[0]) == 0) {
 
-                    for (unsigned int index = 0;
-                        geometries[index].name; index++) {
-                        geometry = geometries[index];
-
-                        if (strcmp(geometry.name, arguments[0]) == 0) {
                             move_window_to_grid_coordinate(window_id,
-                                geometry.geometry.x, geometry.geometry.y);
+                                ((Geometry *)element->data)->x,
+                                ((Geometry *)element->data)->y);
                             resize_window_with_grid_units(window_id,
-                                geometry.geometry.height,
-                                geometry.geometry.width);
+                                ((Geometry *)element->data)->height,
+                                ((Geometry *)element->data)->width);
+                            border_update(window_id);
+
                             commit();
                             return;
                         }
-                    }*/
+
+                        element = element->next;
+                    }
                 }
                 break;
 
