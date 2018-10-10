@@ -146,27 +146,11 @@ start_custard()
 
     xcb_file_descriptor = xcb_get_file_descriptor(xcb_connection);
 
-/*    Configuration = (struct Config *)malloc(sizeof(struct Config));*/
-/*    apply_config_defaults();*/
     grid_apply_configuration();
 
     wm_running = 1;
 
     xcb_generic_event_t *event;
-
-/*    if (config_path) {
-        if (debug) {
-            fprintf(stderr, "[debug] Executing %s\n", config_path);
-        }
-
-        if (fork() == 0) {
-            execl(config_path, config_path, NULL);
-
-            // Shouldn't be reached
-            fprintf(stderr, "[error] Unable to execute %s\n", config_path);
-            exit(EXIT_FAILURE);
-        }
-    }*/
 
     xcb_query_tree_reply_t *tree_reply;
     tree_reply = xcb_query_tree_reply(
@@ -255,10 +239,6 @@ stop_custard()
 {
     debug_output("Ending custard");
 
-/*    if (!wm_running) {
-        return;
-    }*/
-
     xcb_query_tree_reply_t *tree_reply;
     tree_reply = xcb_query_tree_reply(
         xcb_connection,
@@ -288,8 +268,6 @@ stop_custard()
     finalize_ewmh_connection();
     finalize_xcb_connection();
     finalize_configuration();
-
-/*    free(Configuration);*/
 
 }
 
