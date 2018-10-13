@@ -125,14 +125,6 @@ _debug(const char *file, const char *func, const int line, char *fmt, ...)
     fputs("\n", stderr);
 }
 
-void
-debug_output_old(char *message)
-{
-    if (debug) {
-        fprintf(stderr, "[debug] %s\n", message);
-    }
-}
-
 int
 start_custard()
 {
