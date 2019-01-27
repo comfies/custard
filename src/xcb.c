@@ -81,7 +81,7 @@ initialize_xcb_connection()
     }
 
     if (!visual) {
-        debug_output("Visual not found, fallback to screen!!!!");
+        debug_output("Visual not found, falling back to screen visual");
     }
 
     colormap = xcb_generate_id(xcb_connection);
