@@ -6,6 +6,7 @@
 #include "workspace.h"
 #include "xcb.h"
 #include "ewmh.h"
+#include "utilities.h"
 
 #include <xcb/xcb.h>
 
@@ -52,13 +53,38 @@ handlers_map_request(xcb_generic_event_t *generic_event)
     unsigned short int managed = manage_window(window_id);
 
     if (managed) {
-        move_window_to_grid_coordinate(window_id, grid_window_default_x,
-            grid_window_default_y);
-        resize_window_with_grid_units(window_id, grid_window_default_height,
-            grid_window_default_width);
+        change_window_geometry_grid_coordinate(window_id,
+            grid_window_default_x, grid_window_default_y,
+            grid_window_default_height, grid_window_default_width);
+
         attach_window_to_workspace(window_id, focused_workspace);
 
         map_window(window_id);
+
+        /* xcb: regex test the title */
+
+        /*
+        xcb_atom_t prop = XCB_ATOM_WM_NAME;
+        xcb_atom_t type = XCB_GET_PROPERTY_TYPE_ANY;
+
+        xcb_get_property_reply_t *reply = xcb_get_property_reply(xcb_connection,
+            xcb_get_property(xcb_connection, 0, window_id, prop, type, 0, 30),
+            NULL);
+
+        char *expression = "(Chrom.*)";
+
+        char *window_title = (char *)xcb_get_property_value(reply);
+
+        if (regex_match(window_title, expression))
+        {
+            debug_output("Regex title match: %s (%s)\n", window_title, expression);
+        }
+
+        free(reply);*/
+
+
+        /* end xcb test */
+
         focus_on_window(window_id);
         raise_window(window_id);
     } else {
