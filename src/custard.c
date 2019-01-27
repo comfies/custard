@@ -2,6 +2,7 @@
 
 #include "config.h"
 #include "ewmh.h"
+#include "utilities.h"
 #include "handlers.h"
 #include "grid.h"
 #include "socket.h"

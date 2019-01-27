@@ -1,5 +1,6 @@
 #include "custard.h"
 #include "config.h"
+#include "utilities.h"
 #include "ipc.h" /* TODO: move parse methods to another file */
 
 #include <stdlib.h>
