@@ -1,5 +1,6 @@
 #include "handlers.h"
 
+#include "config.h"
 #include "custard.h"
 #include "grid.h"
 #include "window.h"
@@ -8,6 +9,7 @@
 #include "ewmh.h"
 #include "utilities.h"
 
+#include <string.h>
 #include <xcb/xcb.h>
 
 void
@@ -62,26 +64,59 @@ handlers_map_request(xcb_generic_event_t *generic_event)
         map_window(window_id);
 
         /* xcb: regex test the title */
+        struct LinkedListElement *element = geometry_rules_list_head;
 
-        /*
-        xcb_atom_t prop = XCB_ATOM_WM_NAME;
-        xcb_atom_t type = XCB_GET_PROPERTY_TYPE_ANY;
-
-        xcb_get_property_reply_t *reply = xcb_get_property_reply(xcb_connection,
-            xcb_get_property(xcb_connection, 0, window_id, prop, type, 0, 30),
-            NULL);
-
-        char *expression = "(Chrom.*)";
-
-        char *window_title = (char *)xcb_get_property_value(reply);
-
-        if (regex_match(window_title, expression))
+        if (element)
         {
-            debug_output("Regex title match: %s (%s)\n", window_title, expression);
+
+            xcb_atom_t prop = XCB_ATOM_WM_NAME;
+            xcb_atom_t type = XCB_GET_PROPERTY_TYPE_ANY;
+
+            xcb_get_property_reply_t *reply = xcb_get_property_reply(
+                xcb_connection,
+                    xcb_get_property(xcb_connection, 0, window_id, prop,
+                    type, 0, 30),
+                NULL);
+
+            char *expression = (char *)malloc(sizeof(char));
+            char *window_title = (char *)xcb_get_property_value(reply);
+            GeometryRule *rule;
+
+            struct LinkedListElement *geometry_element = geometry_list_head;
+
+            while (element)
+            {
+                rule = (GeometryRule *)element->data;
+
+                strcpy(expression, rule->match);
+
+                if (regex_match(window_title, expression))
+                {
+                    debug_output("Regex title match: %s %s\n", window_title, expression);
+
+                    while (geometry_element)
+                    {
+                        if (strcmp(((Geometry *)geometry_element->data)->name,
+                            rule->geometry) == 0)
+                        {
+                            change_window_geometry_grid_coordinate(window_id,
+                                ((Geometry *)geometry_element->data)->x,
+                                ((Geometry *)geometry_element->data)->y,
+                                ((Geometry *)geometry_element->data)->height,
+                                ((Geometry *)geometry_element->data)->width);
+                            geometry_element = NULL;
+                            continue;
+                        }
+
+                        geometry_element = geometry_element->next;
+                    }
+                }
+
+                element = element->next;
+            }
+
+            free(reply);
         }
-
-        free(reply);*/
-
 
         /* end xcb test */
 
