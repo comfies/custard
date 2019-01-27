@@ -171,12 +171,12 @@ process_command(char *input)
                         if (strcmp(((Geometry *)element->data)->name,
                             arguments[0]) == 0) {
 
-                            move_window_to_grid_coordinate(window_id,
+                            change_window_geometry_grid_coordinate(window_id,
                                 ((Geometry *)element->data)->x,
-                                ((Geometry *)element->data)->y);
-                            resize_window_with_grid_units(window_id,
+                                ((Geometry *)element->data)->y,
                                 ((Geometry *)element->data)->height,
                                 ((Geometry *)element->data)->width);
+
                             border_update(window_id);
 
                             commit();
