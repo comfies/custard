@@ -18,7 +18,7 @@ def help() -> None:
 def send(message: str) -> None:
     global SOCKET_PATH
 
-    message = str(message).lower()
+    message = str(message)
     try:
         unix_socket = socket.socket(socket.AF_UNIX)
         unix_socket.settimeout(1)
