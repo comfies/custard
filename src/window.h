@@ -34,6 +34,11 @@ void lower_window(xcb_window_t);
 void fullscreen(xcb_window_t);
 void window(xcb_window_t);
 
+void change_window_geometry_pixels(xcb_window_t, unsigned int, unsigned int,
+    unsigned int, unsigned int);
+void change_window_geometry_grid_coordinate(xcb_window_t, unsigned int,
+    unsigned int, unsigned int, unsigned int);
+
 void move_window_to_pixel_coordinate(xcb_window_t, unsigned int, unsigned int);
 void move_window_to_grid_coordinate(xcb_window_t, unsigned int, unsigned int);
 

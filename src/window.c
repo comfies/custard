@@ -317,6 +317,47 @@ lower_window(xcb_window_t window_id) {
 }
 
 void
+change_window_geometry_pixels(xcb_window_t window_id, unsigned int x,
+    unsigned int y, unsigned int height, unsigned int width)
+{
+    unsigned int data[4] = {x, y, width, height};
+
+    xcb_configure_window(xcb_connection, window_id, XCB_CONFIG_WINDOW_X |
+        XCB_CONFIG_WINDOW_Y | XCB_CONFIG_WINDOW_HEIGHT |
+        XCB_CONFIG_WINDOW_WIDTH, data);
+}
+
+void
+change_window_geometry_grid_coordinate(xcb_window_t window_id, unsigned int x,
+    unsigned int y, unsigned int height, unsigned int width)
+{
+    Window *window = window_list_get_window(window_id);
+
+    unsigned int x_in_pixels = grid_get_offset_x(x) + grid_margin_left;
+    unsigned int y_in_pixels = grid_get_offset_y(y) + grid_margin_top;
+
+    unsigned int height_in_pixels = grid_get_span_y(height);
+    unsigned int width_in_pixels = grid_get_span_x(width);
+
+    xcb_window_t parent = XCB_WINDOW_NONE;
+
+    if (window)
+    {
+        parent = window->parent;
+        window->x = x;
+        window->y = y;
+        window->height = height;
+        window->width = width;
+    }
+
+    resize_window_with_pixels(window_id, height_in_pixels, width_in_pixels);
+
+    if (parent != XCB_WINDOW_NONE)
+        change_window_geometry_pixels(parent, x_in_pixels, y_in_pixels,
+            height_in_pixels, width_in_pixels);
+}
+
+void
 move_window_to_pixel_coordinate(xcb_window_t window_id, unsigned int x,
     unsigned int y)
 {
