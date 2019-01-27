@@ -75,7 +75,7 @@ handlers_map_request(xcb_generic_event_t *generic_event)
             xcb_get_property_reply_t *reply = xcb_get_property_reply(
                 xcb_connection,
                     xcb_get_property(xcb_connection, 0, window_id, prop,
-                    type, 0, 30),
+                    type, 0, 256),
                 NULL);
 
             char *expression = (char *)malloc(sizeof(char));
