@@ -36,7 +36,7 @@ clean:
 
 install: all
 	install -Dm755 "$(BUILDPREFIX)/$(TARGET)" "$(DESTDIR)$(BINPREFIX)/$(TARGET)"
-	install -Dm755 "$(SRCPREFIX)/contrib/custardctl.py" "$(DESTDIR)$(BINPREFIX)/custardctl"
+	install -Dm755 "contrib/custardctl.py" "$(DESTDIR)$(BINPREFIX)/custardctl"
 #	install -Dm644 "$(SRCPREFIX)/man/custard.man" "$(DESTDIR)$(MANPREFIX)/man1/custard.1"
 
 uninstall:
