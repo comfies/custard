@@ -1,7 +1,6 @@
 #include "custard.h"
 #include "config.h"
 #include "utilities.h"
-#include "ipc.h" /* TODO: move parse methods to another file */
 
 #include <stdlib.h>
 #include <string.h>
@@ -36,6 +35,8 @@ struct LinkedListElement *geometry_rules_list_head = NULL;
 unsigned short
 new_geometry(const char *name, unsigned int x, unsigned int y,
     unsigned int height, unsigned int width) {
+
+    /* TODO: if named geometry already exists, replace the x, y, h, w*/
 
     /* Almost like window_list_append_window */
 
@@ -85,6 +86,8 @@ new_geometry(const char *name, unsigned int x, unsigned int y,
 
 unsigned short
 new_geometry_rule(window_attribute_t attribute, char *match, char *geometry) {
+
+    /* TODO: if match already exists, replace the rule */
 
     struct LinkedListElement *element = geometry_rules_list_head;
 
