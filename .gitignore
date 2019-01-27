@@ -1,4 +1,4 @@
-*.o
-*.d
-custard
+.ccls-cache
+build
 tags
+
