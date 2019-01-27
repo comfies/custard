@@ -34,7 +34,7 @@ struct LinkedListElement *geometry_rules_list_head = NULL;
 
 unsigned short
 new_geometry(const char *name, unsigned int x, unsigned int y,
-    unsigned int height, unsigned int width) {
+	unsigned int height, unsigned int width) {
 
     /* TODO: if named geometry already exists, replace the x, y, h, w*/
 
