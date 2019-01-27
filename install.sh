@@ -23,7 +23,7 @@ installandconfigure(){
     cp ./examples/custard.sh ~/.config/custard/rc.sh
 
     cat <<EOF>> ~/.config/custard/start.sh
-\#!/bin/bash
+#!/bin/bash
 echo '' > /tmp/custard.log
 sxhkd -c ~/.config/custard/sxhkd &
 (sleep 2; sh ~/.config/custard/rc.sh) &
