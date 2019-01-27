@@ -3,7 +3,7 @@ LD  = $(CC)
 
 CFLAGS   = -Wall -Wextra -pedantic -std=c99 -O2
 CPPFLAGS = -MD -MP -D_POSIX_C_SOURCE=200809L
-LDFLAGS  = -lxcb -lxcb-ewmh -lxcb-icccm -lxcb-util -lconfig
+LDFLAGS  = -lxcb -lxcb-ewmh -lxcb-icccm -lxcb-util -lconfig -lpcre
 
 PREFIX    = /usr/local
 BINPREFIX = $(PREFIX)/bin
