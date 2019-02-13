@@ -289,7 +289,7 @@ focus_next_window()
                 return;
             }
 
-            if (window_is_in_workspace(window, focused_workspace)) {
+            if (focused_workspace->id == window->workspace) {
                 focus_on_window(window->id);
                 raise_window(window->id);
                 return;

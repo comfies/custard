@@ -1,6 +1,7 @@
 #include "custard.h"
 #include "config.h"
 #include "utilities.h"
+#include "workspace.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -247,6 +248,8 @@ initialize_configuration() {
     config_lookup_int(&configuration, "workspaces", &temp);
     num_workspaces = (unsigned)temp;
 
+    initialize_workspaces();
+
     /* Execute the RC */
     config_lookup_string(&configuration, "rc", &rc_file);
 
@@ -293,6 +296,8 @@ finalize_configuration() {
         free(old_element->data);
         free(old_element);
     }
+
+    finalize_workspaces();
 
     return 1;
 }

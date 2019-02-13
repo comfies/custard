@@ -3,6 +3,7 @@
 #include "config.h"
 #include "ewmh.h"
 #include "grid.h"
+#include "workspace.h"
 #include "xcb.h"
 
 #include <xcb/xcb.h>
@@ -87,6 +88,8 @@ manage_window(xcb_window_t window_id)
 
     window->height = grid_window_default_height;
     window->width = grid_window_default_width;
+
+    window->workspace = focused_workspace->id;
 
     window_list_append_window(window);
 
@@ -197,6 +200,9 @@ focus_on_window(xcb_window_t window_id)
 
     if (window) {
         focused_window = window;
+        if (focused_workspace->focused_window != window_id)
+            focused_workspace->focused_window = window_id;
+
         xcb_ungrab_button(xcb_connection, XCB_BUTTON_INDEX_ANY, window_id,
             XCB_MOD_MASK_ANY);
         border_update(window_id);

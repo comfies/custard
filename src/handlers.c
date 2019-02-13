@@ -48,9 +48,8 @@ handlers_map_request(xcb_generic_event_t *generic_event)
     xcb_map_request_event_t *event = (xcb_map_request_event_t *)generic_event;
     xcb_window_t window_id = event->window;
 
-    if (window_id == ewmh_window_id) {
+    if (window_id == ewmh_window_id)
         return;
-    }
 
     unsigned short int managed = manage_window(window_id);
 
@@ -59,11 +58,12 @@ handlers_map_request(xcb_generic_event_t *generic_event)
             grid_window_default_x, grid_window_default_y,
             grid_window_default_height, grid_window_default_width);
 
-        attach_window_to_workspace(window_id, focused_workspace);
+//        attach_window_to_workspace(window_id, focused_workspace);
 
         map_window(window_id);
 
         /* xcb: regex test the title */
+        /* TODO: unmanaged windows should still have rules applied to them */
         struct LinkedListElement *element = geometry_rules_list_head;
 
         if (element)

@@ -14,7 +14,8 @@ struct Window {
     unsigned int y;
     unsigned int width;
     unsigned int height;
-    short unsigned int workspaces;
+    short unsigned int workspace;
+    /* TODO: store rule pointer in the window itself? */
 };
 
 short unsigned int manage_window(xcb_window_t);
