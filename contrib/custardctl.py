@@ -29,6 +29,8 @@ def send(message: str) -> None:
         exit(1)
 
 def hash_string(string: str) -> int:
+    return string
+
     assert type(string) is str, "Argument for hash_string() is not a string"
     MAGIC_NUMBER = 5381
     BITMASK = 0xFFFFFFFF
@@ -68,7 +70,7 @@ def c_target(*args, **kwargs):
             try:
                 method_output = method(*args, **kwargs)
                 socket_output = "{0};{1}".format(hash_string(target_name),
-                                                 hash_string(action_name))
+                                                 hash_string(action_name).replace('_', ' '))
 
                 if method_output:
                     socket_output += ";" + method_output
@@ -122,7 +124,7 @@ class SocketCommands:
         return "{0};{1};{2};{3};{4}".format(name, x, y, height, width)
 
     @c_target()
-    def new_geometry_rule(attribute, rule, geometry):
+    def new_geometry_rule(attribute, match, geometry):
         attribute_map = {
             'window_first_class': 0,
             'window_second_class': 1,
@@ -136,10 +138,10 @@ class SocketCommands:
 
         attribute = attribute_map.get(attribute)
 
-        return "{0};{1};{2}".format(attribute, rule, geometry)
+        return "{0};{1};{2}".format(attribute, match, geometry)
 
     @c_target(target='window')
-    def geometry(name):
+    def change_geometry(name):
         return name
 
     @c_target(target='window')
