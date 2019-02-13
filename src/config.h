@@ -39,10 +39,17 @@ typedef enum {
     WINDOW_NAME
 } window_attribute_t;
 
+struct RuleData {
+    unsigned int workspace;
+    unsigned short sticky;
+    char *geometry;
+}; /* TODO: advanced rulings? See L52 */
+
 struct GeometryRule {
     window_attribute_t attribute_type;
     char *match;
     char *geometry;
+/*    struct RuleData*; */
 };
 
 extern struct LinkedListElement *geometry_list_head;
