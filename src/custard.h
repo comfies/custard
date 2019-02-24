@@ -16,6 +16,7 @@ extern xcb_window_t focused_window;
 extern unsigned int focused_workspace;
 
 extern unsigned short debug_mode;
+extern char *rc_file;
 
 extern unsigned short border_type;
 extern unsigned short border_invert_colors;

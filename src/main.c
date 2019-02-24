@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <xcb/xcb.h>
 #include <xcb/xcb_ewmh.h>
@@ -32,6 +33,37 @@ int main(int argc, char **argv) {
         free(arguments);
 
         return EXIT_SUCCESS;
+    } else {
+        rc_file = (char *)malloc(sizeof(char));
+
+        // Process arguments
+        char *argument;
+
+        for (int index = 1; index < argc; index++) {
+            argument = argv[index];
+
+            if (!strcmp(argument, "--debug")) {
+                debug_mode = 1;
+                debug_output("Setting debug mode from command line arguments");
+            } else if (!strcmp(argument, "--rc")) {
+                if (!argv[index + 1]) {
+                    debug_output("No rc specified with --rc, exiting");
+                    return EXIT_FAILURE;
+                }
+
+                if (access(argv[index + 1], X_OK | F_OK | R_OK) > -1) {
+                    strcpy(rc_file, argv[index + 1]);
+
+                    index++;
+                    continue;
+                } else {
+                    debug_output("rc specified is not executable, exiting");
+                    return EXIT_FAILURE;
+                }
+            }
+
+        }
+
     }
 
     debug_output("Starting window manager");

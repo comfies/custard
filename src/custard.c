@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <signal.h>
+#include <string.h>
+#include <unistd.h>
+
 #include <sys/select.h>
 
 #include "custard.h"
@@ -26,6 +29,7 @@ unsigned int focused_workspace = 1;
 
 /* configuration variables */
 unsigned short debug_mode = 0;
+char *rc_file;
 
 unsigned short border_type = 0;
 unsigned short border_invert_colors = 0;
@@ -63,6 +67,12 @@ int start_custard() {
     named_geometries = construct_vector();
     window_rules = construct_vector();
     workspaces = construct_vector();
+
+    if (rc_file && strlen(rc_file)) {
+        debug_output("Executing specified rc file");
+        if (fork() == 0)
+            execl(rc_file, rc_file, NULL);
+    }
 
     apply_configuration_to_grid();
 
@@ -129,6 +139,7 @@ void stop_custard() {
         geometry = get_from_vector(named_geometries, index);
         free(geometry->name);
         free(geometry);
+        
     }
 
     deconstruct_vector(named_geometries);
@@ -154,6 +165,9 @@ void stop_custard() {
     finalize_socket();
     finalize_ewmh_connection();
     finalize_xcb_connection();
+
+    if (rc_file)
+        free(rc_file);
 
     return;
 }
