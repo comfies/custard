@@ -135,11 +135,11 @@ unsigned short ipc_command_wm_configure(char **arguments) {
         grid_gap = uint;
     else if (!strcmp("grid.offset.top", setting))
         grid_offset_top = uint;
-    else if (!strcmp("grid_offset_bottom", setting))
+    else if (!strcmp("grid.offset.bottom", setting))
         grid_offset_bottom = uint;
-    else if (!strcmp("grid_offset_left", setting))
+    else if (!strcmp("grid.offset.left", setting))
         grid_offset_left = uint;
-    else if (!strcmp("grid_offset_right", setting))
+    else if (!strcmp("grid.offset.right", setting))
         grid_offset_right = uint;
     else if (!strcmp("border.type", setting))
         border_type = uint;
