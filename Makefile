@@ -1,7 +1,7 @@
 CC ?= gcc
 LD  = $(CC)
 
-CFLAGS		=	-Wall -Wextra -pedantic -std=c99 -O2
+CFLAGS		=	-Wall -Wextra -pedantic -O2
 CPPFLAGS	=	-MD -MP -D_POSIX_C_SOURCE=200809L
 LDFLAGS		=	-lxcb -lxcb-ewmh -lxcb-icccm -lxcb-util -lconfig -lpcre
 
@@ -36,10 +36,10 @@ clean:
 
 install: all
 	install -Dm755 "$(BUILDPREFIX)/$(TARGET)" "$(DESTDIR)$(BINPREFIX)/$(TARGET)"
-	install -Dm755 "contrib/custardctl.py" "$(DESTDIR)$(BINPREFIX)/custardctl"
+#	install -Dm755 "contrib/custardctl.py" "$(DESTDIR)$(BINPREFIX)/custardctl"
 #	install -Dm644 "$(SRCPREFIX)/man/custard.man" "$(DESTDIR)$(MANPREFIX)/man1/custard.1"
 
 uninstall:
 	$(RM) "$(DESTDIR)$(BINPREFIX)/$(TARGET)"
-	$(RM) "$(DESTDIR)$(BINPREFIX)/custardctl"
+#	$(RM) "$(DESTDIR)$(BINPREFIX)/custardctl"
 #	$(RM) "$(DESTDIR)$(MANPREFIX)/man1/custardctl.1"
