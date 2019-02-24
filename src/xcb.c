@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -117,5 +116,3 @@ void commit() {
     debug_output("Flushed to X");
     xcb_flush(xcb_connection);
 }
-
-
