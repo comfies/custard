@@ -8,11 +8,11 @@
 #include "xcb.h"
 
 void (*event_handlers[])(xcb_generic_event_t*) = {
-    [XCB_MAP_REQUEST] = event_map_request,
-    [XCB_DESTROY_NOTIFY] = event_window_destroyed,
-    [XCB_CLIENT_MESSAGE] = event_message_received,
-    [XCB_BUTTON_PRESS] = event_window_clicked,
-    [XCB_NO_OPERATION] = NULL
+    [XCB_MAP_REQUEST]       = event_map_request,
+    [XCB_DESTROY_NOTIFY]    = event_window_destroyed,
+    [XCB_CLIENT_MESSAGE]    = event_message_received,
+    [XCB_BUTTON_PRESS]      = event_window_clicked,
+    [XCB_NO_OPERATION]      = NULL
 };
 
 void handle_event(xcb_generic_event_t *event) {
