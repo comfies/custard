@@ -139,10 +139,6 @@ unsigned short manage_window(xcb_window_t window_id) {
         }
     }
 
-    // TODO: test
-
-    // regex_match
-
     /* Create parent window */
 
     unsigned int data[] = { 0x00000000, 0x00000000, 1, colormap };
@@ -159,6 +155,8 @@ unsigned short manage_window(xcb_window_t window_id) {
     xcb_reparent_window(xcb_connection, window_id, window->parent, 0, 0);
     xcb_change_window_attributes(xcb_connection, window->parent,
         XCB_CW_EVENT_MASK, data);
+
+    map_window(window_id);
 
     push_to_vector(managed_windows, window);
 
@@ -349,17 +347,19 @@ void map_window(xcb_window_t window_id) {
 
     window_t *window = get_window_from_id(window_id);
 
-    xcb_map_window(xcb_connection, window_id);
     if (window)
         xcb_map_window(xcb_connection, window->parent);
+    else
+        xcb_map_window(xcb_connection, window_id);
 }
 
 void unmap_window(xcb_window_t window_id) {
     window_t *window = get_window_from_id(window_id);
 
-    xcb_unmap_window(xcb_connection, window_id);
     if (window)
         xcb_unmap_window(xcb_connection, window->parent);
+    else
+        xcb_unmap_window(xcb_connection, window_id);
 }
 
 void raise_window(xcb_window_t window_id) {
