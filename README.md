@@ -4,6 +4,9 @@
 
 # table of contents
 
+* **[installation](#installation)**
+    * **[installation/dependencies](#dependencies)**
+
 # description
 
 custard is a manual tiling window manager for the X windowing system. Users
