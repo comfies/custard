@@ -1,37 +1,35 @@
-#include "window.h"
-
-#include "config.h"
-#include "ewmh.h"
-#include "grid.h"
-#include "workspace.h"
-#include "xcb.h"
+#include <string.h>
 
 #include <xcb/xcb.h>
 #include <xcb/xcb_icccm.h>
 
-short unsigned int
-manage_window(xcb_window_t window_id)
-{
-    if (window_list_get_window(window_id) || window_id == ewmh_window_id) {
+#include "custard.h"
+#include "grid.h"
+#include "ewmh.h"
+#include "rules.h"
+#include "vector.h"
+#include "window.h"
+#include "workspaces.h"
+#include "xcb.h"
+
+unsigned short manage_window(xcb_window_t window_id) {
+    unsigned int index = 0;
+
+    if (window_id == screen->root || window_id == ewmh_window_id)
         return 0;
-    }
+
+    if (get_window_from_id(window_id))
+        return 0;
 
     xcb_atom_t atom;
     xcb_ewmh_get_atoms_reply_t window_type;
-    xcb_get_geometry_reply_t *geometry;
-    xcb_get_window_attributes_reply_t *attributes;
-
-    geometry = xcb_get_geometry_reply(xcb_connection, xcb_get_geometry(
-            xcb_connection, window_id), NULL);
-
-    attributes = xcb_get_window_attributes_reply(xcb_connection,
-        xcb_get_window_attributes(xcb_connection, window_id), NULL);
 
     if (xcb_ewmh_get_wm_window_type_reply(ewmh_connection,
         xcb_ewmh_get_wm_window_type(ewmh_connection, window_id), &window_type,
         NULL)) {
+        index = 0;
 
-        for (unsigned int index = 0; index < window_type.atoms_len; index++) {
+        for (; index < window_type.atoms_len; index++) {
             atom = window_type.atoms[index];
 
             if (atom == ewmh_connection->_NET_WM_WINDOW_TYPE_TOOLBAR ||
@@ -42,11 +40,18 @@ manage_window(xcb_window_t window_id)
                 atom == ewmh_connection->_NET_WM_WINDOW_TYPE_DOCK ||
                 atom == ewmh_connection->_NET_WM_WINDOW_TYPE_DESKTOP ||
                 atom == ewmh_connection->_NET_WM_WINDOW_TYPE_NOTIFICATION) {
+
                 xcb_ewmh_get_atoms_reply_wipe(&window_type);
                 return 0;
+
             } else if (atom == ewmh_connection->_NET_WM_WINDOW_TYPE_SPLASH) {
                 xcb_ewmh_get_atoms_reply_wipe(&window_type);
-                unsigned int position[2] = {
+
+                xcb_get_geometry_reply_t *geometry;
+                geometry = xcb_get_geometry_reply(xcb_connection,
+                    xcb_get_geometry(xcb_connection, window_id), NULL);
+
+                unsigned int data[2] = {
                     (screen->width_in_pixels -
                         (unsigned int)geometry->width) / 2,
                     (screen->height_in_pixels -
@@ -54,138 +59,207 @@ manage_window(xcb_window_t window_id)
                 };
 
                 xcb_configure_window(xcb_connection, window_id,
-                    XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y, position);
+                    XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y, data);
+
+                return 0;
             }
         }
 
+        xcb_ewmh_get_atoms_reply_wipe(&window_type);
     }
 
-    if (attributes) {
-        if (attributes->override_redirect) {
-            return 0;
-        }
-    }
+    debug_output("Window type check completed");
 
-    unsigned int data[1] = {
-        XCB_EVENT_MASK_BUTTON_PRESS |
-        XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY
-    };
+    xcb_get_window_attributes_reply_t *attributes;
+    attributes = xcb_get_window_attributes_reply(xcb_connection,
+        xcb_get_window_attributes(xcb_connection, window_id), NULL);
 
-//    xcb_change_window_attributes(xcb_connection, window_id, event_mask, data);
+    if (attributes && attributes->override_redirect)
+        return 0;
+
+    debug_output("Window override redirect check completed");
 
     xcb_grab_button(xcb_connection, 0, window_id, XCB_EVENT_MASK_BUTTON_PRESS,
         XCB_GRAB_MODE_ASYNC, XCB_GRAB_MODE_ASYNC, XCB_NONE, XCB_NONE,
         XCB_BUTTON_INDEX_ANY, XCB_MOD_MASK_ANY);
 
-    Window *window = (Window *)malloc(sizeof(Window));
+    window_t *window = (window_t *)malloc(sizeof(window_t));
+
     window->id = window_id;
-    window->parent = XCB_WINDOW_NONE;
-    window->mapped = 0;
-    window->fullscreen = 0;
-    /* Check geometry rules for matching geometry */
+    window->parent = xcb_generate_id(xcb_connection);
+
+    window->workspace = focused_workspace;
+
+    // TODO: check if window name or classes are matched by any rules
+
     window->x = grid_window_default_x;
     window->y = grid_window_default_y;
-
     window->height = grid_window_default_height;
     window->width = grid_window_default_width;
 
-    window->workspace = focused_workspace->id;
+    /* Test for geometry rules */
 
-    window_list_append_window(window);
+    xcb_atom_t property_atom = XCB_ATOM_WM_NAME;
+    xcb_atom_t property_type = XCB_GET_PROPERTY_TYPE_ANY;
 
-    debug_output("Window created and added to linked list");
+    xcb_get_property_reply_t *property = xcb_get_property_reply(xcb_connection,
+        xcb_get_property(xcb_connection, 0, window_id, property_atom,
+        property_type, 0, 256), NULL);
 
-    /* Transparent borders maybe? */
+    char *window_title = (char *)xcb_get_property_value(property);
 
-    window->parent = xcb_generate_id(xcb_connection);
+    index = 0;
 
-    unsigned int window_data[] = {
-        0xff000000, 0xff000000, 1, colormap
-    };
+    window_rule_t *rule = NULL;
+    named_geometry_t *geometry = NULL;
 
-    xcb_create_window(xcb_connection, 32, window->parent,
-        screen->root,
-        grid_window_default_x, grid_window_default_y,
-        grid_window_default_width, grid_window_default_height,
-        border_total_size,
-        XCB_WINDOW_CLASS_INPUT_OUTPUT, visual->visual_id,
-        XCB_CW_BACK_PIXEL | XCB_CW_BORDER_PIXEL | XCB_CW_OVERRIDE_REDIRECT |
-        XCB_CW_COLORMAP,
-        window_data);
+    for (; index < window_rules->size; index++) {
+        rule = get_from_vector(window_rules, index);
 
-    xcb_map_window(xcb_connection, window->parent);
-    xcb_reparent_window(xcb_connection, window_id, window->parent, 0, 0);
-    xcb_change_window_attributes(xcb_connection, window->parent, event_mask,
-        data);
+        if (regex_match(window_title, rule->expression)) {
+            debug_output("%s",
+                "Window title matches rule expression, setting geometry");
 
-    /* End test code */
+            index = 0;
 
-    return 1;
+            for (; index < named_geometries->size; index++) {
+                geometry = get_from_vector(named_geometries, index);
 
-}
+                if (!strcmp(geometry->name, rule->named_geometry)) {
+                    window->x = geometry->x;
+                    window->y = geometry->y;
+                    window->height = geometry->height;
+                    window->width = geometry->width;
 
-short unsigned int
-unmanage_window(xcb_window_t window_id)
-{
-    debug_output("Called");
+                    break;
+                }
+            }
 
-    if (focused_window && focused_window->id == window_id) {
-        focused_window = NULL;
+            break;
+        }
     }
 
-    Window *window = window_list_get_window(window_id);
+    // TODO: test
 
-    xcb_destroy_window(xcb_connection, window->parent);
+    // regex_match
 
-    window_list_remove_window(window_id);
+    /* Create parent window */
 
-    free(window);
+    unsigned int data[] = { 0x00000000, 0x00000000, 1, colormap };
 
-    commit();
+    xcb_create_window(xcb_connection, 32, window->parent, screen->root,
+        window->x, window->y, window->width, window->height, border_total_size,
+        XCB_WINDOW_CLASS_INPUT_OUTPUT, visual->visual_id,
+        XCB_CW_BACK_PIXEL | XCB_CW_BORDER_PIXEL | XCB_CW_OVERRIDE_REDIRECT |
+        XCB_CW_COLORMAP, data);
+
+    data[0] = XCB_EVENT_MASK_BUTTON_PRESS |
+        XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY;
+
+    xcb_reparent_window(xcb_connection, window_id, window->parent, 0, 0);
+    xcb_change_window_attributes(xcb_connection, window->parent,
+        XCB_CW_EVENT_MASK, data);
+
+    push_to_vector(managed_windows, window);
+
+    change_window_geometry(window_id, window->x, window->y,
+        window->height, window->width);
+
+    debug_output("Window created and added to vector");
 
     return 1;
 }
 
-void
-unfocus_window()
-{
+void unmanage_window(xcb_window_t window_id) {
+    if (focused_window == window_id)
+        focused_window = XCB_WINDOW_NONE;
+
+    unsigned int index = 0;
+
+    workspace_t *workspace = NULL;
+    for (; index < workspaces->size; index++) {
+        workspace = get_from_vector(workspaces, index);
+        if (workspace->focused_window == window_id)
+            workspace->focused_window = XCB_WINDOW_NONE;
+    }
+
+    index = 0;
+
+    window_t *window = NULL; 
+    for (; index < managed_windows->size; index++) {
+        window = get_from_vector(managed_windows, index);
+        if (window->id == window_id) {
+            pull_from_vector(managed_windows, index);
+
+            xcb_destroy_window(xcb_connection, window->parent);
+            free(window);
+
+            return;
+        }
+    }
+}
+
+window_t *get_window_from_id(xcb_window_t window_id) {
+    window_t *window = NULL;
+
+    for (unsigned int index = 0; index < managed_windows->size; index++) {
+        window = get_from_vector(managed_windows, index);
+        if (window->id == window_id)
+            return window;
+    }
+
+    return NULL;
+}
+
+xcb_window_t get_focused_window() {
+    xcb_window_t window_id = focused_window;
+
+    if (window_id == screen->root || window_id == ewmh_window_id ||
+        window_id == XCB_WINDOW_NONE)
+        return 0;
+
+    return window_id;
+}
+
+void focus_on_window(xcb_window_t window_id) {
     debug_output("Called");
 
-    xcb_set_input_focus(xcb_connection, XCB_INPUT_FOCUS_POINTER_ROOT,
-        screen->root, XCB_CURRENT_TIME);
+    /* Unfocus the window */
 
-    xcb_ewmh_set_active_window(ewmh_connection, 0, XCB_WINDOW_NONE);
+    xcb_window_t previously_focused_window = get_focused_window();
 
-    if (focused_window) {
-        xcb_window_t window_id = focused_window->id;
-        focused_window = NULL;
+    debug_output("Testing last focused window");
 
-        xcb_grab_button(xcb_connection, 0, window_id,
+    if (previously_focused_window) {
+        if (previously_focused_window == window_id)
+            return;
+
+        focused_window = XCB_WINDOW_NONE;
+
+        xcb_grab_button(xcb_connection, 0, previously_focused_window,
             XCB_EVENT_MASK_BUTTON_PRESS, XCB_GRAB_MODE_ASYNC,
             XCB_GRAB_MODE_ASYNC, XCB_NONE, XCB_NONE, XCB_BUTTON_INDEX_ANY,
             XCB_MOD_MASK_ANY);
 
-        border_update(window_id);
+        border_update(previously_focused_window);
     }
-}
 
-void
-focus_on_window(xcb_window_t window_id)
-{
-    debug_output("Called");
+    /* Test if it's a parent window and redirect to the child if so */
 
-    if (focused_window) {
-        if (focused_window->id != window_id) {
-            unfocus_window();
-        } else {
-            return;
+    window_t *window = NULL;
+    for (unsigned int index = 0; index < managed_windows->size; index++) {
+        window = get_from_vector(managed_windows, index);
+
+        if (window->parent == window_id) {
+            debug_output("Parent targeted for focus, redirecting to child");
+            window_id = window->id;
+            break;
         }
     }
 
-    unsigned int data[2] = {
-        XCB_ICCCM_WM_STATE_NORMAL,
-        XCB_NONE
-    };
+    /* Focus on new window */
+
+    unsigned int data[2] = { XCB_ICCCM_WM_STATE_NORMAL, XCB_NONE };
 
     xcb_change_property(xcb_connection, XCB_PROP_MODE_REPLACE, window_id,
         ewmh_connection->_NET_WM_STATE, ewmh_connection->_NET_WM_STATE,
@@ -193,53 +267,52 @@ focus_on_window(xcb_window_t window_id)
 
     xcb_set_input_focus(xcb_connection, XCB_INPUT_FOCUS_POINTER_ROOT,
         window_id, XCB_CURRENT_TIME);
-
     xcb_ewmh_set_active_window(ewmh_connection, 0, window_id);
 
-    Window *window = window_list_get_window(window_id);
+    focused_window = window_id;
 
-    if (window) {
-        focused_window = window;
-        if (focused_workspace->focused_window != window_id)
-            focused_workspace->focused_window = window_id;
+    debug_output("Focus set for manager");
 
-        xcb_ungrab_button(xcb_connection, XCB_BUTTON_INDEX_ANY, window_id,
-            XCB_MOD_MASK_ANY);
-        border_update(window_id);
-    }
+    workspace_t *workspace = get_from_vector(workspaces,
+        focused_workspace - 1);
+    if (workspace->focused_window != window_id)
+        workspace->focused_window = window_id;
+
+    debug_output("Focus set for workspace");
+
+    xcb_ungrab_button(xcb_connection, XCB_BUTTON_INDEX_ANY, window_id,
+        XCB_MOD_MASK_ANY);
+
+    debug_output("Released mouse keys for window");
+
+    border_update(window_id);
+
 }
 
-void
-close_window(xcb_window_t window_id)
-{
+void close_window(xcb_window_t window_id) {
     debug_output("Called");
 
-    if (window_id == screen->root) {
+    if (!get_focused_window())
         return;
-    }
-
-    Window *window = window_list_get_window(window_id);
-
-    if (window) {
-        unmanage_window(window_id);
-    }
 
     xcb_icccm_get_wm_protocols_reply_t protocols;
     xcb_icccm_get_wm_protocols_reply(xcb_connection,
         xcb_icccm_get_wm_protocols(xcb_connection, window_id,
             ewmh_connection->WM_PROTOCOLS), &protocols, NULL);
 
-    xcb_atom_t delete_window_atom;
+    xcb_atom_t delete_atom;
     xcb_intern_atom_reply_t *reply = xcb_intern_atom_reply(xcb_connection,
         xcb_intern_atom(xcb_connection, 0, 16, "WM_DELETE_WINDOW"), NULL);
 
     if (reply) {
-        delete_window_atom = reply->atom;
+        delete_atom = reply->atom;
 
-        debug_output("Attempting to use WM protocols to close window");
+        debug_output("Attempting to use wm protocols to close window");
+        debug_output("%d protocol atoms found", protocols.atoms_len);
 
         for (unsigned int index = 0; index < protocols.atoms_len; index++) {
-            if (protocols.atoms[index] == delete_window_atom) {
+            if (protocols.atoms[index] == delete_atom) {
+                debug_output("Protocol atom found");
 
                 xcb_client_message_event_t event = {
                     .response_type = XCB_CLIENT_MESSAGE,
@@ -248,272 +321,155 @@ close_window(xcb_window_t window_id)
                     .window = window_id,
                     .type = ewmh_connection->WM_PROTOCOLS,
                     .data.data32 = {
-                        delete_window_atom,
+                        delete_atom,
                         XCB_CURRENT_TIME
                     }
                 };
+                debug_output("event created");
 
                 xcb_send_event(xcb_connection, 0, window_id,
                     XCB_EVENT_MASK_NO_EVENT, (char *)&event);
+                debug_output("Event sent");
 
                 xcb_icccm_get_wm_protocols_reply_wipe(&protocols);
+                unmanage_window(window_id);
                 return;
             }
         }
-
     }
 
+    xcb_icccm_get_wm_protocols_reply_wipe(&protocols);
     xcb_kill_client(xcb_connection, window_id);
 
-    debug_output("Window closed via xcb_kill_client(...)");
-
+    unmanage_window(window_id);
+    debug_output("Window closed via xcb_kill_client");
 }
 
-void
-map_window(xcb_window_t window_id)
-{
-    Window *window = window_list_get_window(window_id);
+void map_window(xcb_window_t window_id) {
 
-    if (window) {
-        xcb_map_window(xcb_connection, window_id);
-        window_id = window->parent;
-    }
+    window_t *window = get_window_from_id(window_id);
 
     xcb_map_window(xcb_connection, window_id);
+    if (window)
+        xcb_map_window(xcb_connection, window->parent);
 }
 
-void
-unmap_window(xcb_window_t window_id)
-{
-    Window *window = window_list_get_window(window_id);
+void unmap_window(xcb_window_t window_id) {
+    window_t *window = get_window_from_id(window_id);
 
-    if (window) {
+    xcb_unmap_window(xcb_connection, window_id);
+    if (window)
         xcb_unmap_window(xcb_connection, window->parent);
-    } else { 
-        xcb_unmap_window(xcb_connection, window_id);
-    }
 }
 
-void
-raise_window(xcb_window_t window_id) {
-    Window *window = window_list_get_window(window_id);
+void raise_window(xcb_window_t window_id) {
+    window_t *window = get_window_from_id(window_id);
 
-    if (window) {
+    if (window)
         window_id = window->parent;
-    }
 
-    unsigned int data[1] = {XCB_STACK_MODE_ABOVE};
+    unsigned int data[1] = { XCB_STACK_MODE_ABOVE };
 
     xcb_configure_window(xcb_connection, window_id,
         XCB_CONFIG_WINDOW_STACK_MODE, data);
 }
 
-void
-lower_window(xcb_window_t window_id) {
-    Window *window = window_list_get_window(window_id);
+void lower_window(xcb_window_t window_id) {
+    window_t *window = get_window_from_id(window_id);
 
-    if (window) {
+    if (window)
         window_id = window->parent;
-    }
 
-    unsigned int data[1] = {XCB_STACK_MODE_BELOW};
+    unsigned int data[1] = { XCB_STACK_MODE_BELOW };
 
     xcb_configure_window(xcb_connection, window_id,
         XCB_CONFIG_WINDOW_STACK_MODE, data);
 }
 
-void
-change_window_geometry_pixels(xcb_window_t window_id, unsigned int x,
-    unsigned int y, unsigned int height, unsigned int width)
-{
-    unsigned int data[4] = {x, y, width, height};
+void change_window_geometry(xcb_window_t window_id, unsigned int x,
+    unsigned int y, unsigned int height, unsigned int width) {
+
+    unsigned int x_in_pixels = grid_get_x_offset(x) + grid_offset_left;
+    unsigned int y_in_pixels = grid_get_y_offset(y) + grid_offset_top;
+
+    unsigned int height_in_pixels = grid_get_span_y(height);
+    unsigned int width_in_pixels = grid_get_span_x(width);
+
+    debug_output("Window geometry change %d %d %dx%d",
+        x, y, height, width);
+
+    window_t *window = get_window_from_id(window_id);
+
+    unsigned int data[4];
+
+    /* TODO: create more efficient geometry method
+        (only change window attributes as needed, not all of them
+        regardless of whether or not they are needed)
+        */
+
+    if (window) {
+        window->x = x;
+        window->y = y;
+        window->height = height;
+        window->width = width;
+
+        data[0] = width_in_pixels;
+        data[1] = height_in_pixels;
+
+        xcb_configure_window(xcb_connection, window_id,
+            XCB_CONFIG_WINDOW_HEIGHT | XCB_CONFIG_WINDOW_WIDTH, data);
+
+        window_id = window->parent;
+    }
+
+    data[0] = x_in_pixels;
+    data[1] = y_in_pixels;
+    data[2] = width_in_pixels;
+    data[3] = height_in_pixels;
 
     xcb_configure_window(xcb_connection, window_id, XCB_CONFIG_WINDOW_X |
         XCB_CONFIG_WINDOW_Y | XCB_CONFIG_WINDOW_HEIGHT |
         XCB_CONFIG_WINDOW_WIDTH, data);
 }
 
-void
-change_window_geometry_grid_coordinate(xcb_window_t window_id, unsigned int x,
-    unsigned int y, unsigned int height, unsigned int width)
-{
-    Window *window = window_list_get_window(window_id);
+void border_update(xcb_window_t window_id) {
+    window_t *window = get_window_from_id(window_id);
 
-    unsigned int x_in_pixels = grid_get_offset_x(x) + grid_margin_left;
-    unsigned int y_in_pixels = grid_get_offset_y(y) + grid_margin_top;
-
-    unsigned int height_in_pixels = grid_get_span_y(height);
-    unsigned int width_in_pixels = grid_get_span_x(width);
-
-    xcb_window_t parent = XCB_WINDOW_NONE;
-
-    if (window)
-    {
-        parent = window->parent;
-        window->x = x;
-        window->y = y;
-        window->height = height;
-        window->width = width;
-    }
-
-    resize_window_with_pixels(window_id, height_in_pixels, width_in_pixels);
-
-    if (parent != XCB_WINDOW_NONE)
-        change_window_geometry_pixels(parent, x_in_pixels, y_in_pixels,
-            height_in_pixels, width_in_pixels);
-}
-
-void
-move_window_to_pixel_coordinate(xcb_window_t window_id, unsigned int x,
-    unsigned int y)
-{
-    unsigned int data[2] = {x, y};
-
-    xcb_configure_window(xcb_connection, window_id,
-        XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y, data);
-}
-
-void
-move_window_to_grid_coordinate(xcb_window_t window_id, unsigned int x,
-    unsigned int y)
-{
-    unsigned int x_in_pixels = grid_get_offset_x(x) + grid_margin_left;
-    unsigned int y_in_pixels = grid_get_offset_y(y) + grid_margin_top;
-
-    Window *window = window_list_get_window(window_id);
-
-    if (window) {
-        window_id = window->parent;
-        window->x = x;
-        window->y = y;
-    }
-
-    move_window_to_pixel_coordinate(window_id, x_in_pixels, y_in_pixels);
-}
-
-void
-resize_window_with_pixels(xcb_window_t window_id, unsigned int height,
-    unsigned int width)
-{
-    unsigned int data[2] = {width, height};
-
-    xcb_configure_window(xcb_connection, window_id,
-        XCB_CONFIG_WINDOW_HEIGHT | XCB_CONFIG_WINDOW_WIDTH, data);
-}
-
-void
-resize_window_with_grid_units(xcb_window_t window_id, unsigned int height,
-    unsigned int width)
-{
-    unsigned int height_in_pixels = grid_get_span_y(height);
-    unsigned int width_in_pixels = grid_get_span_x(width);
-
-    Window *window = window_list_get_window(window_id);
-
-    if (window) {
-        resize_window_with_pixels(window_id, height_in_pixels,
-            width_in_pixels);
-        window_id = window->parent;
-        window->height = height;
-        window->width = width;
-    }
-
-    resize_window_with_pixels(window_id, height_in_pixels, width_in_pixels);
-}
-
-void
-fullscreen(xcb_window_t window_id)
-{
-    Window *window = window_list_get_window(window_id);
-
-    if (!window) {
+    if (!window || border_type == 0)
         return;
-    }
 
-    if (window->fullscreen)  {
-        return;
-    }
+    debug_output("Border update issued");
 
-    window->fullscreen = 1;
-
-    unsigned int border_width[1] = {0};
-
-    xcb_configure_window(xcb_connection, window->parent,
-        XCB_CONFIG_WINDOW_BORDER_WIDTH, border_width);
-
-    move_window_to_pixel_coordinate(window->parent, 0, 0);
-    resize_window_with_pixels(window->parent, screen->height_in_pixels,
-        screen->width_in_pixels);
-    resize_window_with_pixels(window_id, screen->height_in_pixels,
-        screen->width_in_pixels);
-
-}
-
-void
-window(xcb_window_t window_id)
-{
-    Window *window = window_list_get_window(window_id);
-
-    if (!window) {
-        return;
-    }
-
-    if (!window->fullscreen) {
-        return;
-    }
-
-    window->fullscreen = 0;
-
-    move_window_to_grid_coordinate(window_id, window->x, window->y);
-    resize_window_with_grid_units(window_id, window->height, window->width);
-    border_update(window_id);
-}
-
-void
-border_update(xcb_window_t window_id)
-{
-    Window *window = window_list_get_window(window_id);
-
-    if (!window || border_type == 0) {
-        return;
-    }
-
-    xcb_get_geometry_reply_t *geometry = xcb_get_geometry_reply(xcb_connection,
+    xcb_get_geometry_reply_t *geometry;
+    geometry = xcb_get_geometry_reply(xcb_connection,
         xcb_get_geometry(xcb_connection, window->parent), NULL);
 
-    if (!geometry) {
+    if (!geometry)
         return;
-    }
 
-    unsigned int data[1] = {border_total_size};
+    debug_output("Geometry check passed");
+
+    unsigned int data[1] = { border_total_size };
 
     xcb_configure_window(xcb_connection, window->parent,
         XCB_CONFIG_WINDOW_BORDER_WIDTH, data);
-
-    debug_output("Selecting border update method");
 
     unsigned int colors[2] = {
         border_unfocused_color,
         border_background_color
     };
 
-    debug_output("Colors: %x %x %x", border_focused_color,
-        border_unfocused_color, border_background_color);
+    unsigned short focused = 0;
 
-    short unsigned int focused = 0;
-    if (focused_window) {
-        if (focused_window->id == window_id) {
-            focused = 1;
-        }
-    }
+    if (get_focused_window() == window_id)
+        focused = 1;
 
     if (focused) {
         if (border_invert_colors) {
             colors[1] = border_focused_color;
             colors[0] = border_background_color;
-        } else {
+        } else
             colors[0] = border_focused_color;
-        }
     } else {
         if (border_invert_colors) {
             colors[1] = border_unfocused_color;
@@ -521,26 +477,26 @@ border_update(xcb_window_t window_id)
         }
     }
 
+    debug_output("Selecting update method");
+
     if (border_type == 1) {
+        debug_output("Border method XCB_CW_BORDER_PIXEL");
         data[0] = colors[0];
 
         xcb_change_window_attributes(xcb_connection, window->parent,
             XCB_CW_BORDER_PIXEL, data);
-
     } else {
+        debug_output("Border method pixmap + graphics_context");
+        unsigned short height = geometry->height + (border_total_size * 2);
+        unsigned short width = geometry->width + (border_total_size * 2);
 
-        short unsigned height = geometry->height + (border_total_size * 2);
-        short unsigned width = geometry->width + (border_total_size * 2);
-
-        xcb_rectangle_t outer_border[4] = {
-            {0, 0, width, height}
-        };
+        xcb_rectangle_t outer_border[4] = { { 0, 0, width, height } };
 
         xcb_pixmap_t pixmap = xcb_generate_id(xcb_connection);
         xcb_gcontext_t graphics_context = xcb_generate_id(xcb_connection);
 
-        xcb_create_pixmap(xcb_connection, 32, pixmap, screen->root,
-            width, height);
+        xcb_create_pixmap(xcb_connection, 32, pixmap, screen->root, width,
+            height);
         xcb_create_gc(xcb_connection, graphics_context, pixmap, 0, NULL);
 
         data[0] = colors[1];
@@ -593,10 +549,8 @@ border_update(xcb_window_t window_id)
                 }
             };
 
-
             xcb_poly_fill_rectangle(xcb_connection, pixmap, graphics_context,
                 5, double_border);
-
         } else if (border_type == 3) {
             xcb_rectangle_t triple_border[8] = {
 
@@ -666,7 +620,6 @@ border_update(xcb_window_t window_id)
                 } /* Bottom-left */
             };
 
-
             xcb_poly_fill_rectangle(xcb_connection, pixmap, graphics_context,
                 8, triple_border);
         }
@@ -677,6 +630,5 @@ border_update(xcb_window_t window_id)
 
         xcb_free_pixmap(xcb_connection, pixmap);
         xcb_free_gc(xcb_connection, graphics_context);
-
     }
 }

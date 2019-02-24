@@ -1,29 +1,28 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include "custard.h"
-
-#include <xcb/xcb.h>
-
-struct Window {
+typedef struct {
     xcb_window_t id;
     xcb_window_t parent;
-    short unsigned int mapped;
-    short unsigned int fullscreen;
+
     unsigned int x;
     unsigned int y;
-    unsigned int width;
     unsigned int height;
-    short unsigned int workspace;
-    /* TODO: store rule pointer in the window itself? */
-};
+    unsigned int width;
 
-short unsigned int manage_window(xcb_window_t);
-short unsigned int unmanage_window(xcb_window_t);
-void update_window_borders(void);
+    unsigned short fullscreen;
 
-void unfocus_window(void);
+    unsigned int workspace;
+} window_t;
+
+unsigned short manage_window(xcb_window_t);
+void unmanage_window(xcb_window_t);
+
+window_t *get_window_from_id(xcb_window_t);
+xcb_window_t get_focused_window(void);
+
 void focus_on_window(xcb_window_t);
+
 void close_window(xcb_window_t);
 
 void map_window(xcb_window_t);
@@ -32,29 +31,9 @@ void unmap_window(xcb_window_t);
 void raise_window(xcb_window_t);
 void lower_window(xcb_window_t);
 
-void fullscreen(xcb_window_t);
-void window(xcb_window_t);
-
-void change_window_geometry_pixels(xcb_window_t, unsigned int, unsigned int,
+void change_window_geometry(xcb_window_t, unsigned int, unsigned int,
     unsigned int, unsigned int);
-void change_window_geometry_grid_coordinate(xcb_window_t, unsigned int,
-    unsigned int, unsigned int, unsigned int);
-
-void move_window_to_pixel_coordinate(xcb_window_t, unsigned int, unsigned int);
-void move_window_to_grid_coordinate(xcb_window_t, unsigned int, unsigned int);
-
-void resize_window_with_pixels(xcb_window_t, unsigned int, unsigned int);
-void resize_window_with_grid_units(xcb_window_t, unsigned int, unsigned int);
-
-void move_window_cardinal(xcb_window_t, cardinal_direction_t);
-void expand_window_cardinal(xcb_window_t, cardinal_direction_t);
-void contract_window_cardinal(xcb_window_t, cardinal_direction_t);
 
 void border_update(xcb_window_t);
-void border_update_single(xcb_window_t);
-void border_update_double(xcb_window_t);
-void border_update_triple(xcb_window_t);
-void border_update_with_graphics_context(xcb_window_t, xcb_rectangle_t*,
-    unsigned int);
 
 #endif /* WINDOW_H */

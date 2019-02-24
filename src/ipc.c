@@ -1,258 +1,270 @@
-#include "ipc.h"
-
-#include "config.h"
-#include "grid.h"
-#include "utilities.h"
-#include "window.h"
-#include "workspace.h"
-#include "xcb.h"
-
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-struct ipc_command ipc_commands[][NUMCOMMANDS] = {
-    {{"custard",     "stop",             ipc_custard_halt}},
-    {{"custard",     "configure",        ipc_custard_configure}},
-    {{"custard",     "new geometry",     ipc_custard_new_geometry}},
-    {{"custard",     "new rule",         ipc_custard_new_rule}},
+#include "custard.h"
+#include "grid.h"
+#include "ipc.h"
+#include "rules.h"
+#include "window.h"
+#include "workspaces.h"
+#include "xcb.h"
 
-    {{"window",      "close",            ipc_window_close}},
-    {{"window",      "raise",            ipc_window_raise}},
-    {{"window",      "lower",            ipc_window_lower}},
-    {{"window",      "change geometry",  ipc_window_change_geometry}},
+struct ipc_command ipc_commands[][number_of_ipc_commands] = {
+    {{ "halt",              ipc_command_wm_halt }},
+    {{ "configure",         ipc_command_wm_configure }},
+    {{ "reconfigure",       ipc_command_wm_reconfigure }},
 
-    {{"workspace",   "focus",            ipc_workspace_focus}}
+    {{ "create.geometry",   ipc_command_new_geometry }},
+    {{ "create.rule",       ipc_command_new_window_rule }},
+
+    {{ "window.close",      ipc_command_window_close }},
+    {{ "window.raise",      ipc_command_window_raise}},
+    {{ "window.lower",      ipc_command_window_lower}},
+    {{ "window.geometry",   ipc_command_window_change_geometry }},
+
+    {{ "workspace",         ipc_command_change_workspace }},
 };
 
-void
-process_command(char *input)
-{
-    debug_output("beginning of received input >>\n %s <<end of received input", input);
-
-    char *target;
-    char *action;
-    char *arguments[8];
+void process_input(char *data) {
+    debug_output("Input data\n\t%s", data);
 
     char *token;
+    char delimiter[2] = { 29, '\0' };
+
+    char *descriptor;
+    char *arguments[8];
+
     unsigned int index = 0;
 
-    token = strtok(input, ";");
-
-    while (token) {
-        if (index == 0) {
-            target = token;
-        } else if (index == 1) {
-            action = token;
-        } else {
-            arguments[index - 2] = token;
+    while ((token = strsep(&data, delimiter))) {
+        if (index == 9) {
+            debug_output("Input has more arguments than accepted, ignoring");
+            return;
         }
 
-        token = NULL;
-        if (++index < 10) {
-            token = strtok(NULL, ";");
-        }
+        if (index < 1)
+            descriptor = token;
+        else
+            arguments[index - 1] = token;
+        index++;
     }
 
-    if (!target || !action) {
-        return;
-    }
+    index = 0;
 
-    debug_output("Input split");
+    unsigned short flush;
+    struct ipc_command *command = NULL;
 
-    short unsigned flush;
-    struct ipc_command *command;
-    for (unsigned int index = 0; index < NUMCOMMANDS; index++) {
+    for (; index < number_of_ipc_commands; index++) {
         command = ipc_commands[index];
 
-        if (strcmp(target, command->target))
+        if (strcmp(descriptor, command->command))
             continue;
 
-        if (strcmp(action, command->action))
-            continue;
-
-        /* Found the match, now what? */
         flush = command->routine(arguments);
 
         if (flush)
             commit();
+    }
+}
 
-        return;
+unsigned short parse_boolean(char *string) {
+    if (string && (!strcmp(string, "True") || !strcmp(string, "true")))
+        return 1;
+
+    return 0;
+}
+
+unsigned int parse_unsigned_integer(char *string) {
+    if (string)
+        return atoi(string);
+
+    return 0;
+}
+
+unsigned int parse_rgba_color(char *string) {
+    unsigned int rgba = 0x000000ff;
+
+    if (string) {
+        char groups[9] = {
+            string[1], string[2], /* R */
+            string[3], string[4], /* G */
+            string[5], string[6], /* B */
+            string[7], string[8], /* A */
+            '\0'
+        };
+
+        rgba = strtol(groups, NULL, 16);
     }
 
-    return;
+    unsigned int alpha, red, green, blue;
+
+    alpha   = (rgba & 0x000000ff);
+    red     = (((rgba & 0xff000000) / 0x1000000) * alpha) / 255;
+    green   = (((rgba & 0x00ff0000) / 0x10000) * alpha) / 255;
+    blue    = (((rgba & 0x0000ff00) / 0x100) * alpha) / 255;
+
+    unsigned int value = (alpha * 0x1000000) |
+        (red * 0x10000) | (green * 0x100) | blue;
+
+    return value;
 }
 
-short unsigned
-ipc_custard_halt(char **arguments) 
-{
-    wm_running = 0;
+/* IPC commands */
+
+unsigned short ipc_command_wm_halt(char **arguments) {
+    suppress_unused(arguments);
+
+    window_manager_is_running = 0;
     return 0;
 }
 
-short unsigned
-ipc_custard_configure(char **arguments)
-{
-    if (strcmp("grid_rows", arguments[0]) == 0) {
-        grid_rows = parse_unsigned_integer(arguments[1]);
-    } else if (strcmp("grid_columns", arguments[0]) == 0) {
-        grid_columns = parse_unsigned_integer(arguments[1]);
-    } else if (strcmp("grid_gap", arguments[0]) == 0) {
-        grid_gap = parse_unsigned_integer(arguments[1]);
-    } else if (strcmp("grid_margin_top", arguments[0]) == 0) {
-        grid_margin_top = parse_unsigned_integer(arguments[1]);
-    } else if (strcmp("grid_margin_bottom", arguments[0]) == 0) {
-        grid_margin_bottom = parse_unsigned_integer(arguments[1]);
-    } else if (strcmp("grid_margin_left", arguments[0]) == 0) {
-        grid_margin_left = parse_unsigned_integer(arguments[1]);
-    } else if (strcmp("grid_margin_right", arguments[0]) == 0) {
-        grid_margin_right = parse_unsigned_integer(arguments[1]);
-    } else if (strcmp("border_type", arguments[0]) == 0) {
-        border_type = parse_unsigned_integer(arguments[1]);
+unsigned short ipc_command_wm_configure(char **arguments) {
+    char *setting = arguments[0];
 
-        if (border_type > 3) {
-            border_type = 3;
-        }
-    } else if (strcmp("border_inner_size", arguments[0]) == 0) {
-        border_inner_size = parse_unsigned_integer(arguments[1]);
+    unsigned short boolean = parse_boolean(arguments[1]);
+    unsigned int uint = parse_unsigned_integer(arguments[1]);
+    unsigned int argb = parse_rgba_color(arguments[1]);
 
-        if (border_type == 0) {
-            border_total_size = 0;
-        } else {
-            border_total_size = border_inner_size +
-                ((border_type - 1) * border_outer_size);
-        }
-    } else if (strcmp("border_outer_size", arguments[0]) == 0) {
-        border_outer_size = parse_unsigned_integer(arguments[1]);
+    if (!strcmp("debug", setting))
+        debug_mode = boolean;
+    else if (!strcmp("grid.rows", setting))
+        grid_rows = uint;
+    else if (!strcmp("grid.columns", setting))
+        grid_columns = uint;
+    else if (!strcmp("grid.gap", setting))
+        grid_gap = uint;
+    else if (!strcmp("grid.offset.top", setting))
+        grid_offset_top = uint;
+    else if (!strcmp("grid_offset_bottom", setting))
+        grid_offset_bottom = uint;
+    else if (!strcmp("grid_offset_left", setting))
+        grid_offset_left = uint;
+    else if (!strcmp("grid_offset_right", setting))
+        grid_offset_right = uint;
+    else if (!strcmp("border.type", setting))
+        border_type = uint;
+    else if (!strcmp("border.inner.size", setting))
+        border_inner_size = uint;
+    else if (!strcmp("border.outer.size", setting))
+        border_outer_size = uint;
+    else if (!strcmp("border.color.focused", setting))
+        border_focused_color = argb;
+    else if (!strcmp("border.color.unfocused", setting))
+        border_unfocused_color = argb;
+    else if (!strcmp("border.color.background", setting))
+        border_background_color = argb;
+    else if (!strcmp("border.color.switch", setting))
+        border_invert_colors = boolean;
+    else if (!strcmp("workspaces", setting))
+        number_of_workspaces = uint;
 
-        if (border_type == 0) {
-            border_total_size = 0;
-        } else {
-            border_total_size = border_inner_size +
-                ((border_type - 1) * border_outer_size);
-        }
+    return 0;
+}
 
-    } else if (strcmp("border_focused_color", arguments[0]) == 0) {
-        border_focused_color = parse_rgba_color(arguments[1]);
-    } else if (
-        strcmp("border_unfocused_color", arguments[0]) == 0) {
-        border_unfocused_color = parse_rgba_color(arguments[1]);
-    } else if (
-        strcmp("border_background_color", arguments[0]) == 0) {
-        border_background_color = parse_rgba_color(arguments[1]);
+unsigned short ipc_command_wm_reconfigure(char **arguments) {
+    suppress_unused(arguments);
+
+    if (border_type == 0)
+        border_total_size = 0;
+    else if (border_type == 1) {
+        border_total_size = border_outer_size;
+
+        if (border_inner_size > border_outer_size)
+            border_total_size = border_inner_size;
+    } else {
+        border_total_size = border_inner_size +
+            ((border_type - 1) * border_outer_size);
     }
 
-                /* Missing: border_invert_colors, workspaces */
+    apply_configuration_to_grid();
 
-    grid_apply_configuration();
+    unsigned int index = 0;
+
+    window_t *window = NULL;
+    for (; index < managed_windows->size; index++) {
+        window = get_from_vector(managed_windows, index);
+        border_update(window->id);
+    }
+
+    for (; index < number_of_workspaces; index++)
+        create_new_workspace();
 
     return 1;
 }
 
-short unsigned
-ipc_custard_new_geometry(char **arguments)
-{
-    new_geometry(arguments[0],
-        parse_unsigned_integer(arguments[1]),
-        parse_unsigned_integer(arguments[2]),
-        parse_unsigned_integer(arguments[3]),
-        parse_unsigned_integer(arguments[4]));
+unsigned short ipc_command_new_geometry(char **arguments) {
+    unsigned int x, y, height, width;
+
+    x = parse_unsigned_integer(arguments[1]);
+    y = parse_unsigned_integer(arguments[2]);
+    height = parse_unsigned_integer(arguments[3]);
+    width = parse_unsigned_integer(arguments[4]);
+
+    create_new_geometry(arguments[0], x, y, height, width);
+    return 0;
+}
+
+unsigned short ipc_command_new_window_rule(char **arguments) {
+    create_new_rule(arguments[0], arguments[1]);
 
     return 0;
 }
 
-short unsigned
-ipc_custard_new_rule(char **arguments)
-{
-    new_geometry_rule(
-        (window_attribute_t)parse_unsigned_integer(arguments[0]),
-        arguments[1],
-        arguments[2]);
+unsigned short ipc_command_window_close(char **arguments) {
+    suppress_unused(arguments);
 
-    return 0;
-}
-
-short unsigned
-ipc_window_close(char **arguments)
-{
-    if (!focused_window)
+    if (!get_focused_window())
         return 0;
 
-    xcb_window_t window_id = focused_window->id;
-
-    close_window(window_id);
+    close_window(focused_window);
 
     return 1;
 }
 
-short unsigned
-ipc_window_raise(char **arguments)
-{
-    if (!focused_window)
+unsigned short ipc_command_window_raise(char **arguments) {
+    suppress_unused(arguments);
+
+    if (!get_focused_window())
         return 0;
 
-    xcb_window_t window_id = focused_window->id;
-
-    raise_window(window_id);
-
+    raise_window(focused_window);
     return 1;
 }
 
-short unsigned
-ipc_window_lower(char **arguments)
-{
-    if (!focused_window)
+unsigned short ipc_command_window_lower(char **arguments) {
+    suppress_unused(arguments);
+
+    if (!get_focused_window())
         return 0;
 
-    xcb_window_t window_id = focused_window->id;
-
-    lower_window(window_id);
-
+    lower_window(focused_window);
     return 1;
 }
 
-short unsigned
-ipc_window_change_geometry(char **arguments)
-{
-    if (!focused_window)
+unsigned short ipc_command_window_change_geometry(char **arguments) {
+    if (!get_focused_window())
         return 0;
 
-    xcb_window_t window_id = focused_window->id;
+    named_geometry_t *geometry = NULL;
+    for (unsigned int index = 0; index < named_geometries->size; index++) {
+        geometry = get_from_vector(named_geometries, index);
 
-    struct LinkedListElement *element = geometry_list_head;
+        if (!strcmp(geometry->name, arguments[0])) {
+            change_window_geometry(focused_window,
+                geometry->x, geometry->y, geometry->height, geometry->width);
 
-    if (!element)
-        return 0;
-
-    while (element) {
-        debug_output("Testing geometry %s to %s.",
-            ((Geometry *)element->data)->name, arguments[0]);
-        if (strcmp(((Geometry *)element->data)->name,
-            arguments[0]) == 0) {
-
-            change_window_geometry_grid_coordinate(window_id,
-                ((Geometry *)element->data)->x,
-                ((Geometry *)element->data)->y,
-                ((Geometry *)element->data)->height,
-                ((Geometry *)element->data)->width);
-
-            border_update(window_id);
+            if (get_window_from_id(focused_window))
+                border_update(focused_window);
 
             return 1;
         }
-
-        element = element->next;
     }
 
     return 0;
 }
 
-short unsigned
-ipc_workspace_focus(char **arguments)
-{
-    unsigned int workspace = parse_unsigned_integer(arguments[0]);
-
-    focus_on_workspace(workspace);
+unsigned short ipc_command_change_workspace(char **arguments) {
+    focus_on_workspace(parse_unsigned_integer(arguments[0]));
 
     return 1;
 }

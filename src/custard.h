@@ -3,50 +3,49 @@
 
 #include <xcb/xcb.h>
 
-#define event_mask XCB_CW_EVENT_MASK
+#include "vector.h"
 
-typedef struct Geometry Geometry;
-typedef struct GeometryRule GeometryRule;
-typedef struct Window Window;
+extern unsigned short window_manager_is_running;
 
-extern unsigned short debug;
-extern unsigned short wm_running;
-extern const char *config_path;
+extern vector_t *managed_windows;
+extern vector_t *named_geometries;
+extern vector_t *window_rules;
+extern vector_t *workspaces;
 
-extern int xcb_file_descriptor;
+extern xcb_window_t focused_window;
+extern unsigned int focused_workspace;
 
-struct LinkedListElement {
-    void *next;
-    void *data;
-};
+extern unsigned short debug_mode;
 
-extern struct LinkedListElement *window_list_head;
-extern Window *focused_window;
+extern unsigned short border_type;
+extern unsigned short border_invert_colors;
 
-typedef enum {
-    NORTH,
-    SOUTH,
-    WEST,
-    EAST,
-    NORTHWEST,
-    NORTHEAST,
-    SOUTHWEST,
-    SOUTHEAST,
-    ALL
-} cardinal_direction_t;
+extern unsigned int border_inner_size;
+extern unsigned int border_outer_size;
+extern unsigned int border_total_size;
 
-unsigned int window_list_get_size(void);
-unsigned short window_list_append_window(Window*);
-unsigned short window_list_remove_window(xcb_window_t);
-Window *window_list_get_window(xcb_window_t);
+extern unsigned int border_focused_color;
+extern unsigned int border_unfocused_color;
+extern unsigned int border_background_color;
 
-void _debug(const char*, const char*, const int, char*, ...);
-//#define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
-#define debug_output(...) _debug(__FILE__, __func__, __LINE__, __VA_ARGS__)
+extern unsigned int grid_rows;
+extern unsigned int grid_columns;
+
+extern unsigned int grid_gap;
+extern unsigned int grid_offset_top;
+extern unsigned int grid_offset_bottom;
+extern unsigned int grid_offset_left;
+extern unsigned int grid_offset_right;
+
+extern unsigned int number_of_workspaces;
 
 int start_custard(void);
 void stop_custard(void);
 
-void focus_next_window(void);
+void signal_handler(int);
+
+void _debug_output(const char*, const char*, const int, char*, ...);
+#define debug_output(...) \
+    _debug_output(__FILE__, __func__, __LINE__, __VA_ARGS__)
 
 #endif /* CUSTARD_H */

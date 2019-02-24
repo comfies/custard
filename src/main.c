@@ -1,69 +1,40 @@
-#include <ctype.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <math.h>
-#include <getopt.h>
-#include <sys/socket.h>
-#include <sys/select.h>
-#include <sys/types.h>
-#include <sys/un.h>
 
 #include <xcb/xcb.h>
 #include <xcb/xcb_ewmh.h>
 #include <xcb/xcb_icccm.h>
 
 #include "custard.h"
-
-#include "ipc.h"
-#include "config.h"
-#include "xcb.h"
-#include "ewmh.h"
+#include "controller.h"
 #include "socket.h"
-#include "handlers.h"
-#include "grid.h"
-#include "window.h"
-#include "workspace.h"
 
-int
-main(int argc, char** argv)
-{
+int main(int argc, char **argv) {
+    if (argc >= 2 && !strcmp("--", argv[1])) {
+        debug_output("Starting controller");
 
-    int commandline_argument;
+        if (!initialize_controller())
+            return EXIT_FAILURE;
 
-    while ((commandline_argument = getopt(argc, argv, "hdc:")) != -1) {
-        switch (commandline_argument) {
-            case 'h':
-                printf("%s\n", "custard 2.0");
-                exit(EXIT_SUCCESS);
-                break;
-            case 'd':
-                debug = 1;
-                debug_output("Debug log enabled via command-line.");
-                break;
-            case 'c':
-                config_path = optarg;
-                if (config_path[0] == '=') {
-                    config_path++;
-                }
-                break;
+        char **arguments = malloc(sizeof(char *) * (argc - 2));
 
-            case '?':
-                if (optopt == 'c') {
-                    fprintf(stderr, "Option -c requires an argument.\n");
-                    exit(EXIT_FAILURE);
-                } else if (isprint(optopt)) {
-                    fprintf(stderr, "Unknown option -%c.\n", optopt);
-                    exit(EXIT_FAILURE);
-                } else {
-                    fprintf(stderr, "Unknown option character \\x%x.\n", optopt);
-                    exit(EXIT_FAILURE);
-                }
+        for (int index = 2; index < argc; index++) {
+            arguments[index - 2] = malloc(strlen(argv[index]) + 1);
+            strcpy(arguments[index - 2], argv[index]);
         }
+
+        controller_input(argc - 2, arguments);
+
+        finalize_controller();
+
+        for (int index = 0; index < (argc - 2); index++)
+            free(arguments[index]);
+        free(arguments);
+
+        return EXIT_SUCCESS;
     }
 
+    debug_output("Starting window manager");
+
     return start_custard();
-
 }
-

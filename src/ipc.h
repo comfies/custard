@@ -1,28 +1,34 @@
 #ifndef IPC_H
 #define IPC_H
 
-#define NUMCOMMANDS 9
+#define suppress_unused(parameter) (void)(parameter)
+#define number_of_ipc_commands 10
 
 struct ipc_command {
-    char *target;
-    char *action;
-    short unsigned (*routine)(char **);
+    char *command;
+    unsigned short (*routine)(char **);
 };
 
-extern struct ipc_command ipc_commands[][NUMCOMMANDS];
+extern struct ipc_command ipc_commands[][number_of_ipc_commands];
 
-void process_command(char*);
+void process_input(char*);
 
-short unsigned ipc_custard_halt(char **);
-short unsigned ipc_custard_configure(char **);
-short unsigned ipc_custard_new_geometry(char **);
-short unsigned ipc_custard_new_rule(char **);
+unsigned short parse_boolean(char *);
+unsigned int parse_unsigned_integer(char *);
+unsigned int parse_rgba_color(char *);
 
-short unsigned ipc_window_close(char **);
-short unsigned ipc_window_raise(char **);
-short unsigned ipc_window_lower(char **);
-short unsigned ipc_window_change_geometry(char **);
+unsigned short ipc_command_wm_halt(char **);
+unsigned short ipc_command_wm_configure(char **);
+unsigned short ipc_command_wm_reconfigure(char **);
 
-short unsigned ipc_workspace_focus(char **);
+unsigned short ipc_command_new_geometry(char **);
+unsigned short ipc_command_new_window_rule(char **);
+
+unsigned short ipc_command_window_close(char **);
+unsigned short ipc_command_window_raise(char **);
+unsigned short ipc_command_window_lower(char **);
+unsigned short ipc_command_window_change_geometry(char **);
+
+unsigned short ipc_command_change_workspace(char **);
 
 #endif /* IPC_H */

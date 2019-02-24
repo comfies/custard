@@ -1,93 +1,86 @@
-#include "socket.h"
-
-#include "custard.h"
-#include "config.h"
-#include "ipc.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <netinet/in.h>
-#include <sys/un.h>
 #include <unistd.h>
+#include <sys/un.h>
 #include <sys/socket.h>
 
-int socket_file_descriptor;
+#include "custard.h"
+#include "ipc.h"
+#include "socket.h"
 
-unsigned short int
-initialize_socket()
-{
+int socket_file_descriptor;
+socket_mode_t socket_mode;
+
+unsigned short initialize_socket() {
     struct sockaddr_un address;
 
     memset(&address, 0, sizeof(address));
     address.sun_family = AF_UNIX;
-    snprintf(address.sun_path, sizeof(address.sun_path), SOCKET_PATH);
-    unlink(SOCKET_PATH);
+
+    snprintf(address.sun_path, sizeof(address.sun_path), "/tmp/custard.sock");
 
     socket_file_descriptor = socket(AF_UNIX, SOCK_STREAM, 0);
 
-    if (socket_file_descriptor == -1) {
-        debug_output("Invalid file descriptor, unable to create socket");
+    if (!socket_file_descriptor) {
+        debug_output("Unable to open socket");
         return 0;
     }
 
-    if (bind(socket_file_descriptor,
-        (struct sockaddr *)&address, sizeof(address)) == -1) {
-        debug_output("Unable to bind socket");
-        return 0;
-    }
+    if (socket_mode == WINDOW_MANAGER) {
+        if (bind(socket_file_descriptor, (struct sockaddr *)&address,
+            sizeof(address)) < 0) {
+            debug_output("Unable to bind socket");
+            return 0;
+        }
 
-    if (listen(socket_file_descriptor, 1) == -1) {
-        debug_output("Unable to listen to socket");
-        return 0;
+        if (listen(socket_file_descriptor, 1) < 0) {
+            debug_output("Unable to listen to socket");
+            return 0;
+        }
+    } else {
+        if (connect(socket_file_descriptor, (struct sockaddr*)&address,
+            sizeof(address)) < 0) {
+            debug_output("Unable to connect to socket");
+            return 0;
+        }
     }
 
     return 1;
 }
 
-void
-read_socket()
-{
+void finalize_socket() {
+    debug_output("Called");
+
+    if (socket_mode == WINDOW_MANAGER)
+        unlink("/tmp/custard.sock");
+    else
+        close(socket_file_descriptor);
+}
+
+void write_to_socket(char *data) {
+    debug_output("Outputting data to socket\n\t%s", data);
+
+    write(socket_file_descriptor, data, strlen(data));
+
+    return;
+}
+
+void read_from_socket() {
     int command_file_descriptor = accept(socket_file_descriptor, NULL, 0);
 
-    if (command_file_descriptor == -1) {
-        debug_output("Unable to accept connection");
+    if (!command_file_descriptor) {
+        debug_output("Unable to accept connection to socket");
         return;
     }
 
-    debug_output("Reading from socket");
-
     char *data = calloc(1025, sizeof(char));
-
     ssize_t data_length = read(command_file_descriptor, data, 1024);
 
-    if (data_length > 0) {
+    if (data_length) {
         data[data_length] = '\0';
-        process_command(data);
+        process_input(data);
     }
 
     free(data);
-
 }
-
-void *
-start_socket_read_loop(void *pointer)
-{
-    (void)pointer;
-
-    debug_output("Started socket read loop");
-    while (wm_running) {
-        read_socket();
-    }
-
-    return NULL;
-}
-
-void
-finalize_socket()
-{
-    debug_output("Called");
-    unlink(SOCKET_PATH);
-}
-
