@@ -6,9 +6,8 @@
 
 # description
 
-custard is a manual tiling window manager for the X windowing system.  It
-arranges windows in a grid and allows the user to modify which cells of the
-grid each window takes up.
+custard is a manual tiling window manager for the X windowing system. Users
+configure a grid size and create geometries that windows are sized after.
 
 custard is based on [2bwm](https://github.com/venam/2bwm),
 [swm](https://github.com/dcat/swm), [subtle](https://subtle.subforge.org/),
@@ -16,9 +15,7 @@ and [howm](https://github.com/HarveyHunt/howm).
 
 # installing
 
-Installing is done on a per-user basis (except for the man pages).
-Installation will provide the `custard` and `custardctl` commands that are
-necessary for the window manager to function.
+TODO: write this
 
 ## dependencies
 
@@ -59,38 +56,58 @@ custard configuration files.
 ```
 $ git clone https://github.com/Sweets/custard
 $ cd custard
-# make install
-# sudo make install
-# make clean
+$ sudo make install
+$ make clean
 ```
 
 ## post install
 
 # usage
 
-custard works by having a server and a client interact with eachother over
-[the socket](#the-socket), which is a UNIX socket, by default located at
-`/tmp/custard.sock`. The client sends messages over the socket which are
-read by the server and followed through with. Currently, the default method
-of facilitating this is `custardctl` which adds another layer of abstraction
-whereby arguments passed to `custardctl` are translated into the actual
-commands sent to the server.
+The `custard` binary is used as both the window manager and the window manager
+controller based on the arguments passed in the commandline.
+
+The window manager creates a UNIX socket located at `/tmp/custard.sock`, and
+running the `custard` command with two hyphens surrounded by spaces prefixing
+socket command.
 
 ## overview
 
-The socket is located at `/tmp/custard.sock` by default. To interface with
-custard, a string must be sent to the socket, structure as
-`<target>;<action>;<arguments...>`. The maximum accepted buffer size is 1024
-bytes, and there can be at most 8 arguments in a command sent to the socket.
-
-The `target` and `action` are both strings hashed using the djb2 hashing
-algorithm. Arguments are not hashed.
-
 ## socket commands
 
-## using custardctl to manage windows
-
 # configuration
+
+The command structure for configuring custard is the setting name followed
+by the setting value.
+
+```
+$ custard -- configure [setting name] [setting value]
+```
+
+|Setting|Accepted Arguments|Description|
+|-|-|-|
+|`debug`|`True` or `False`|Enables or disables debug mode|
+|`grid.columns`|Any positive integer|Sets the amount of columns for the grid|
+|`grid.rows`|Any positive integer|Sets the amount of rows for the grid|
+|`grid.gap`|Any positive integer|Sets the gap size in pixels|
+|`grid.offset.top`|Any positive integer|Amount of pixels to offset the grid from the top of the screen|
+|`grid.offset.bottom`|Any positive integer|Amount of pixels to offset the grid from the bottom of the screen|
+|`grid.offset.left`|Any positive integer|Amount of pixels to offset the grid from the left of the screen|
+|`grid.offset.right`|Any positive integer|Amount of pixels to offset the grid from the right of the screen|
+|`border.type`|Either `0`, `1`, `2`, or `3`|Sets the border type for windows|
+|`border.inner.size`|Any positive integer|Sets the inner size of the border|
+|`border.outer.size`|Any positive integer|Sets the outer size of the border|
+|`border.color.focused`|#RRGGBBAA|Sets the focused color for borders|
+|`border.color.unfocused`|#RRGGBBAA|Sets the unfocused color for borders|
+|`border.color.background`|#RRGGBBAA|Sets the background color for borders|
+|`border.color.switch`|`True` or `False`|Switches the focused and unfocused or background colors of borders depending on the border.type setting|
+|`workspaces`|Any positive integer|Sets the amount of workspaces|
+
+Too apply the new configuration to custard you must send the reconfigure command.
+
+```
+$ custard -- reconfigure
+```
 
 # contributing
 
