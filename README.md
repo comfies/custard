@@ -73,6 +73,8 @@ socket command.
 
 ## overview
 
+---
+
 ## configuration
 
 The command structure for configuring custard is the setting name followed
@@ -139,6 +141,8 @@ If `border.color.switch` is set to `True`, then custard will swap the focused an
 |-|-|-|-|
 |`debug`|`False`|`True` or `False`|Outputs debug data to STDERR|
 |`workspaces`|`1`|Any positive integer|The number of workspaces|
+
+---
 
 # contributing
 
