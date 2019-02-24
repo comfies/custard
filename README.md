@@ -6,6 +6,18 @@
 
 * **[installation](#installation)**
     * **[dependencies](#dependencies)**
+    * **[automatic install](#automatic-install)**
+    * **[manual install](#manual-install)**
+* **[usage](#usage)**
+    * **[commandline arguments](#commandline-arguments)**
+    * **[using custard with xinit](#using-custard-with-xinit)**
+    * **[using custard with a display manager](#using-custard-with-a-display-manager)**
+* **[configuration](#configuration)**
+    * **[configuring the virtual grid](#configuring-the-virtual-grid)**
+    * **[window borders](#window-borders)**
+        * **[types and sizes](#types-and-sizes)**
+        * **[border colors](#border-colors)**
+        * **[miscellaneous](#miscellaneous)**
 
 # description
 
@@ -46,6 +58,8 @@ $ git clone git://anongit.freedesktop.org/xcb/util-wm
 
 TODO: this
 
+###### [return to table of contents](#table-of-contents)
+
 ## manual install
 
 ```
@@ -55,6 +69,8 @@ $ make
 $ sudo make install
 $ make clean
 ```
+
+###### [return to table of contents](#table-of-contents)
 
 # usage
 
@@ -68,15 +84,21 @@ $ make clean
 If the first argument of the commandline after the `custard` binary is two hyphens
 (`--`) then custard will start as a controller and not as a window manager.
 
+###### [return to table of contents](#table-of-contents)
+
 ## using custard with xinit
+
+###### [return to table of contents](#table-of-contents)
 
 ## using custard with a display manager
 
 TODO: this
 
+###### [return to table of contents](#table-of-contents)
+
 ---
 
-## configuration
+# configuration
 
 The command structure for configuring custard is the setting name followed
 by the setting value.
@@ -91,6 +113,8 @@ to the socket.
 ```
 $ custard -- reconfigure
 ```
+
+###### [return to table of contents](#table-of-contents)
 
 ## configuring the virtual grid
 
@@ -108,6 +132,8 @@ The settings related to the virtual grid, as well as their default values, are l
 |`grid.offset.left`|0|Any positive integer|
 |`grid.offset.right`|0|Any positive integer|
 
+###### [return to table of contents](#table-of-contents)
+
 ## window borders
 
 ### types and sizes
@@ -123,6 +149,8 @@ size.
 |`border.inner.size`|0|Any positive integer|
 |`border.outer.size`|0|Any positive integer|
 
+###### [return to table of contents](#table-of-contents)
+
 ### border colors
 
 Borders can use up to three different colors depending on the border type. You can also swap colors using the `switch` color setting, but a specific set of conditions applies to how this setting works based on the used border type.
@@ -136,12 +164,16 @@ Borders can use up to three different colors depending on the border type. You c
 
 If `border.color.switch` is set to `True`, then custard will swap the focused and unfocused colors. If the border type is set to `1`, this setting will swap the focused color with the background color. If the border type is set to either `2` or `3`, then the setting will swap based on the focused state. If a given window is focused, the background and focused colors are swapped, and if a given window is not focused, the background and unfocused colors are swapped.
 
+###### [return to table of contents](#table-of-contents)
+
 ### miscellaneous
 
 |Setting|Default Value|Accepted Values|Description|
 |-|-|-|-|
 |`debug`|`False`|`True` or `False`|Outputs debug data to STDERR|
 |`workspaces`|`1`|Any positive integer|The number of workspaces|
+
+###### [return to table of contents](#table-of-contents)
 
 ---
 
