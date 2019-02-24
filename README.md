@@ -73,9 +73,7 @@ socket command.
 
 ## overview
 
-## socket commands
-
-# configuration
+## configuration
 
 The command structure for configuring custard is the setting name followed
 by the setting value.
@@ -84,30 +82,63 @@ by the setting value.
 $ custard -- configure [setting name] [setting value]
 ```
 
-|Setting|Accepted Arguments|Description|
-|-|-|-|
-|`debug`|`True` or `False`|Enables or disables debug mode|
-|`grid.columns`|Any positive integer|Sets the amount of columns for the grid|
-|`grid.rows`|Any positive integer|Sets the amount of rows for the grid|
-|`grid.gap`|Any positive integer|Sets the gap size in pixels|
-|`grid.offset.top`|Any positive integer|Amount of pixels to offset the grid from the top of the screen|
-|`grid.offset.bottom`|Any positive integer|Amount of pixels to offset the grid from the bottom of the screen|
-|`grid.offset.left`|Any positive integer|Amount of pixels to offset the grid from the left of the screen|
-|`grid.offset.right`|Any positive integer|Amount of pixels to offset the grid from the right of the screen|
-|`border.type`|Either `0`, `1`, `2`, or `3`|Sets the border type for windows|
-|`border.inner.size`|Any positive integer|Sets the inner size of the border|
-|`border.outer.size`|Any positive integer|Sets the outer size of the border|
-|`border.color.focused`|#RRGGBBAA|Sets the focused color for borders|
-|`border.color.unfocused`|#RRGGBBAA|Sets the unfocused color for borders|
-|`border.color.background`|#RRGGBBAA|Sets the background color for borders|
-|`border.color.switch`|`True` or `False`|Switches the focused and unfocused or background colors of borders depending on the border.type setting|
-|`workspaces`|Any positive integer|Sets the amount of workspaces|
-
-Too apply the new configuration to custard you must send the reconfigure command.
+To apply the new configuration to custard you must issue the reconfigure command
+to the socket.
 
 ```
 $ custard -- reconfigure
 ```
+
+## configuring the virtual grid
+
+custard creates a virtual grid that windows are moved and sized about. By default, there is only two rows and two columns. The grid may also be offset from the top, left, right, or bottom of the screen, as well as create gaps between windows.
+
+The settings related to the virtual grid, as well as their default values, are listed below.
+
+|Setting Name|Default Value|Accepted Values|
+|-|-|-|
+|`grid.rows`|2|Any positive integer|
+|`grid.columns`|2|Any positive integer|
+|`grid.gap`|0|Any positive integer|
+|`grid.offset.top`|0|Any positive integer|
+|`grid.offset.bottom`|0|Any positive integer|
+|`grid.offset.left`|0|Any positive integer|
+|`grid.offset.right`|0|Any positive integer|
+
+## window borders
+
+### types and sizes
+
+Windows can have one of four border types, as well as specific sizes.
+
+If the border type is set to single, the border size is equal to the outer border
+size.
+
+|Setting|Default Value|Accepted Values|
+|-|-|-|
+|`border.type`|0|Any positive number less than 4|
+|`border.inner.size`|0|Any positive integer|
+|`border.outer.size`|0|Any positive integer|
+
+### border colors
+
+Borders can use up to three different colors depending on the border type. You can also swap colors using the `switch` color setting, but a specific set of conditions applies to how this setting works based on the used border type.
+
+|Setting|Default Value|Accepted Values|Conditions|
+|-|-|-|-|
+|`border.color.focused`|#ffffffff|0x00000000 - 0xffffffff|Only shown when a window is focused|
+|`border.color.unfocused`|#ffffffff|0x00000000 - 0xffffffff|Only shown when a window is not focused|
+|`border.color.background`|#ffffffff|0x00000000 - 0xffffffff|Only shown when the border type is `2` or `3`|
+|`border.color.switch`|`False`|`True` or `False`|Conditions outlined below|
+
+If `border.color.switch` is set to `True`, then custard will swap the focused and unfocused colors. If the border type is set to `1`, this setting will swap the focused color with the background color. If the border type is set to either `2` or `3`, then the setting will swap based on the focused state. If a given window is focused, the background and focused colors are swapped, and if a given window is not focused, the background and unfocused colors are swapped.
+
+### miscellaneous
+
+|Setting|Default Value|Accepted Values|Description|
+|-|-|-|-|
+|`debug`|`False`|`True` or `False`|Outputs debug data to STDERR|
+|`workspaces`|`1`|Any positive integer|The number of workspaces|
 
 # contributing
 
