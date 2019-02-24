@@ -13,9 +13,7 @@ custard is based on [2bwm](https://github.com/venam/2bwm),
 [swm](https://github.com/dcat/swm), [subtle](https://subtle.subforge.org/),
 and [howm](https://github.com/HarveyHunt/howm).
 
-# installing
-
-TODO: write this
+# installation
 
 ## dependencies
 
@@ -41,37 +39,35 @@ $ git clone git://anongit.freedesktop.org/xcb/util-wm
 
 ## automatic install
 
-custard comes packaged with a script that automagically compiles and installs
-custard, as well as copying the configuration files to
-`$XDG_CONFIG_HOME/custard/`. The install script assumes that all dependencies
-have been met and will behave unexpectedly if they are not.
-
-### automatic configuration
+TODO: this
 
 ## manual install
-
-Doing the install manually will *not* automatically set up sxhkd or
-custard configuration files.
 
 ```
 $ git clone https://github.com/Sweets/custard
 $ cd custard
+$ make
 $ sudo make install
 $ make clean
 ```
 
-## post install
-
 # usage
 
-The `custard` binary is used as both the window manager and the window manager
-controller based on the arguments passed in the commandline.
+## commandline arguments
 
-The window manager creates a UNIX socket located at `/tmp/custard.sock`, and
-running the `custard` command with two hyphens surrounded by spaces prefixing
-socket command.
+|Argument|Function|
+|-|-|
+|`--debug`|Enables the debug mode from the command-line|
+|`--rc`|Sets the rc file that will be ran when custard starts. The next argument must be a file that is both readable and executable.|
 
-## overview
+If the first argument of the commandline after the `custard` binary is two hyphens
+(`--`) then custard will start as a controller and not as a window manager.
+
+## using custard with xinit
+
+## using custard with a display manager
+
+TODO: this
 
 ---
 
