@@ -5,7 +5,7 @@
 # table of contents
 
 * **[installation](#installation)**
-    * **[installation/dependencies](#dependencies)**
+    * **[dependencies](#dependencies)**
 
 # description
 
@@ -39,6 +39,8 @@ $ git clone git://anongit.freedesktop.org/xcb/libxcb
 $ git clone git://anongit.freedesktop.org/xcb/util
 $ git clone git://anongit.freedesktop.org/xcb/util-wm
 ```
+
+###### [return to table of contents](#table-of-contents)
 
 ## automatic install
 
