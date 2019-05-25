@@ -17,8 +17,14 @@ unsigned short initialize_socket() {
 
     memset(&address, 0, sizeof(address));
     address.sun_family = AF_UNIX;
+    
+    char *display = getenv("DISPLAY");
+    char *user = getenv("USER");
 
-    snprintf(address.sun_path, sizeof(address.sun_path), "/tmp/custard.sock");
+    char file_path[19 + strlen(user) + strlen(display)];
+    sprintf(file_path, "/tmp/custard.%s_%s.sock", user, display);
+    
+    snprintf(address.sun_path, sizeof(address.sun_path), file_path);
 
     socket_file_descriptor = socket(AF_UNIX, SOCK_STREAM, 0);
 
