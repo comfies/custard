@@ -34,8 +34,8 @@ and [howm](https://github.com/HarveyHunt/howm).
 
 |OS          |Packages                                                |
 |------------|--------------------------------------------------------|
-|Arch Linux  |`libxcb xcb-util xcb-util-wm libconfig`                 |
-|Debian Linux|`xcb libxcb-ewmh-dev libxcb-icccm4 libxcb-util0-dev libconfig-dev libxcb-icccm4-dev`|
+|Arch Linux  |`libxcb xcb-util xcb-util-wm`                           |
+|Debian Linux|`xcb libxcb-ewmh-dev libxcb-icccm4 libxcb-util0-dev`    |
 |Gentoo Linux|`x11-libs/libxcb x11-libs/xcb-util x11-libs/xcb-util-wm`|
 |Void Linux  |`libxcb-devel xcb-util-devel xcb-util-wm-devel`         |
 |OpenBSD     |`/usr/ports/x11/xcb`                                    |
