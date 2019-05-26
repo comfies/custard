@@ -1,0 +1,26 @@
+#!/bin/bash
+
+custard -- configure grid.rows 2
+custard -- configure grid.columns 2
+
+custard -- configure grid.gap 0
+custard -- configure grid.offset.top 0
+custard -- configure grid.offset.bottom 0
+custard -- configure grid.offset.left 0
+custard -- configure grid.offset.right 0
+
+custard -- configure border.type 0
+custard -- configure border.inner.size 0
+custard -- configure border.outer.size 0
+
+custard -- configure border.color.focused "#FFFFFFFF"
+custard -- configure border.color.unfocused "#FFFFFFFF"
+custard -- configure border.color.background "#FFFFFFFF"
+custard -- configure border.color.switch False
+
+custard -- configure debug False
+custard -- configure workspaces 2
+
+custard -- reconfigure
+
+sxhkd -c ~/.config/sxhkdrc &
