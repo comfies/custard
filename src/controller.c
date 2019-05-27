@@ -43,7 +43,7 @@ void controller_input(int argc, char **argv) {
         return;
     }
 
-    sprintf(buffer, descriptor);
+    sprintf(buffer, "%s", descriptor);
 
     debug_output("%s", buffer);
 
