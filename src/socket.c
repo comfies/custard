@@ -12,6 +12,8 @@
 int socket_file_descriptor;
 socket_mode_t socket_mode;
 
+char *socket_path;
+
 unsigned short initialize_socket() {
     struct sockaddr_un address;
 
@@ -21,10 +23,10 @@ unsigned short initialize_socket() {
     char *display = getenv("DISPLAY");
     char *user = getenv("USER");
 
-    char file_path[19 + strlen(user) + strlen(display)];
-    sprintf(file_path, "/tmp/custard.%s_%s.sock", user, display);
+    socket_path = (char *)malloc(20 + strlen(user) + strlen(display));
+    sprintf(socket_path, "/tmp/custard.%s_%s.sock", user, display);
     
-    snprintf(address.sun_path, sizeof(address.sun_path), file_path);
+    snprintf(address.sun_path, sizeof(address.sun_path), socket_path);
 
     socket_file_descriptor = socket(AF_UNIX, SOCK_STREAM, 0);
 
@@ -59,9 +61,11 @@ void finalize_socket() {
     debug_output("Called");
 
     if (socket_mode == WINDOW_MANAGER)
-        unlink("/tmp/custard.sock");
+        unlink(socket_path);
     else
         close(socket_file_descriptor);
+    
+    free(socket_path);
 }
 
 void write_to_socket(char *data) {
