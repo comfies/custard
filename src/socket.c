@@ -26,7 +26,7 @@ unsigned short initialize_socket() {
     socket_path = (char *)malloc(20 + strlen(user) + strlen(display));
     sprintf(socket_path, "/tmp/custard.%s_%s.sock", user, display);
     
-    snprintf(address.sun_path, sizeof(address.sun_path), socket_path);
+    snprintf(address.sun_path, sizeof(address.sun_path), "%s", socket_path);
 
     socket_file_descriptor = socket(AF_UNIX, SOCK_STREAM, 0);
 
