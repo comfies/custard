@@ -389,11 +389,11 @@ void lower_window(xcb_window_t window_id) {
 void change_window_geometry(xcb_window_t window_id, unsigned int x,
     unsigned int y, unsigned int height, unsigned int width) {
 
-    unsigned int x_in_pixels = grid_get_x_offset(x) + grid_offset_left;
-    unsigned int y_in_pixels = grid_get_y_offset(y) + grid_offset_top;
+    unsigned int x_in_pixels = (unsigned int)grid_get_x_offset(x) + grid_offset_left;
+    unsigned int y_in_pixels = (unsigned int)grid_get_y_offset(y) + grid_offset_top;
 
-    unsigned int height_in_pixels = grid_get_span_y(height);
-    unsigned int width_in_pixels = grid_get_span_x(width);
+    unsigned int height_in_pixels = (unsigned int)grid_get_span_y(height);
+    unsigned int width_in_pixels = (unsigned int)grid_get_span_x(width);
 
     debug_output("Window geometry change %d %d %dx%d",
         x, y, height, width);
