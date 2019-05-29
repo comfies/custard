@@ -3,8 +3,8 @@
 #include "grid.h"
 #include "xcb.h"
 
-unsigned int grid_x_unit_size_in_pixels = 0;
-unsigned int grid_y_unit_size_in_pixels = 0;
+float grid_x_unit_size_in_pixels = 0;
+float grid_y_unit_size_in_pixels = 0;
 
 unsigned int grid_window_default_x = 0;
 unsigned int grid_window_default_y = 0;
