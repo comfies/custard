@@ -49,6 +49,9 @@ void process_input(char *data) {
         index++;
     }
 
+    if (!descriptor)
+        return;
+
     index = 0;
 
     unsigned short flush;
@@ -195,10 +198,27 @@ unsigned short ipc_command_wm_reconfigure(char **arguments) {
 unsigned short ipc_command_new_geometry(char **arguments) {
     unsigned int x, y, height, width;
 
-    x = parse_unsigned_integer(arguments[1]);
-    y = parse_unsigned_integer(arguments[2]);
-    height = parse_unsigned_integer(arguments[3]);
-    width = parse_unsigned_integer(arguments[4]);
+    /*
+     * custard -- geometry X,Y WxH
+     */
+
+    if (!arguments[1] || !arguments[2])
+        return 0;
+
+    char *position = strdup(arguments[1]);
+    char *size = strdup(arguments[2]);
+
+    char *token;
+
+    token = strsep(&position, ",");
+
+    x = parse_unsigned_integer(token);
+    y = parse_unsigned_integer(position);
+
+    token = strsep(&size, "x");
+
+    width = parse_unsigned_integer(token);
+    height = parse_unsigned_integer(size);
 
     create_new_geometry(arguments[0], x, y, height, width);
     return 0;
