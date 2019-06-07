@@ -34,8 +34,6 @@ int main(int argc, char **argv) {
 
         return EXIT_SUCCESS;
     } else {
-        rc_file = (char *)malloc(sizeof(char));
-
         // Process arguments
         char *argument;
 
@@ -52,6 +50,8 @@ int main(int argc, char **argv) {
                 }
 
                 if (access(argv[index + 1], X_OK | F_OK | R_OK) > -1) {
+                    rc_file = (char *)malloc(sizeof(char) *
+                            (strlen(argv[index + 1]) + 1));
                     strcpy(rc_file, argv[index + 1]);
 
                     index++;
