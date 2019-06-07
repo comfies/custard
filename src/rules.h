@@ -9,9 +9,13 @@ typedef struct {
     unsigned int width;
 } named_geometry_t;
 
+#define VALUE_UNCHANGED 0
+
 typedef struct {
     char *expression;
+
     char *named_geometry;
+    unsigned int workspace;
 } window_rule_t;
 
 void create_new_geometry(char *, unsigned int, unsigned int, unsigned int,

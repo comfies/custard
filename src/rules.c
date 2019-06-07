@@ -56,7 +56,9 @@ void create_new_rule(char *expression, char *named_geometry) {
 
     rule = (window_rule_t *)malloc(sizeof(window_rule_t));
     rule->expression = (char *)malloc(sizeof(char));
+
     rule->named_geometry = (char *)malloc(sizeof(char));
+    rule->workspace = VALUE_UNCHANGED;
 
     strcpy(rule->expression, expression);
     strcpy(rule->named_geometry, named_geometry);
