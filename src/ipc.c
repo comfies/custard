@@ -122,6 +122,11 @@ unsigned short ipc_command_wm_halt(char **arguments) {
 }
 
 unsigned short ipc_command_wm_configure(char **arguments) {
+
+    /*
+     * custard -- configure NAME VALUE
+     */
+
     char *setting = arguments[0];
 
     unsigned short boolean = parse_boolean(arguments[1]);
@@ -199,7 +204,7 @@ unsigned short ipc_command_new_geometry(char **arguments) {
     unsigned int x, y, height, width;
 
     /*
-     * custard -- geometry X,Y WxH
+     * custard -- geometry NAME X,Y WIDTHxHEIGHT
      */
 
     if (!arguments[1] || !arguments[2])
@@ -225,6 +230,11 @@ unsigned short ipc_command_new_geometry(char **arguments) {
 }
 
 unsigned short ipc_command_new_window_rule(char **arguments) {
+    
+    /*
+     * custard -- rule window.VALUE? REGEX ...
+     */
+
     create_new_rule(arguments[0], arguments[1]);
 
     return 0;
