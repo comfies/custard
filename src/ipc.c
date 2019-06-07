@@ -14,8 +14,8 @@ struct ipc_command ipc_commands[][number_of_ipc_commands] = {
     {{ "configure",         ipc_command_wm_configure }},
     {{ "reconfigure",       ipc_command_wm_reconfigure }},
 
-    {{ "create.geometry",   ipc_command_new_geometry }},
-    {{ "create.rule",       ipc_command_new_window_rule }},
+    {{ "geometry",          ipc_command_new_geometry }},
+    {{ "rule",              ipc_command_new_window_rule }},
 
     {{ "window.close",      ipc_command_window_close }},
     {{ "window.raise",      ipc_command_window_raise}},
