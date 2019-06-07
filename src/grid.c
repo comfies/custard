@@ -12,15 +12,26 @@ unsigned int grid_window_default_height = 1;
 unsigned int grid_window_default_width = 1;
 
 void apply_configuration_to_grid() {
-    grid_x_unit_size_in_pixels = (float)((screen->width_in_pixels - (
-        ((border_total_size * 2) * grid_columns) +
-        (grid_offset_left + grid_offset_right) +
-        (grid_gap * (grid_columns + 1)))) / (float)grid_columns);
 
-    grid_y_unit_size_in_pixels = (float)((screen->height_in_pixels - (
-        ((border_total_size * 2) * grid_rows) +
-        (grid_offset_top + grid_offset_bottom) +
-        (grid_gap * (grid_rows + 1)))) / (float)grid_rows);
+    unsigned int horizontal_border_sum = (border_total_size * 2) *
+        grid_columns;
+    unsigned int horizontal_offset_sum = grid_offset_left + grid_offset_right;
+    unsigned int horizontal_gap_sum = grid_gap * (grid_columns + 1);
+
+    float usable_x_pixels = (float)(screen->width_in_pixels - (
+                horizontal_border_sum + horizontal_offset_sum +
+                    horizontal_gap_sum));
+
+    grid_x_unit_size_in_pixels = usable_x_pixels / (float)grid_columns;
+
+    unsigned int vertical_border_sum = (border_total_size * 2) * grid_rows;
+    unsigned int vertical_offset_sum = grid_offset_top + grid_offset_bottom;
+    unsigned int vertical_gap_sum = grid_gap * (grid_rows + 1);
+
+    float usable_y_pixels = (float)(screen->height_in_pixels - (
+                vertical_border_sum + vertical_offset_sum + vertical_gap_sum));
+
+    grid_y_unit_size_in_pixels = usable_y_pixels / (float)grid_rows;
 
     grid_window_default_x = (grid_columns / 2) - 1;
 
