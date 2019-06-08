@@ -34,16 +34,28 @@ void event_map_request(xcb_generic_event_t *generic_event) {
 
     debug_output("Window manage call made");
 
-    map_window(window_id);
-    debug_output("Window mapped");
-
-    raise_window(window_id);
-    debug_output("Window raised");
-
+    unsigned short map_and_raise = 0;
+    window_t *window = NULL;
+    
     if (managed) {
+        window = get_window_from_id(window_id);
+
+        if (window->workspace == focused_workspace)
+            map_and_raise = 1;
+    } else
+        map_and_raise = 1;
+
+    if (map_and_raise) {
+        map_window(window_id);
+        debug_output("Window mapped");
+
+        raise_window(window_id);
+        debug_output("Window raised");
+
         focus_on_window(window_id);
         debug_output("Window focused");
-    }
+    } else
+        border_update(window_id);
 
     commit();
 }
