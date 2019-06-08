@@ -66,7 +66,7 @@ void create_new_rule(char **arguments) {
         if (!arguments[index + 1])
             traversing = 0;
         index++;
-        free(argument_pointer);
+//        free(argument_pointer);
     }
 
     window_rule_t *rule = NULL;
