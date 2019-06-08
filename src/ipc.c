@@ -32,12 +32,12 @@ void process_input(char *data) {
     char delimiter[2] = { 29, '\0' };
 
     char *descriptor;
-    char *arguments[8];
+    char *arguments[32];
 
     unsigned int index = 0;
 
     while ((token = strsep(&data, delimiter))) {
-        if (index == 9) {
+        if (index == 33) {
             debug_output("Input has more arguments than accepted, ignoring");
             return;
         }
