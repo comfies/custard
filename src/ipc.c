@@ -211,7 +211,10 @@ unsigned short ipc_command_new_geometry(char **arguments) {
         return 0;
 
     char *position = strdup(arguments[1]);
+    char *position_pointer = position;
+
     char *size = strdup(arguments[2]);
+    char *size_pointer = size;
 
     char *token;
 
@@ -226,6 +229,10 @@ unsigned short ipc_command_new_geometry(char **arguments) {
     height = parse_unsigned_integer(size);
 
     create_new_geometry(arguments[0], x, y, height, width);
+
+    free(position_pointer);
+    free(size_pointer);
+
     return 0;
 }
 
