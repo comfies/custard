@@ -189,7 +189,7 @@ void _debug_output(const char *file, const char *method, const int line,
     if (!debug_mode)
         return;
 
-    fprintf(stderr, "%-14s :%-4d (%s) - ", file, line, method);
+    fprintf(stderr, "%-16s :%-4d (%s) - ", file, line, method);
     va_list ap;
     va_start(ap, formatting);
     vfprintf(stderr, formatting, ap);
