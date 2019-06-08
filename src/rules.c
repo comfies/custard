@@ -69,6 +69,7 @@ void create_new_rule(char **arguments) {
 //        free(argument_pointer);
     }
 
+    unsigned short modify_rule = 0;
     window_rule_t *rule = NULL;
     for (unsigned int index = 0; index < window_rules->size; index++) {
         rule = get_from_vector(window_rules, index);
@@ -76,13 +77,14 @@ void create_new_rule(char **arguments) {
         if (!strcmp(rule->expression, expression)) {
             debug_output("%s",
                 "Rule for expression already exists, changing named geometry");
+            modify_rule = 1;
 
             break;
         }
     }
 
 
-    if (!rule) {
+    if (!modify_rule) {
         rule = (window_rule_t *)malloc(sizeof(window_rule_t));
 
         rule->expression = (char *)malloc(sizeof(char));
