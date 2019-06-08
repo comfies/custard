@@ -235,7 +235,7 @@ unsigned short ipc_command_new_window_rule(char **arguments) {
      * custard -- rule window.VALUE? REGEX ...
      */
 
-    create_new_rule(arguments[0], arguments[1]);
+    create_new_rule(arguments);
 
     return 0;
 }

@@ -21,7 +21,7 @@ typedef struct {
 void create_new_geometry(char *, unsigned int, unsigned int, unsigned int,
     unsigned int);
 
-void create_new_rule(char *, char *);
+void create_new_rule(char **);
 
 unsigned short regex_match(char *, char *);
 

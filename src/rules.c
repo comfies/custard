@@ -38,7 +38,10 @@ void create_new_geometry(char *name, unsigned int x, unsigned int y,
     push_to_vector(named_geometries, geometry);
 }
 
-void create_new_rule(char *expression, char *named_geometry) {
+void create_new_rule(char **arguments) {
+
+    char *expression = arguments[0];
+    char *named_geometry = arguments[1];
 
     window_rule_t *rule = NULL;
     for (unsigned int index = 0; index < window_rules->size; index++) {
