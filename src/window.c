@@ -120,19 +120,25 @@ unsigned short manage_window(xcb_window_t window_id) {
             debug_output("%s",
                 "Window title matches rule expression, setting geometry");
 
-            index = 0;
+            if (rule->named_geometry) {
+                index = 0;
 
-            for (; index < named_geometries->size; index++) {
-                geometry = get_from_vector(named_geometries, index);
+                for (; index < named_geometries->size; index++) {
+                    geometry = get_from_vector(named_geometries, index);
 
-                if (!strcmp(geometry->name, rule->named_geometry)) {
-                    window->x = geometry->x;
-                    window->y = geometry->y;
-                    window->height = geometry->height;
-                    window->width = geometry->width;
+                    if (!strcmp(geometry->name, rule->named_geometry)) {
+                        window->x = geometry->x;
+                        window->y = geometry->y;
+                        window->height = geometry->height;
+                        window->width = geometry->width;
 
-                    break;
+                        break;
+                    }
                 }
+            }
+
+            if (rule->workspace) {
+                window->workspace = rule->workspace;
             }
 
             break;

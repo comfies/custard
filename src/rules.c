@@ -1,8 +1,10 @@
 #include <pcre.h>
+
 #include <stdlib.h>
 #include <string.h>
 
 #include "custard.h"
+#include "ipc.h"
 #include "rules.h"
 #include "vector.h"
 
@@ -41,7 +43,31 @@ void create_new_geometry(char *name, unsigned int x, unsigned int y,
 void create_new_rule(char **arguments) {
 
     char *expression = arguments[0];
-    char *named_geometry = arguments[1];
+
+    char *named_geometry = VALUE_UNCHANGED;
+    unsigned int workspace = VALUE_UNCHANGED;
+
+    unsigned short traversing = 1;
+    unsigned int index = 1;
+
+    char *argument, *argument_pointer;
+    char *name;
+
+    while (traversing) {
+        argument = argument_pointer = strdup(arguments[index]);
+        name = strsep(&argument, ":");
+
+        if (!strcmp("workspace", name))
+            workspace = parse_unsigned_integer(argument);
+
+        if (!strcmp("geometry", name))
+            named_geometry = argument;
+
+        if (!arguments[index + 1])
+            traversing = 0;
+        index++;
+        free(argument_pointer);
+    }
 
     window_rule_t *rule = NULL;
     for (unsigned int index = 0; index < window_rules->size; index++) {
@@ -51,22 +77,30 @@ void create_new_rule(char **arguments) {
             debug_output("%s",
                 "Rule for expression already exists, changing named geometry");
 
-            strcpy(rule->named_geometry, named_geometry);
-
-            return;
+            break;
         }
     }
 
-    rule = (window_rule_t *)malloc(sizeof(window_rule_t));
-    rule->expression = (char *)malloc(sizeof(char));
 
-    rule->named_geometry = (char *)malloc(sizeof(char));
-    rule->workspace = VALUE_UNCHANGED;
+    if (!rule) {
+        rule = (window_rule_t *)malloc(sizeof(window_rule_t));
 
-    strcpy(rule->expression, expression);
-    strcpy(rule->named_geometry, named_geometry);
+        rule->expression = (char *)malloc(sizeof(char));
+        strcpy(rule->expression, expression);
 
-    push_to_vector(window_rules, rule);
+        push_to_vector(window_rules, rule);
+    }
+
+    if (workspace != VALUE_UNCHANGED)
+        rule->workspace = workspace;
+
+    if (named_geometry != VALUE_UNCHANGED) {
+        if (!rule->named_geometry)
+            rule->named_geometry = (char *)malloc(sizeof(char));
+
+        strcpy(rule->named_geometry, named_geometry);
+    }
+
 }
 
 unsigned short regex_match(char *subject, char *expression) {

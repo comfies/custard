@@ -150,7 +150,8 @@ void stop_custard() {
     for (; index < window_rules->size; index++) {
         rule = get_from_vector(window_rules, index);
         free(rule->expression);
-        free(rule->named_geometry);
+        if (rule->named_geometry)
+            free(rule->named_geometry);
     }
 
     deconstruct_vector(window_rules);
