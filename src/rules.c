@@ -59,8 +59,10 @@ void create_new_rule(char **arguments) {
         if (!strcmp("workspace", name))
             workspace = parse_unsigned_integer(argument);
 
-        if (!strcmp("geometry", name))
-            named_geometry = argument;
+        if (!strcmp("geometry", name)) {
+            named_geometry = (char *)malloc(sizeof(char));
+            strcpy(named_geometry, argument);
+        }
 
         index++;
         
@@ -95,12 +97,8 @@ void create_new_rule(char **arguments) {
     if (workspace != VALUE_UNCHANGED)
         rule->workspace = workspace;
 
-    if (named_geometry != VALUE_UNCHANGED) {
-        if (!rule->named_geometry)
-            rule->named_geometry = (char *)malloc(sizeof(char));
-
-        strcpy(rule->named_geometry, named_geometry);
-    }
+    if (named_geometry != VALUE_UNCHANGED)
+          rule->named_geometry = named_geometry;
 
 }
 
