@@ -47,13 +47,12 @@ void create_new_rule(char **arguments) {
     char *named_geometry = VALUE_UNCHANGED;
     unsigned int workspace = VALUE_UNCHANGED;
 
-    unsigned short traversing = 1;
     unsigned int index = 1;
 
     char *argument, *argument_pointer;
     char *name;
 
-    while (traversing) {
+    while (strcmp(arguments[index], "\0")) {
         argument = argument_pointer = strdup(arguments[index]);
         name = strsep(&argument, ":");
 
@@ -63,8 +62,6 @@ void create_new_rule(char **arguments) {
         if (!strcmp("geometry", name))
             named_geometry = argument;
 
-        if (!arguments[index + 1])
-            traversing = 0;
         index++;
         
         if (argument_pointer)
