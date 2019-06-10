@@ -97,8 +97,11 @@ void create_new_rule(char **arguments) {
     if (workspace != VALUE_UNCHANGED)
         rule->workspace = workspace;
 
-    if (named_geometry != VALUE_UNCHANGED)
-          rule->named_geometry = named_geometry;
+    if (named_geometry != VALUE_UNCHANGED) {
+        if (rule->named_geometry)
+            free(rule->named_geometry);
+        rule->named_geometry = named_geometry;
+    }
 
 }
 
