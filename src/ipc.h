@@ -2,7 +2,7 @@
 #define IPC_H
 
 #define suppress_unused(parameter) (void)(parameter)
-#define number_of_ipc_commands 10
+#define number_of_ipc_commands 9
 
 struct ipc_command {
     char *command;

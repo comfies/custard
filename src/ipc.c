@@ -12,7 +12,6 @@
 struct ipc_command ipc_commands[][number_of_ipc_commands] = {
     {{ "halt",              ipc_command_wm_halt }},
     {{ "configure",         ipc_command_wm_configure }},
-    {{ "reconfigure",       ipc_command_wm_reconfigure }},
 
     {{ "geometry",          ipc_command_new_geometry }},
     {{ "rule",              ipc_command_new_window_rule }},
@@ -185,12 +184,6 @@ unsigned short ipc_command_wm_configure(char **arguments) {
         border_invert_colors = boolean;
     else if (!strcmp("workspaces", setting))
         number_of_workspaces = uint;
-
-    return 0;
-}
-
-unsigned short ipc_command_wm_reconfigure(char **arguments) {
-    suppress_unused(arguments);
 
     if (border_type == 0)
         border_total_size = 0;
