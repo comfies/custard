@@ -66,7 +66,9 @@ void create_new_rule(char **arguments) {
         if (!arguments[index + 1])
             traversing = 0;
         index++;
-//        free(argument_pointer);
+        
+        if (argument_pointer)
+            free(argument_pointer);
     }
 
     unsigned short modify_rule = 0;
