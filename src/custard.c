@@ -152,6 +152,7 @@ void stop_custard() {
         free(rule->expression);
         if (rule->named_geometry)
             free(rule->named_geometry);
+        free(rule);
     }
 
     deconstruct_vector(window_rules);
