@@ -90,8 +90,6 @@ unsigned short manage_window(xcb_window_t window_id) {
 
     window->workspace = focused_workspace;
 
-    // TODO: check if window name or classes are matched by any rules
-
     window->x = grid_window_default_x;
     window->y = grid_window_default_y;
     window->height = grid_window_default_height;
@@ -118,7 +116,7 @@ unsigned short manage_window(xcb_window_t window_id) {
 
         if (regex_match(window_title, rule->expression)) {
             debug_output("%s",
-                "Window title matches rule expression, setting geometry");
+                "Window title matches rule expression, setting rules");
 
             if (rule->named_geometry) {
                 index = 0;
