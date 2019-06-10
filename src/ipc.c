@@ -87,31 +87,49 @@ unsigned int parse_unsigned_integer(char *string) {
 }
 
 unsigned int parse_rgba_color(char *string) {
-    unsigned int rgba = 0x000000ff;
+    unsigned int rgba = 0xffffffff;
 
-    if (string) {
-        char groups[9] = {
-            string[1], string[2], /* R */
-            string[3], string[4], /* G */
-            string[5], string[6], /* B */
-            string[7], string[8], /* A */
-            '\0'
-        };
+    if (!string)
+        return rgba;
 
-        rgba = strtol(groups, NULL, 16);
-    }
+    unsigned int length = strlen(string);
+    if (length > 9 || length < 3 || length == 6 || length == 8)
+        return rgba;
+    else if (string[0] != '#')
+        return rgba;
+
+    unsigned int offset = 0;
+    if (length < 6)
+        offset = 4;
+
+    char group[8] = "000000ff";
+    for (unsigned int index = 0; index < (length - 1); index++)
+        group[index + offset] = string[index + 1];
+
+    rgba = strtol(group, NULL, 16);
 
     unsigned int alpha, red, green, blue;
+    if (offset) {
+        alpha = ((rgba & 0x000F) * 0xFF) / 0xF;
+        red   = (((rgba & 0xF000) / 0x1000) * 0xFF) / 0xF;
+        green = (((rgba & 0x0F00) / 0x100) * 0xFF) / 0xF;
+        blue  = (((rgba & 0x00F0) / 0x10) * 0xFF) / 0xF;
+    } else {
+        alpha = (rgba & 0x000000FF);
+        red   = (rgba & 0xFF000000) / 0x1000000;
+        green = (rgba & 0x00FF0000) / 0x10000;
+        blue  = (rgba & 0x0000FF00) / 0x100;
+    }
 
-    alpha   = (rgba & 0x000000ff);
-    red     = (((rgba & 0xff000000) / 0x1000000) * alpha) / 255;
-    green   = (((rgba & 0x00ff0000) / 0x10000) * alpha) / 255;
-    blue    = (((rgba & 0x0000ff00) / 0x100) * alpha) / 255;
+    red   = (red * alpha) / 0xFF;
+    green = (green * alpha) / 0xFF;
+    blue  = (blue * alpha) / 0xFF;
 
-    unsigned int value = (alpha * 0x1000000) |
-        (red * 0x10000) | (green * 0x100) | blue;
+    alpha *= 0x1000000;
+    red   *= 0x10000;
+    green *= 0x100;
 
-    return value;
+    return alpha | red | green | blue;
 }
 
 /* IPC commands */
