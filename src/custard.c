@@ -24,6 +24,7 @@ vector_t *managed_windows = NULL;
 vector_t *named_geometries = NULL;
 vector_t *window_rules = NULL;
 vector_t *workspaces = NULL;
+vector_t *monitors = NULL;
 
 xcb_window_t focused_window = XCB_WINDOW_NONE;
 unsigned int focused_workspace = 1;
@@ -62,24 +63,24 @@ int start_custard() {
         !initialize_socket())
         return EXIT_FAILURE;
 
-    // TODO(Sweets):
-    // DELETE THIS
-    initialize_monitors();
-
     window_manager_is_running = 1;
 
     managed_windows = construct_vector();
     named_geometries = construct_vector();
     window_rules = construct_vector();
     workspaces = construct_vector();
+    monitors = construct_vector();
+
+    if (!initialize_monitors()) {
+        // Unable to initialize the monitors for some reason, but we'll add the 
+        // display anyways
+    }
 
     if (rc_file && strlen(rc_file)) {
         debug_output("Executing specified rc file");
         if (fork() == 0)
             execl(rc_file, rc_file, NULL);
     }
-
-    apply_configuration_to_grid();
 
     signal(SIGTERM, signal_handler);
 
