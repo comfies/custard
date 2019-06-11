@@ -109,10 +109,10 @@ unsigned int parse_rgba_color(char *string) {
 
     unsigned int alpha, red, green, blue;
     if (offset) {
-        alpha = ((rgba & 0x000F) * 0xFF) / 0xF;
-        red   = (((rgba & 0xF000) / 0x1000) * 0xFF) / 0xF;
-        green = (((rgba & 0x0F00) / 0x100) * 0xFF) / 0xF;
-        blue  = (((rgba & 0x00F0) / 0x10) * 0xFF) / 0xF;
+        alpha = (rgba & 0x000F) * 0x11;
+        red   = ((rgba & 0xF000) / 0x1000) * 0x11;
+        green = ((rgba & 0x0F00) / 0x100) * 0x11;
+        blue  = ((rgba & 0x00F0) / 0x10) * 0x11;
     } else {
         alpha = (rgba & 0x000000FF);
         red   = (rgba & 0xFF000000) / 0x1000000;
