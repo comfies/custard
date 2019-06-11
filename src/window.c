@@ -6,6 +6,7 @@
 #include "custard.h"
 #include "grid.h"
 #include "ewmh.h"
+#include "monitor.h"
 #include "rules.h"
 #include "vector.h"
 #include "window.h"
@@ -90,10 +91,11 @@ unsigned short manage_window(xcb_window_t window_id) {
 
     window->workspace = focused_workspace;
 
-    window->x = grid_window_default_x;
-    window->y = grid_window_default_y;
-    window->height = grid_window_default_height;
-    window->width = grid_window_default_width;
+    monitor_t *focused_monitor = get_focused_monitor();
+    window->x = focused_monitor->grid->default_x;
+    window->y = focused_monitor->grid->default_y;
+    window->height = focused_monitor->grid->default_height;
+    window->width = focused_monitor->grid->default_width;
 
     /* Test for geometry rules */
 
