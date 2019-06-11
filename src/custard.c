@@ -11,6 +11,7 @@
 #include "ewmh.h"
 #include "grid.h"
 #include "handlers.h"
+#include "monitor.h"
 #include "rules.h"
 #include "socket.h"
 #include "vector.h"
@@ -60,6 +61,10 @@ int start_custard() {
     if (!initialize_xcb_connection() || !initialize_ewmh_connection() ||
         !initialize_socket())
         return EXIT_FAILURE;
+
+    // TODO(Sweets):
+    // DELETE THIS
+    initialize_monitors();
 
     window_manager_is_running = 1;
 
