@@ -11,6 +11,7 @@ extern vector_t *managed_windows;
 extern vector_t *named_geometries;
 extern vector_t *window_rules;
 extern vector_t *workspaces;
+extern vector_t *monitors;
 
 extern xcb_window_t focused_window;
 extern unsigned int focused_workspace;
