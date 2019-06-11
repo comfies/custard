@@ -170,6 +170,17 @@ void stop_custard() {
 
     deconstruct_vector(workspaces);
 
+    index = 0;
+    monitor_t *monitor = NULL;
+
+    for (; index < monitors->size; index++) {
+        monitor = get_from_vector(monitors, index);
+        free(monitor->grid);
+        free(monitor);
+    }
+
+    deconstruct_vector(monitors);
+
     finalize_socket();
     finalize_ewmh_connection();
     finalize_xcb_connection();
