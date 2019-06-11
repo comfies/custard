@@ -197,15 +197,25 @@ unsigned short ipc_command_wm_configure(char **arguments) {
             ((border_type - 1) * border_outer_size);
     }
 
-    apply_configuration_to_grid();
+//    apply_configuration_to_grid();
 
     unsigned int index = 0;
+
+    monitor_t *monitor = NULL;
+    for (; index < monitors->size; index++) {
+        monitor = get_from_vector(monitors, index);
+        apply_configuration_to_monitor_grid(monitor);
+    }
+
+    index = 0;
 
     window_t *window = NULL;
     for (; index < managed_windows->size; index++) {
         window = get_from_vector(managed_windows, index);
         border_update(window->id);
     }
+
+    index = 0;
 
     for (; index < number_of_workspaces; index++)
         create_new_workspace();
