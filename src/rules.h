@@ -16,6 +16,7 @@ typedef struct {
 
     char *named_geometry;
     unsigned int workspace;
+    char *screen;
 } window_rule_t;
 
 void create_new_geometry(char *, unsigned int, unsigned int, unsigned int,

@@ -158,6 +158,8 @@ void stop_custard() {
         free(rule->expression);
         if (rule->named_geometry)
             free(rule->named_geometry);
+        if (rule->screen)
+            free(rule->screen);
         free(rule);
     }
 
@@ -175,6 +177,7 @@ void stop_custard() {
 
     for (; index < monitors->size; index++) {
         monitor = get_from_vector(monitors, index);
+        free(monitor->name);
         free(monitor->grid);
         free(monitor);
     }

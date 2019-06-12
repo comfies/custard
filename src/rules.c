@@ -46,6 +46,7 @@ void create_new_rule(char **arguments) {
 
     char *named_geometry = VALUE_UNCHANGED;
     unsigned int workspace = VALUE_UNCHANGED;
+    char *screen = VALUE_UNCHANGED;
 
     unsigned int index = 1;
 
@@ -62,6 +63,11 @@ void create_new_rule(char **arguments) {
         if (!strcmp("geometry", name)) {
             named_geometry = (char *)malloc(sizeof(char));
             strcpy(named_geometry, argument);
+        }
+
+        if (!strcmp("monitor", name)) {
+            screen = (char *)malloc(sizeof(char));
+            strcpy(screen, argument);
         }
 
         index++;
@@ -102,6 +108,12 @@ void create_new_rule(char **arguments) {
             free(rule->named_geometry);
         rule->named_geometry = named_geometry;
     }
+
+/*    if (screen != VALUE_UNCHANGED) {
+        if (rule->screen)
+            free(rule->screen);
+        rule->screen = screen;
+    }*/
 
 }
 
