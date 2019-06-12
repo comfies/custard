@@ -9,6 +9,8 @@ typedef struct {
     unsigned int height;
     unsigned int width;
 
+    char *name;
+
     grid_t *grid;
 } monitor_t;
 

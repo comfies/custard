@@ -1,4 +1,7 @@
+#include <stdio.h>
+
 #include <stdlib.h>
+#include <string.h>
 #include <xcb/randr.h>
 
 #include "custard.h"
@@ -11,54 +14,43 @@ unsigned short initialize_monitors() {
     if (!xcb_get_extension_data(xcb_connection, &xcb_randr_id))
         return 0;
 
-    xcb_randr_get_screen_resources_reply_t *screen_resources;
+    xcb_randr_monitor_info_t *monitor_information;
 
-    screen_resources = xcb_randr_get_screen_resources_reply(xcb_connection,
-            xcb_randr_get_screen_resources(xcb_connection, screen->root), NULL);
+    xcb_randr_get_monitors_reply_t *outputs = xcb_randr_get_monitors_reply(
+            xcb_connection, xcb_randr_get_monitors(
+                xcb_connection, screen->root, XCB_NONE), NULL);
+    xcb_randr_monitor_info_iterator_t monitor_iterator;
 
-    xcb_randr_output_t *outputs = xcb_randr_get_screen_resources_outputs(
-            screen_resources);
+    monitor_iterator = xcb_randr_get_monitors_monitors_iterator(outputs);
 
-    unsigned int number_of_monitors;
-    number_of_monitors = xcb_randr_get_screen_resources_outputs_length(
-            screen_resources);
-
-    xcb_randr_get_output_info_reply_t *output_data;
-    xcb_randr_get_crtc_info_reply_t *monitor_data;
-
-    monitor_t *monitor = NULL;
-    for (unsigned int index = 0; index < number_of_monitors; index++) {
-        output_data = xcb_randr_get_output_info_reply(xcb_connection,
-                xcb_randr_get_output_info(xcb_connection, outputs[index],
-                    XCB_CURRENT_TIME), NULL);
-
-        if (!output_data || !output_data->crtc) {
-            free(output_data);
-            continue;
-        }
-
-        monitor_data = xcb_randr_get_crtc_info_reply(xcb_connection,
-                xcb_randr_get_crtc_info(xcb_connection, output_data->crtc,
-                    XCB_CURRENT_TIME), NULL);
-
-        debug_output("Monitor: %d,%d %dx%d",
-                monitor_data->x, monitor_data->y,
-                monitor_data->width, monitor_data->height);
+    monitor_t *monitor;
+    char *monitor_name;
+    while (monitor_iterator.rem) {
+        monitor_information = monitor_iterator.data;
 
         monitor = (monitor_t *)malloc(sizeof(monitor_t));
-        monitor->x = monitor_data->x;
-        monitor->y = monitor_data->y;
-        monitor->height = monitor_data->height;
-        monitor->width = monitor_data->width;
+
+        monitor_name = xcb_get_atom_name_name(xcb_get_atom_name_reply(
+                    xcb_connection, xcb_get_atom_name(
+                        xcb_connection, monitor_information->name), NULL));
+
+        monitor->x = monitor_information->x;
+        monitor->y = monitor_information->y;
+        monitor->height = monitor_information->height;
+        monitor->width = monitor_information->width;
 
         monitor->grid = (grid_t *)malloc(sizeof(grid_t));
-        // each monitor has its own grid
-        apply_configuration_to_monitor_grid(monitor);
+        
+        monitor->name = (char *)malloc(sizeof(char));
+        strcpy(monitor->name, monitor_name);
+
+        debug_output("Monitor %s %dx%d +%d+%d",
+                monitor->name, monitor->width, monitor->height,
+                monitor->x, monitor->y);
 
         push_to_vector(monitors, monitor);
-
-        free(monitor_data);
-        free(output_data);
+        debug_output("%s %s", monitor->name, monitor_name);
+        xcb_randr_monitor_info_next(&monitor_iterator);
     }
 
     return 1;
