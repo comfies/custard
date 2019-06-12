@@ -28,10 +28,10 @@ void apply_configuration_to_monitor_grid(monitor_t *);
 float grid_get_span(float, unsigned int);
 float grid_get_offset(float, unsigned int);
 
-float grid_get_span_x(unsigned int);
-float grid_get_span_y(unsigned int);
+float grid_get_span_x(unsigned int, monitor_t *);
+float grid_get_span_y(unsigned int, monitor_t *);
 
-float grid_get_x_offset(unsigned int);
-float grid_get_y_offset(unsigned int);
+float grid_get_x_offset(unsigned int, monitor_t *);
+float grid_get_y_offset(unsigned int, monitor_t *);
 
 #endif /* GRID_H */

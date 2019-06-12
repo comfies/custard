@@ -71,26 +71,32 @@ float grid_get_offset(float unit_size, unsigned int amount) {
         (border_total_size * 2) * amount);
 }
 
-float grid_get_span_x(unsigned int amount) {
-    monitor_t *focused_monitor = get_focused_monitor();
-    return grid_get_span(focused_monitor->grid->x_unit_size_in_pixels, amount);
+float grid_get_span_x(unsigned int amount, monitor_t *monitor) {
+    if (!monitor)
+        return 0;
+
+    return grid_get_span(monitor->grid->x_unit_size_in_pixels, amount);
 }
 
-float grid_get_span_y(unsigned int amount) {
-    monitor_t *focused_monitor = get_focused_monitor();
-    return grid_get_span(focused_monitor->grid->y_unit_size_in_pixels, amount);
+float grid_get_span_y(unsigned int amount, monitor_t *monitor) {
+    if (!monitor)
+        return 0;
+
+    return grid_get_span(monitor->grid->y_unit_size_in_pixels, amount);
 }
 
-float grid_get_x_offset(unsigned int amount) {
-    monitor_t *focused_monitor = get_focused_monitor();
+float grid_get_x_offset(unsigned int amount, monitor_t *monitor) {
+    if (!monitor)
+        return 0;
+
     return grid_get_offset(
-            focused_monitor->grid->x_unit_size_in_pixels, amount) +
-        focused_monitor->x;
+            monitor->grid->x_unit_size_in_pixels, amount) + monitor->x;
 }
 
-float grid_get_y_offset(unsigned int amount) {
-    monitor_t *focused_monitor = get_focused_monitor();
+float grid_get_y_offset(unsigned int amount, monitor_t *monitor) {
+    if (!monitor)
+        return 0;
+
     return grid_get_offset(
-            focused_monitor->grid->y_unit_size_in_pixels, amount) +
-        focused_monitor->y;
+            monitor->grid->y_unit_size_in_pixels, amount) + monitor->y;
 }
