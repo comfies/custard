@@ -92,6 +92,7 @@ unsigned short manage_window(xcb_window_t window_id) {
     window->workspace = focused_workspace;
 
     monitor_t *focused_monitor = get_focused_monitor();
+
     window->x = focused_monitor->grid->default_x;
     window->y = focused_monitor->grid->default_y;
     window->height = focused_monitor->grid->default_height;
@@ -395,23 +396,18 @@ void lower_window(xcb_window_t window_id) {
 void change_window_geometry(xcb_window_t window_id, unsigned int x,
     unsigned int y, unsigned int height, unsigned int width) {
 
-    unsigned int x_in_pixels = (unsigned int)grid_get_x_offset(x) + grid_offset_left;
-    unsigned int y_in_pixels = (unsigned int)grid_get_y_offset(y) + grid_offset_top;
-
-    unsigned int height_in_pixels = (unsigned int)grid_get_span_y(height);
-    unsigned int width_in_pixels = (unsigned int)grid_get_span_x(width);
+    monitor_t *monitor = get_focused_monitor();
+    window_t *window = get_window_from_id(window_id);
 
     debug_output("Window geometry change %d %d %dx%d",
         x, y, height, width);
 
-    window_t *window = get_window_from_id(window_id);
-
-    unsigned int data[4];
-
-    /* TODO: create more efficient geometry method
-        (only change window attributes as needed, not all of them
-        regardless of whether or not they are needed)
-        */
+    unsigned int data[4] = {
+        (unsigned int)grid_get_x_offset(x, monitor) + grid_offset_left,
+        (unsigned int)grid_get_y_offset(y, monitor) + grid_offset_top,
+        (unsigned int)grid_get_span_x(width, monitor),
+        (unsigned int)grid_get_span_y(height, monitor)
+    };
 
     if (window) {
         window->x = x;
@@ -419,23 +415,17 @@ void change_window_geometry(xcb_window_t window_id, unsigned int x,
         window->height = height;
         window->width = width;
 
-        data[0] = width_in_pixels;
-        data[1] = height_in_pixels;
+        unsigned int child_data[2] = { data[2], data[3] };
 
         xcb_configure_window(xcb_connection, window_id,
-            XCB_CONFIG_WINDOW_HEIGHT | XCB_CONFIG_WINDOW_WIDTH, data);
+            XCB_CONFIG_WINDOW_HEIGHT | XCB_CONFIG_WINDOW_WIDTH, child_data);
 
         window_id = window->parent;
     }
 
-    data[0] = x_in_pixels;
-    data[1] = y_in_pixels;
-    data[2] = width_in_pixels;
-    data[3] = height_in_pixels;
-
-    xcb_configure_window(xcb_connection, window_id, XCB_CONFIG_WINDOW_X |
-        XCB_CONFIG_WINDOW_Y | XCB_CONFIG_WINDOW_HEIGHT |
-        XCB_CONFIG_WINDOW_WIDTH, data);
+    xcb_configure_window(xcb_connection, window_id,
+        XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y |
+        XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT, data);
 }
 
 void border_update(xcb_window_t window_id) {
