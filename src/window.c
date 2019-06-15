@@ -571,6 +571,10 @@ void border_update(xcb_window_t window_id) {
 
             xcb_poly_fill_rectangle(xcb_connection, pixmap, graphics_context,
                 5, double_border);
+
+            data[0] = colors[0];
+            xcb_change_window_attributes(xcb_connection, window->parent,
+                XCB_CW_BACK_PIXEL, data);
         } else if (border_type == 3) {
             xcb_rectangle_t triple_border[8] = {
 
@@ -642,6 +646,10 @@ void border_update(xcb_window_t window_id) {
 
             xcb_poly_fill_rectangle(xcb_connection, pixmap, graphics_context,
                 8, triple_border);
+
+            data[0] = colors[1];
+            xcb_change_window_attributes(xcb_connection, window->parent,
+                XCB_CW_BACK_PIXEL, data);
         }
 
         data[0] = pixmap;
