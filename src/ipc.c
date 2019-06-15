@@ -313,7 +313,7 @@ unsigned short ipc_command_window_change_geometry(char **arguments) {
         geometry = get_from_vector(named_geometries, index);
 
         if (!strcmp(geometry->name, arguments[0])) {
-            change_window_geometry(focused_window,
+            change_window_geometry(focused_window, get_focused_monitor(),
                 geometry->x, geometry->y, geometry->height, geometry->width);
 
             if (get_window_from_id(focused_window))

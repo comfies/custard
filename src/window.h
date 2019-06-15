@@ -1,6 +1,9 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
+#include "grid.h"
+#include "monitor.h"
+
 typedef struct {
     xcb_window_t id;
     xcb_window_t parent;
@@ -31,8 +34,8 @@ void unmap_window(xcb_window_t);
 void raise_window(xcb_window_t);
 void lower_window(xcb_window_t);
 
-void change_window_geometry(xcb_window_t, unsigned int, unsigned int,
-    unsigned int, unsigned int);
+void change_window_geometry(xcb_window_t, monitor_t *,
+    unsigned int, unsigned int, unsigned int, unsigned int);
 
 void border_update(xcb_window_t);
 
