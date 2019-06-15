@@ -14,163 +14,187 @@
 #include "xcb.h"
 
 unsigned short manage_window(xcb_window_t window_id) {
-    unsigned int index = 0;
-
-    if (window_id == screen->root || window_id == ewmh_window_id)
+    if (get_window_from_id(window_id) ||
+        window_id == screen->root || window_id == ewmh_window_id)
         return 0;
 
-    if (get_window_from_id(window_id))
-        return 0;
+    /*
+     * Get cookies
+     */
 
-    xcb_atom_t atom;
-    xcb_ewmh_get_atoms_reply_t window_type;
+    xcb_get_property_cookie_t window_type_cookie;
+    window_type_cookie = xcb_ewmh_get_wm_window_type(
+        ewmh_connection, window_id);
 
-    if (xcb_ewmh_get_wm_window_type_reply(ewmh_connection,
-        xcb_ewmh_get_wm_window_type(ewmh_connection, window_id), &window_type,
-        NULL)) {
-        index = 0;
+    xcb_get_window_attributes_cookie_t window_attributes_cookie;
+    window_attributes_cookie = xcb_get_window_attributes(
+        xcb_connection, window_id);
 
-        for (; index < window_type.atoms_len; index++) {
-            atom = window_type.atoms[index];
-
-            if (atom == ewmh_connection->_NET_WM_WINDOW_TYPE_TOOLBAR ||
-                atom == ewmh_connection->_NET_WM_WINDOW_TYPE_MENU ||
-                atom == ewmh_connection->_NET_WM_WINDOW_TYPE_DROPDOWN_MENU ||
-                atom == ewmh_connection->_NET_WM_WINDOW_TYPE_POPUP_MENU ||
-                atom == ewmh_connection->_NET_WM_WINDOW_TYPE_DND ||
-                atom == ewmh_connection->_NET_WM_WINDOW_TYPE_DOCK ||
-                atom == ewmh_connection->_NET_WM_WINDOW_TYPE_DESKTOP ||
-                atom == ewmh_connection->_NET_WM_WINDOW_TYPE_NOTIFICATION) {
-
-                xcb_ewmh_get_atoms_reply_wipe(&window_type);
-                return 0;
-
-            } else if (atom == ewmh_connection->_NET_WM_WINDOW_TYPE_SPLASH) {
-                xcb_ewmh_get_atoms_reply_wipe(&window_type);
-
-                xcb_get_geometry_reply_t *geometry;
-                geometry = xcb_get_geometry_reply(xcb_connection,
-                    xcb_get_geometry(xcb_connection, window_id), NULL);
-
-                unsigned int data[2] = {
-                    (screen->width_in_pixels -
-                        (unsigned int)geometry->width) / 2,
-                    (screen->height_in_pixels -
-                        (unsigned int)geometry->height) / 2
-                };
-
-                xcb_configure_window(xcb_connection, window_id,
-                    XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y, data);
-
-                return 0;
-            }
-        }
-
-        xcb_ewmh_get_atoms_reply_wipe(&window_type);
-    }
-
-    debug_output("Window type check completed");
+    xcb_get_property_cookie_t atom_name_cookie;
+    atom_name_cookie = xcb_get_property(xcb_connection, 0,
+        window_id, XCB_ATOM_WM_NAME, XCB_GET_PROPERTY_TYPE_ANY, 0, 256);
 
     xcb_get_window_attributes_reply_t *attributes;
     attributes = xcb_get_window_attributes_reply(xcb_connection,
-        xcb_get_window_attributes(xcb_connection, window_id), NULL);
+        window_attributes_cookie, NULL);
+
+    /*
+     * It's gamer time.
+     */
 
     if (attributes && attributes->override_redirect)
         return 0;
 
-    debug_output("Window override redirect check completed");
+    xcb_ewmh_get_atoms_reply_t window_type;
 
-    xcb_grab_button(xcb_connection, 0, window_id, XCB_EVENT_MASK_BUTTON_PRESS,
-        XCB_GRAB_MODE_ASYNC, XCB_GRAB_MODE_ASYNC, XCB_NONE, XCB_NONE,
-        XCB_BUTTON_INDEX_ANY, XCB_MOD_MASK_ANY);
+    if (xcb_ewmh_get_wm_window_type_reply(ewmh_connection, window_type_cookie,
+            &window_type, NULL)) {
+
+        xcb_atom_t atom;
+
+        for (unsigned int index = 0; index < window_type.atoms_len; index++) {
+
+            atom = window_type.atoms[index];
+
+            if (atom == ewmh_connection->_NET_WM_WINDOW_TYPE_TOOLBAR       ||
+                atom == ewmh_connection->_NET_WM_WINDOW_TYPE_MENU          ||
+                atom == ewmh_connection->_NET_WM_WINDOW_TYPE_DROPDOWN_MENU ||
+                atom == ewmh_connection->_NET_WM_WINDOW_TYPE_POPUP_MENU    ||
+                atom == ewmh_connection->_NET_WM_WINDOW_TYPE_DND           ||
+                atom == ewmh_connection->_NET_WM_WINDOW_TYPE_DOCK          ||
+                atom == ewmh_connection->_NET_WM_WINDOW_TYPE_DESKTOP       ||
+                atom == ewmh_connection->_NET_WM_WINDOW_TYPE_NOTIFICATION) {
+                debug_output("Window(%08x) type check failed", window_id);
+                xcb_ewmh_get_atoms_reply_wipe(&window_type);
+                return 0;
+            } else if (atom == ewmh_connection->_NET_WM_WINDOW_TYPE_SPLASH) {
+                debug_output("Window(%08x) type check failed", window_id);
+                // Do something else
+            }
+
+        }
+
+        xcb_ewmh_get_atoms_reply_wipe(&window_type);
+
+    }
+
+    debug_output("Window(%08x) type check completed", window_id);
+
+    monitor_t *monitor_output = NULL;
+
+    /*
+     * Create window structure
+     */
 
     window_t *window = (window_t *)malloc(sizeof(window_t));
 
     window->id = window_id;
     window->parent = xcb_generate_id(xcb_connection);
 
-    window->workspace = focused_workspace;
+    /*
+     * Test for window rules
+     */
 
-    monitor_t *focused_monitor = get_focused_monitor();
-
-    window->x = focused_monitor->grid->default_x;
-    window->y = focused_monitor->grid->default_y;
-    window->height = focused_monitor->grid->default_height;
-    window->width = focused_monitor->grid->default_width;
-
-    /* Test for geometry rules */
-
-    xcb_atom_t property_atom = XCB_ATOM_WM_NAME;
-    xcb_atom_t property_type = XCB_GET_PROPERTY_TYPE_ANY;
-
-    xcb_get_property_reply_t *property = xcb_get_property_reply(xcb_connection,
-        xcb_get_property(xcb_connection, 0, window_id, property_atom,
-        property_type, 0, 256), NULL);
-
-    char *window_title = (char *)xcb_get_property_value(property);
-
-    index = 0;
+    char *window_title = (char *)xcb_get_property_value(xcb_get_property_reply(
+            xcb_connection, atom_name_cookie, NULL));
 
     window_rule_t *rule = NULL;
-    named_geometry_t *geometry = NULL;
+    unsigned int index = 0;
 
     for (; index < window_rules->size; index++) {
         rule = get_from_vector(window_rules, index);
 
-        if (regex_match(window_title, rule->expression)) {
-            debug_output("%s",
-                "Window title matches rule expression, setting rules");
+        if (!regex_match(window_title, rule->expression))
+            continue;
 
-            if (rule->named_geometry) {
-                index = 0;
+        debug_output("Window(%08x) title(%s) matches rule expression(%s); %s",
+            window_id, window_title, rule->expression, "setting window rules");
 
-                for (; index < named_geometries->size; index++) {
-                    geometry = get_from_vector(named_geometries, index);
+        if (rule->named_geometry) {
+            index = 0;
+            named_geometry_t *geometry = NULL;
 
-                    if (!strcmp(geometry->name, rule->named_geometry)) {
-                        window->x = geometry->x;
-                        window->y = geometry->y;
-                        window->height = geometry->height;
-                        window->width = geometry->width;
+            for (; index < named_geometries->size; index++) {
+                geometry = get_from_vector(named_geometries, index);
 
-                        break;
-                    }
-                }
+                if (strcmp(geometry->name, rule->named_geometry))
+                    continue;
+
+                window->x = geometry->x;
+                window->y = geometry->y;
+
+                window->height = geometry->height;
+                window->width = geometry->width;
+                break;
             }
-
-            if (rule->workspace) {
-                window->workspace = rule->workspace;
-            }
-
-            break;
         }
+
+        if (rule->screen) {
+            index = 0;
+            monitor_t *monitor = NULL;
+
+            for (; index < monitors->size; index++) {
+                monitor = get_from_vector(monitors, index);
+
+                if (strcmp(monitor->name, rule->screen))
+                    continue;
+
+                monitor_output = monitor;
+                break;
+            }
+        }
+
+        if (rule->workspace)
+            window->workspace = rule->workspace;
+
+        break;
     }
 
-    /* Create parent window */
+    /*
+     * Apply defaults for unset values
+     */
 
-    unsigned int data[] = { 0x00000000, 0x00000000, 1, colormap };
+    if (!monitor_output)
+        monitor_output = get_focused_monitor();
+
+    if (window->x == 0 && window->y == 0 &&
+        window->height == 0 && window->width == 0) {
+        window->x = monitor_output->grid->default_x;
+        window->y = monitor_output->grid->default_y;
+        window->height = monitor_output->grid->default_height;
+        window->width = monitor_output->grid->default_width;
+    }
+
+    if (!window->workspace)
+        window->workspace = focused_workspace;
+
+    /*
+     * Create parent window
+     */
+
+    unsigned int data[] = { 0, 0, 1, colormap };
+    unsigned int masked_data = XCB_CW_BACK_PIXEL | XCB_CW_BORDER_PIXEL |
+        XCB_CW_OVERRIDE_REDIRECT | XCB_CW_COLORMAP;
 
     xcb_create_window(xcb_connection, 32, window->parent, screen->root,
         window->x, window->y, window->width, window->height, border_total_size,
-        XCB_WINDOW_CLASS_INPUT_OUTPUT, visual->visual_id,
-        XCB_CW_BACK_PIXEL | XCB_CW_BORDER_PIXEL | XCB_CW_OVERRIDE_REDIRECT |
-        XCB_CW_COLORMAP, data);
+        XCB_WINDOW_CLASS_INPUT_OUTPUT, visual->visual_id, masked_data, data);
 
-    data[0] = XCB_EVENT_MASK_BUTTON_PRESS |
-        XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY;
+    data[0] = XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY;
+    masked_data = XCB_CW_EVENT_MASK;
 
     xcb_reparent_window(xcb_connection, window_id, window->parent, 0, 0);
     xcb_change_window_attributes(xcb_connection, window->parent,
-        XCB_CW_EVENT_MASK, data);
+        masked_data, data);
+
+    /*
+     * Window creation finalization
+     */
 
     map_window(window_id);
-
     push_to_vector(managed_windows, window);
-
-    change_window_geometry(window_id, window->x, window->y,
-        window->height, window->width);
-
-    debug_output("Window created and added to vector");
+    change_window_geometry(window_id, monitor_output,
+        window->x, window->y, window->height, window->width);
 
     return 1;
 }
@@ -393,14 +417,12 @@ void lower_window(xcb_window_t window_id) {
         XCB_CONFIG_WINDOW_STACK_MODE, data);
 }
 
-void change_window_geometry(xcb_window_t window_id, unsigned int x,
-    unsigned int y, unsigned int height, unsigned int width) {
-
-    monitor_t *monitor = get_focused_monitor();
+void change_window_geometry(xcb_window_t window_id, monitor_t *monitor,
+    unsigned int x, unsigned int y, unsigned int height, unsigned int width) {
     window_t *window = get_window_from_id(window_id);
 
-    debug_output("Window geometry change %d %d %dx%d",
-        x, y, height, width);
+    debug_output("Geometry(%d %d %dx%d), Monitor(%s)",
+        x, y, height, width, monitor->name);
 
     unsigned int data[4] = {
         (unsigned int)grid_get_x_offset(x, monitor) + grid_offset_left,
@@ -408,6 +430,8 @@ void change_window_geometry(xcb_window_t window_id, unsigned int x,
         (unsigned int)grid_get_span_x(width, monitor),
         (unsigned int)grid_get_span_y(height, monitor)
     };
+
+    debug_output("Raw(%u %u %ux%u)", data[0], data[1], data[2], data[3]);
 
     if (window) {
         window->x = x;
