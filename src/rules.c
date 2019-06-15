@@ -109,11 +109,11 @@ void create_new_rule(char **arguments) {
         rule->named_geometry = named_geometry;
     }
 
-/*    if (screen != VALUE_UNCHANGED) {
+    if (screen != VALUE_UNCHANGED) {
         if (rule->screen)
             free(rule->screen);
         rule->screen = screen;
-    }*/
+    }
 
 }
 
