@@ -28,7 +28,6 @@ void apply_configuration_to_monitor_grid(monitor_t *monitor) {
                 horizontal_border_sum + horizontal_offset_sum +
                     horizontal_gap_sum));
 
-//    grid_x_unit_size_in_pixels = usable_x_pixels / (float)grid_columns;
     grid->x_unit_size_in_pixels = usable_x_pixels / (float)grid_columns;
 
     unsigned int vertical_border_sum = (border_total_size * 2) * grid_rows;
@@ -38,7 +37,6 @@ void apply_configuration_to_monitor_grid(monitor_t *monitor) {
     float usable_y_pixels = (float)(monitor->height - (
                 vertical_border_sum + vertical_offset_sum + vertical_gap_sum));
 
-//    grid_y_unit_size_in_pixels = usable_y_pixels / (float)grid_rows;
     grid->y_unit_size_in_pixels = usable_y_pixels / (float)grid_rows;
 
     grid->default_x = (grid_columns / 2) - 1;

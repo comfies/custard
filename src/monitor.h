@@ -17,4 +17,4 @@ typedef struct {
 unsigned short initialize_monitors(void);
 monitor_t *get_focused_monitor(void);
 
-#endif
+#endif /* MONITOR_H */
