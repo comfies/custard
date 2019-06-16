@@ -10,7 +10,7 @@
 #include "xcb.h"
 
 void process_input(char *data) {
-    debug_output("Input data\n\t%s", data);;
+    debug_output("Input data\n\t%s", data);
 
     char *token;
     char delimiter[2] = { 29, '\0' };
@@ -313,11 +313,41 @@ void ipc_command_window_lower(char **arguments,
 
 void ipc_command_window_manual_resize(char **arguments,
         unsigned short *screen_update) {
-    suppress_unused(arguments);
-    suppress_unused(screen_update);
+    if (!arguments[0] || !arguments[1])
+        return;
 
     if (!get_focused_window())
         return;
+
+    window_t *window = get_window_from_id(focused_window);
+
+    char *resize = arguments[0];
+    char *direction = arguments[1];
+
+    int modifier;
+
+    if (!strcmp(resize, "shrink")) {
+        modifier = -1;
+    } else if (!strcmp(resize, "expand")) {
+        modifier = 1;
+    } else
+        return;
+
+    if (!strcmp(direction, "up"))
+        window->height += modifier;
+    else if (!strcmp(direction, "down"))
+        window->height += modifier;
+    else if (!strcmp(direction, "left"))
+        window->width += modifier;
+    else if (!strcmp(direction, "right"))
+        window->width += modifier;
+    else
+        return;
+
+    change_window_geometry(window->id, get_focused_monitor(),
+        window->x, window->y, window->height, window->width);
+    border_update(window->id);
+    *screen_update = 1;
 }
 
 void ipc_command_window_manual_move(char **arguments,
@@ -348,6 +378,7 @@ void ipc_command_window_manual_move(char **arguments,
     change_window_geometry(window->id,
         get_focused_monitor(), window->x, window->y,
         window->height, window->width);
+    border_update(window->id);
 
     *screen_update = 1;
 }
