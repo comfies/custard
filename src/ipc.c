@@ -9,28 +9,13 @@
 #include "workspaces.h"
 #include "xcb.h"
 
-struct ipc_command ipc_commands[][number_of_ipc_commands] = {
-    {{ "halt",              ipc_command_wm_halt }},
-    {{ "configure",         ipc_command_wm_configure }},
-
-    {{ "geometry",          ipc_command_new_geometry }},
-    {{ "rule",              ipc_command_new_window_rule }},
-
-    {{ "window.close",      ipc_command_window_close }},
-    {{ "window.raise",      ipc_command_window_raise}},
-    {{ "window.lower",      ipc_command_window_lower}},
-    {{ "window.geometry",   ipc_command_window_change_geometry }},
-
-    {{ "workspace",         ipc_command_change_workspace }},
-};
-
 void process_input(char *data) {
-    debug_output("Input data\n\t%s", data);
+    debug_output("Input data\n\t%s", data);;
 
     char *token;
     char delimiter[2] = { 29, '\0' };
 
-    char *descriptor;
+    char *command = "";
     char *arguments[32];
 
     unsigned int index = 0;
@@ -42,7 +27,7 @@ void process_input(char *data) {
         }
 
         if (index < 1)
-            descriptor = token;
+            command = token;
         else
             arguments[index - 1] = token;
         index++;
@@ -50,25 +35,42 @@ void process_input(char *data) {
 
     arguments[index] = "\0"; // \0\0
 
-    if (!descriptor)
+    if (!command || strlen(command) == 0)
         return;
 
     index = 0;
 
-    unsigned short flush;
-    struct ipc_command *command = NULL;
+    unsigned short screen_update = 0;
 
-    for (; index < number_of_ipc_commands; index++) {
-        command = ipc_commands[index];
+    if (!strcmp(command, "halt") || !strcmp(command, "stop"))
+        ipc_command_wm_halt(arguments, &screen_update);
+    else if (!strcmp(command, "configure"))
+        ipc_command_wm_configure(arguments, &screen_update);
 
-        if (strcmp(descriptor, command->command))
-            continue;
+    else if (!strcmp(command, "geometry"))
+        ipc_command_new_geometry(arguments, &screen_update);
+    else if (!strcmp(command, "rule"))
+        ipc_command_new_window_rule(arguments, &screen_update);
 
-        flush = command->routine(arguments);
+    else if (!strcmp(command, "window.close"))
+        ipc_command_window_close(arguments, &screen_update);
+    else if (!strcmp(command, "window.raise"))
+        ipc_command_window_raise(arguments, &screen_update);
+    else if (!strcmp(command, "window.lower"))
+        ipc_command_window_lower(arguments, &screen_update);
 
-        if (flush)
-            commit();
-    }
+    else if (!strcmp(command, "window.resize"))
+        ipc_command_window_manual_resize(arguments, &screen_update);
+    else if (!strcmp(command, "window.move"))
+        ipc_command_window_manual_move(arguments, &screen_update);
+    else if (!strcmp(command, "window.geometry"))
+        ipc_command_window_change_geometry(arguments, &screen_update);
+
+    else if (!strcmp(command, ""))
+        ipc_command_window_close(arguments, &screen_update);
+
+    if (screen_update)
+        commit();
 }
 
 unsigned short parse_boolean(char *string) {
@@ -133,14 +135,16 @@ unsigned int parse_rgba_color(char *string) {
 
 /* IPC commands */
 
-unsigned short ipc_command_wm_halt(char **arguments) {
+void ipc_command_wm_halt(char **arguments,
+        unsigned short *screen_update) {
     suppress_unused(arguments);
+    suppress_unused(screen_update);
 
     window_manager_is_running = 0;
-    return 0;
 }
 
-unsigned short ipc_command_wm_configure(char **arguments) {
+void ipc_command_wm_configure(char **arguments,
+        unsigned short *screen_update) {
 
     /*
      * custard -- configure NAME VALUE
@@ -220,10 +224,12 @@ unsigned short ipc_command_wm_configure(char **arguments) {
     for (; index < number_of_workspaces; index++)
         create_new_workspace();
 
-    return 1;
+    *screen_update = 1;
 }
 
-unsigned short ipc_command_new_geometry(char **arguments) {
+void ipc_command_new_geometry(char **arguments,
+        unsigned short *screen_update) {
+    suppress_unused(screen_update);
     unsigned int x, y, height, width;
 
     /*
@@ -231,7 +237,7 @@ unsigned short ipc_command_new_geometry(char **arguments) {
      */
 
     if (!arguments[1] || !arguments[2])
-        return 0;
+        return;
 
     char *position = strdup(arguments[1]);
     char *position_pointer = position;
@@ -255,58 +261,101 @@ unsigned short ipc_command_new_geometry(char **arguments) {
 
     free(position_pointer);
     free(size_pointer);
-
-    return 0;
 }
 
-unsigned short ipc_command_new_window_rule(char **arguments) {
+void ipc_command_new_window_rule(char **arguments,
+        unsigned short *screen_update) {
+    suppress_unused(screen_update);
     
     /*
      * custard -- rule window.VALUE? REGEX ...
      */
 
     if (!arguments[0] || !arguments[1])
-        return 0;
+        return;
 
     create_new_rule(arguments);
-
-    return 0;
 }
 
-unsigned short ipc_command_window_close(char **arguments) {
+void ipc_command_window_close(char **arguments,
+        unsigned short *screen_update) {
     suppress_unused(arguments);
 
     if (!get_focused_window())
-        return 0;
+        return;
 
     close_window(focused_window);
 
-    return 1;
+    *screen_update = 1;
 }
 
-unsigned short ipc_command_window_raise(char **arguments) {
+void ipc_command_window_raise(char **arguments,
+        unsigned short *screen_update) {
     suppress_unused(arguments);
 
     if (!get_focused_window())
-        return 0;
+        return;
 
     raise_window(focused_window);
-    return 1;
+    *screen_update = 1;
 }
 
-unsigned short ipc_command_window_lower(char **arguments) {
+void ipc_command_window_lower(char **arguments,
+        unsigned short *screen_update) {
     suppress_unused(arguments);
 
     if (!get_focused_window())
-        return 0;
+        return;
 
     lower_window(focused_window);
-    return 1;
+    *screen_update = 1;
 }
 
-unsigned short ipc_command_window_change_geometry(char **arguments) {
+void ipc_command_window_manual_resize(char **arguments,
+        unsigned short *screen_update) {
+    suppress_unused(arguments);
+    suppress_unused(screen_update);
+
     if (!get_focused_window())
-        return 0;
+        return;
+}
+
+void ipc_command_window_manual_move(char **arguments,
+        unsigned short *screen_update) {
+    if (!arguments[0])
+        return;
+
+    if (!get_focused_window())
+        return;
+
+    window_t *window = get_window_from_id(focused_window);
+
+    if (!strcmp(arguments[0], "up")) {
+        if (!window->y)
+            return;
+        window->y--;
+    } else if (!strcmp(arguments[0], "down")) {
+        window->y++; /* TODO: check monitor bounds */
+    } else if (!strcmp(arguments[0], "left")) {
+        if (!window->x)
+            return;
+        window->x--;
+    } else if (!strcmp(arguments[0], "right")) {
+        window->x++;
+    } else
+        return;
+
+    change_window_geometry(window->id,
+        get_focused_monitor(), window->x, window->y,
+        window->height, window->width);
+
+    *screen_update = 1;
+}
+
+void ipc_command_window_change_geometry(char **arguments,
+        unsigned short *screen_update) {
+    if (!get_focused_window())
+        return;
 
     named_geometry_t *geometry = NULL;
     for (unsigned int index = 0; index < named_geometries->size; index++) {
@@ -319,15 +368,15 @@ unsigned short ipc_command_window_change_geometry(char **arguments) {
             if (get_window_from_id(focused_window))
                 border_update(focused_window);
 
-            return 1;
+            *screen_update = 1;
+            return;
         }
     }
-
-    return 0;
 }
 
-unsigned short ipc_command_change_workspace(char **arguments) {
+void ipc_command_change_workspace(char **arguments,
+        unsigned short *screen_update) {
     focus_on_workspace(parse_unsigned_integer(arguments[0]));
 
-    return 1;
+    *screen_update = 1;
 }
