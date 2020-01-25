@@ -11,7 +11,7 @@
 #include "xcb.h"
 
 unsigned short initialize_monitors() {
-    if (xcb_get_extension_data(xcb_connection, &xcb_randr_id)) {
+    if (!xcb_get_extension_data(xcb_connection, &xcb_randr_id)) {
         monitor_t *monitor = (monitor_t *)malloc(sizeof(monitor_t));
 
         monitor->x = 0;
