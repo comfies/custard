@@ -71,10 +71,7 @@ int start_custard() {
     workspaces = construct_vector();
     monitors = construct_vector();
 
-    if (!initialize_monitors()) {
-        // Unable to initialize the monitors for some reason, but we'll add the 
-        // display anyways
-    }
+    initialize_monitors();
 
     if (rc_file && strlen(rc_file)) {
         debug_output("Executing specified rc file");

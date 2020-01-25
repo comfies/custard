@@ -11,8 +11,26 @@
 #include "xcb.h"
 
 unsigned short initialize_monitors() {
-    if (!xcb_get_extension_data(xcb_connection, &xcb_randr_id))
+    if (xcb_get_extension_data(xcb_connection, &xcb_randr_id)) {
+        monitor_t *monitor = (monitor_t *)malloc(sizeof(monitor_t));
+
+        monitor->x = 0;
+        monitor->y = 0;
+        monitor->height = screen->height_in_pixels;
+        monitor->width = screen->width_in_pixels;
+
+        monitor->grid = (grid_t *)malloc(sizeof(grid_t));
+
+        monitor->name = (char *)malloc(sizeof(char));
+        strcpy(monitor->name, "X");
+
+        debug_output("Monitor initialization failed; %s",
+                "xrandr extension unavailable, initialized entire screen");
+
+        push_to_vector(monitors, monitor);
+
         return 0;
+    }
 
     xcb_randr_monitor_info_t *monitor_information;
 

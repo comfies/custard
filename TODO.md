@@ -12,7 +12,6 @@ Pull requests for things on the TODO list would be greatly appreciated. Please n
 - Fullscreen toggles do not function; these are in handlers.c, event_message_received(). fullscreen() and window() methods should be created in window.c to handle these. fullscreen() should hide the parent window (the decorations, basically) as well as make the actual window as big as the monitor it is one. window() (or perhaps a better name should be put in place) should revert the window to its former state, and make a border_update() call.
 - manage_window() does nothing with splash screen windows (L59); it should center them both horizontally and vertically, set them to not be managed, but still allocate memory for the windows.
 - Settings should eventually be moved from custard.c (L32-L57) to their own file.
-- start_custard() does not initialize the entire X screen as a monitor like it should if the call to initialize_montiors() fails (L74).
 - window.c, ipc.c, rules.c, and grid.c are all in need of refactoring.
 - Better, more user-friendly commands should be used in the IPC. Names should be short but also descriptive of what they do. `window.close`, `window.raise`, etc are all really shitty.
 - Various warnings can still be found during compilation of custard; these should all eventually be mitigated. This is assuming standard gcc.
