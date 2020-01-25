@@ -70,8 +70,6 @@ unsigned short initialize_ewmh_connection() {
     xcb_ewmh_set_supported(ewmh_connection, 0,
         sizeof(supported_atoms)/sizeof*(supported_atoms) + 1, supported_atoms);
 
-    commit();
-
     return 1;
 }
 

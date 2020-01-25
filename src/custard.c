@@ -82,6 +82,8 @@ int start_custard() {
             execl(rc_file, rc_file, NULL);
     }
 
+    commit();
+
     signal(SIGTERM, signal_handler);
 
     xcb_generic_event_t *event;

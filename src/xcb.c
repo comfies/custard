@@ -90,8 +90,6 @@ unsigned short initialize_xcb_connection() {
 
     xcb_file_descriptor = xcb_get_file_descriptor(xcb_connection);
 
-    commit();
-
     return 1;
 
 }
