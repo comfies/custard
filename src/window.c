@@ -304,8 +304,9 @@ void focus_on_window(xcb_window_t window_id) {
 
     workspace_t *workspace = get_from_vector(workspaces,
         focused_workspace - 1);
-    if (workspace->focused_window != window_id)
-        workspace->focused_window = window_id;
+    if (workspace)
+        if (workspace->focused_window != window_id)
+            workspace->focused_window = window_id;
 
     debug_output("Focus set for workspace");
 
