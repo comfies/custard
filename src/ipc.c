@@ -66,6 +66,9 @@ void process_input(char *data) {
     else if (!strcmp(command, "window.geometry"))
         ipc_command_window_change_geometry(arguments, &screen_update);
 
+    else if (!strcmp(command, "workspace"))
+        ipc_command_change_workspace(arguments, &screen_update);
+
     if (screen_update)
         commit();
 }
@@ -218,8 +221,11 @@ void ipc_command_wm_configure(char **arguments,
 
     index = 0;
 
-    for (; index < number_of_workspaces; index++)
-        create_new_workspace();
+    if (workspaces->size < number_of_workspaces) {
+        number_of_workspaces = number_of_workspaces - workspaces->size;
+        for (; index < number_of_workspaces; index++)
+            create_new_workspace();
+    }
 
     *screen_update = 1;
 }
