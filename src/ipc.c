@@ -21,7 +21,7 @@ void process_input(char *data) {
     unsigned int index = 0;
 
     while ((token = strsep(&data, delimiter))) {
-        if (index == 32) {
+        if (index == 31) {
             debug_output("Input has more arguments than accepted, ignoring");
             return;
         }
@@ -33,7 +33,7 @@ void process_input(char *data) {
         index++;
     }
 
-    arguments[index] = "\0"; // \0\0
+    arguments[index - 1] = "\3"; // \0
 
     if (!command || strlen(command) == 0)
         return;
@@ -65,9 +65,6 @@ void process_input(char *data) {
         ipc_command_window_manual_move(arguments, &screen_update);
     else if (!strcmp(command, "window.geometry"))
         ipc_command_window_change_geometry(arguments, &screen_update);
-
-    else if (!strcmp(command, ""))
-        ipc_command_window_close(arguments, &screen_update);
 
     if (screen_update)
         commit();
@@ -266,7 +263,7 @@ void ipc_command_new_geometry(char **arguments,
 void ipc_command_new_window_rule(char **arguments,
         unsigned short *screen_update) {
     suppress_unused(screen_update);
-    
+
     /*
      * custard -- rule window.VALUE? REGEX ...
      */
