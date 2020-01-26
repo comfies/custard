@@ -92,7 +92,8 @@ void create_new_rule(char **arguments) {
     for (unsigned int index = 0; index < window_rules->size; index++) {
         rule = get_from_vector(window_rules, index);
 
-        if (!strcmp(rule->expression, expression)) {
+        if (!strcmp(rule->expression, expression) &&
+            rule->property == window_property) {
             debug_output("%s",
                 "Rule for expression already exists, changing rule");
             modify_rule = 1;
