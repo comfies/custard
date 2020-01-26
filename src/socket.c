@@ -19,13 +19,14 @@ unsigned short initialize_socket() {
 
     memset(&address, 0, sizeof(address));
     address.sun_family = AF_UNIX;
-    
+
     char *display = getenv("DISPLAY");
     char *user = getenv("USER");
 
-    socket_path = (char *)malloc(20 + strlen(user) + strlen(display));
+    socket_path = (char *)malloc(sizeof(char) *
+            (20 + strlen(user) + strlen(display)));
     sprintf(socket_path, "/tmp/custard.%s_%s.sock", user, display);
-    
+
     snprintf(address.sun_path, sizeof(address.sun_path), "%s", socket_path);
 
     socket_file_descriptor = socket(AF_UNIX, SOCK_STREAM, 0);
@@ -36,6 +37,7 @@ unsigned short initialize_socket() {
     }
 
     if (socket_mode == WINDOW_MANAGER) {
+        unlink(socket_path);
         if (bind(socket_file_descriptor, (struct sockaddr *)&address,
             sizeof(address)) < 0) {
             debug_output("Unable to bind socket");
@@ -64,7 +66,7 @@ void finalize_socket() {
         unlink(socket_path);
     else
         close(socket_file_descriptor);
-    
+
     free(socket_path);
 }
 
