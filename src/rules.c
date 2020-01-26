@@ -49,6 +49,8 @@ void create_new_rule(char **arguments) {
         window_property = window_name;
     else if (!strcmp(property, "window.class"))
         window_property = window_class;
+    else
+        return;
 
     char *named_geometry = VALUE_UNCHANGED;
     unsigned int workspace = VALUE_UNCHANGED;
@@ -79,8 +81,7 @@ void create_new_rule(char **arguments) {
             strcpy(screen, argument);
         }
 
-        if (argument_pointer)
-            free(argument_pointer);
+        free(argument_pointer);
 
         index++;
     }
@@ -110,7 +111,9 @@ void create_new_rule(char **arguments) {
         rule->property = window_property;
         strcpy(rule->expression, expression);
 
-        rule->workspace = rule->named_geometry = rule->screen = NULL;
+        rule->workspace = 0;
+        rule->named_geometry = NULL;
+        rule->screen = NULL;
 
         push_to_vector(window_rules, rule);
     }
