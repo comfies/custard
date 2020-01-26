@@ -13,38 +13,26 @@
 #include "workspaces.h"
 #include "xcb.h"
 
-unsigned short manage_window(xcb_window_t window_id) {
+unsigned short window_should_be_managed(xcb_window_t window_id) {
     if (get_window_from_id(window_id) ||
-        window_id == screen->root || window_id == ewmh_window_id)
-        return 0;
+    window_id == screen->root || window_id == ewmh_window_id)
+    return 0;
 
     /*
-     * Get cookies
-     */
-
-    xcb_get_property_cookie_t window_type_cookie;
-    window_type_cookie = xcb_ewmh_get_wm_window_type(
-        ewmh_connection, window_id);
+    * Get cookies
+    */
 
     xcb_get_window_attributes_cookie_t window_attributes_cookie;
     window_attributes_cookie = xcb_get_window_attributes(
         xcb_connection, window_id);
 
-    xcb_get_property_cookie_t atom_name_cookie;
-    atom_name_cookie = xcb_get_property(xcb_connection, 0,
-        window_id, XCB_ATOM_WM_NAME, XCB_GET_PROPERTY_TYPE_ANY, 0, 256);
-
-    xcb_get_property_cookie_t atom_class_cookie;
-    atom_class_cookie = xcb_get_property(xcb_connection, 0,
-        window_id, XCB_ATOM_WM_CLASS, XCB_GET_PROPERTY_TYPE_ANY, 0, 256);
-
     xcb_get_window_attributes_reply_t *attributes;
     attributes = xcb_get_window_attributes_reply(xcb_connection,
         window_attributes_cookie, NULL);
 
-    /*
-     * It's gamer time.
-     */
+    xcb_get_property_cookie_t window_type_cookie;
+    window_type_cookie = xcb_ewmh_get_wm_window_type(
+        ewmh_connection, window_id);
 
     if (attributes && attributes->override_redirect)
         return 0;
@@ -52,7 +40,7 @@ unsigned short manage_window(xcb_window_t window_id) {
     xcb_ewmh_get_atoms_reply_t window_type;
 
     if (xcb_ewmh_get_wm_window_type_reply(ewmh_connection, window_type_cookie,
-            &window_type, NULL)) {
+        &window_type, NULL)) {
 
         xcb_atom_t atom;
 
@@ -70,10 +58,13 @@ unsigned short manage_window(xcb_window_t window_id) {
                 atom == ewmh_connection->_NET_WM_WINDOW_TYPE_NOTIFICATION) {
                 debug_output("Window(%08x) type check failed", window_id);
                 xcb_ewmh_get_atoms_reply_wipe(&window_type);
+
                 return 0;
             } else if (atom == ewmh_connection->_NET_WM_WINDOW_TYPE_SPLASH) {
                 debug_output("Window(%08x) type check failed", window_id);
                 // Do something else
+
+                return 0;
             }
 
         }
@@ -84,7 +75,32 @@ unsigned short manage_window(xcb_window_t window_id) {
 
     debug_output("Window(%08x) type check completed", window_id);
 
-    monitor_t *monitor_output = NULL;
+    return 1;
+}
+
+unsigned short manage_window(xcb_window_t window_id) {
+    if (!window_should_be_managed(window_id))
+        return 0;
+
+    xcb_get_property_cookie_t atom_name_cookie;
+    atom_name_cookie = xcb_get_property(xcb_connection, 0,
+        window_id, XCB_ATOM_WM_NAME, XCB_GET_PROPERTY_TYPE_ANY, 0, 256);
+
+    xcb_get_property_cookie_t atom_class_cookie;
+    atom_class_cookie = xcb_get_property(xcb_connection, 0,
+        window_id, XCB_ATOM_WM_CLASS, XCB_GET_PROPERTY_TYPE_ANY, 0, 256);
+
+    /*
+     * It's gamer time.
+     */
+
+    char *window_title = (char *)xcb_get_property_value(
+        xcb_get_property_reply(xcb_connection, atom_name_cookie, NULL));
+    char *window_class_string = (char *)xcb_get_property_value(
+        xcb_get_property_reply(xcb_connection, atom_class_cookie, NULL));
+
+    debug_output("Window(%08x) - '%s', '%s'",
+        window_id, window_title, window_class_string);
 
     /*
      * Create window structure
@@ -95,19 +111,8 @@ unsigned short manage_window(xcb_window_t window_id) {
     window->id = window_id;
     window->parent = xcb_generate_id(xcb_connection);
 
-    /*
-     * Test for window rules
-     */
-
-    char *window_title = (char *)xcb_get_property_value(xcb_get_property_reply(
-            xcb_connection, atom_name_cookie, NULL));
-    char *window_class_string = (char *)xcb_get_property_value(xcb_get_property_reply(
-            xcb_connection, atom_class_cookie, NULL));
-
-    debug_output("Window(%08x) has title(%s)", window_id, window_title);
-
     window_rule_t *rule = NULL;
-    char *match_subject;
+    char *test_subject;
     unsigned int index = 0;
 
     for (; index < window_rules->size; index++) {
@@ -115,23 +120,31 @@ unsigned short manage_window(xcb_window_t window_id) {
 
         switch (rule->property) {
             case window_name:
-                match_subject = window_title;
+                test_subject = window_title;
                 break;
             case window_class:
-                match_subject = window_class_string;
+                test_subject = window_class_string;
                 break;
-            default:
+            default: // Unimplemented rule?
                 continue;
         }
 
-        debug_output("Window(%08x [%s:%s]) testing rule(%s)",
-            window_id, window_title, window_class_string, rule->expression);
-
-        if (!regex_match(match_subject, rule->expression))
+        if (!regex_match(test_subject, rule->expression)) {
+            rule = NULL;
             continue;
+        }
 
-        debug_output("Window(%08x) matches rule expression(%s); %s",
-            window_id, rule->expression, "setting window rules");
+        break;
+    }
+
+    /*
+     * Window creation finalization and rule application
+     */
+
+    window->workspace = focused_workspace;
+    monitor_t *output = NULL;
+
+    if (rule) {
 
         if (rule->named_geometry) {
             index = 0;
@@ -147,9 +160,10 @@ unsigned short manage_window(xcb_window_t window_id) {
                 window->y = geometry->y;
 
                 window->height = geometry->height;
-                window->width = geometry->width;
+                window->width  = geometry->width;
                 break;
             }
+
         }
 
         if (rule->screen) {
@@ -162,7 +176,7 @@ unsigned short manage_window(xcb_window_t window_id) {
                 if (strcmp(monitor->name, rule->screen))
                     continue;
 
-                monitor_output = monitor;
+                output = monitor;
                 break;
             }
         }
@@ -170,26 +184,20 @@ unsigned short manage_window(xcb_window_t window_id) {
         if (rule->workspace)
             window->workspace = rule->workspace;
 
-        break;
     }
 
-    /*
-     * Apply defaults for unset values
-     */
+    if (!output)
+        output = get_focused_monitor();
 
-    if (!monitor_output)
-        monitor_output = get_focused_monitor();
+    if (!window->x && !window->y && !window->height && !window->width) {
 
-    if (window->x == 0 && window->y == 0 &&
-        window->height == 0 && window->width == 0) {
-        window->x = monitor_output->grid->default_x;
-        window->y = monitor_output->grid->default_y;
-        window->height = monitor_output->grid->default_height;
-        window->width = monitor_output->grid->default_width;
+        window->x = output->grid->default_x;
+        window->y = output->grid->default_y;
+
+        window->height = output->grid->default_height;
+        window->width  = output->grid->default_width;
+
     }
-
-    if (!window->workspace)
-        window->workspace = focused_workspace;
 
     /*
      * Create parent window
@@ -210,14 +218,11 @@ unsigned short manage_window(xcb_window_t window_id) {
     xcb_change_window_attributes(xcb_connection, window->parent,
         masked_data, data);
 
-    /*
-     * Window creation finalization
-     */
-
     map_window(window_id);
     push_to_vector(managed_windows, window);
-    change_window_geometry(window_id, monitor_output,
-        window->x, window->y, window->height, window->width);
+    change_window_geometry(window_id, output,
+        window->x,      window->y,
+        window->height, window->width);
 
     return 1;
 }

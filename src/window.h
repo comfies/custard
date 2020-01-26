@@ -14,9 +14,10 @@ typedef struct {
     unsigned int width;
 
     unsigned short fullscreen;
-
     unsigned int workspace;
 } window_t;
+
+unsigned short window_should_be_managed(xcb_window_t);
 
 unsigned short manage_window(xcb_window_t);
 void unmanage_window(xcb_window_t);
