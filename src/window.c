@@ -34,6 +34,10 @@ unsigned short manage_window(xcb_window_t window_id) {
     atom_name_cookie = xcb_get_property(xcb_connection, 0,
         window_id, XCB_ATOM_WM_NAME, XCB_GET_PROPERTY_TYPE_ANY, 0, 256);
 
+    xcb_get_property_cookie_t atom_class_cookie;
+    atom_class_cookie = xcb_get_property(xcb_connection, 0,
+        window_id, XCB_ATOM_WM_CLASS, XCB_GET_PROPERTY_TYPE_ANY, 0, 256);
+
     xcb_get_window_attributes_reply_t *attributes;
     attributes = xcb_get_window_attributes_reply(xcb_connection,
         window_attributes_cookie, NULL);
@@ -97,18 +101,37 @@ unsigned short manage_window(xcb_window_t window_id) {
 
     char *window_title = (char *)xcb_get_property_value(xcb_get_property_reply(
             xcb_connection, atom_name_cookie, NULL));
+    char *window_class_string = (char *)xcb_get_property_value(xcb_get_property_reply(
+            xcb_connection, atom_class_cookie, NULL));
+
+    debug_output("Window(%08x) has title(%s)", window_id, window_title);
 
     window_rule_t *rule = NULL;
+    char *match_subject;
     unsigned int index = 0;
 
     for (; index < window_rules->size; index++) {
         rule = get_from_vector(window_rules, index);
 
-        if (!regex_match(window_title, rule->expression))
+        switch (rule->property) {
+            case window_name:
+                match_subject = window_title;
+                break;
+            case window_class:
+                match_subject = window_class_string;
+                break;
+            default:
+                continue;
+        }
+
+        debug_output("Window(%08x [%s:%s]) testing rule(%s)",
+            window_id, window_title, window_class_string, rule->expression);
+
+        if (!regex_match(match_subject, rule->expression))
             continue;
 
-        debug_output("Window(%08x) title(%s) matches rule expression(%s); %s",
-            window_id, window_title, rule->expression, "setting window rules");
+        debug_output("Window(%08x) matches rule expression(%s); %s",
+            window_id, rule->expression, "setting window rules");
 
         if (rule->named_geometry) {
             index = 0;
@@ -214,7 +237,7 @@ void unmanage_window(xcb_window_t window_id) {
 
     index = 0;
 
-    window_t *window = NULL; 
+    window_t *window = NULL;
     for (; index < managed_windows->size; index++) {
         window = get_from_vector(managed_windows, index);
         if (window->id == window_id) {

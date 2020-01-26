@@ -1,6 +1,8 @@
 #ifndef RULES_H
 #define RULES_H
 
+#define VALUE_UNCHANGED 0
+
 typedef struct {
     char *name;
     unsigned int x;
@@ -9,10 +11,14 @@ typedef struct {
     unsigned int width;
 } named_geometry_t;
 
-#define VALUE_UNCHANGED 0
+typedef enum window_property {
+    window_name = 0,
+    window_class = 1
+} window_property_t;
 
 typedef struct {
     char *expression;
+    window_property_t property;
 
     char *named_geometry;
     unsigned int workspace;
