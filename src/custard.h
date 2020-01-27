@@ -7,6 +7,7 @@
 
 extern unsigned short window_manager_is_running;
 
+extern vector_t *configuration;
 extern vector_t *managed_windows;
 extern vector_t *named_geometries;
 extern vector_t *window_rules;

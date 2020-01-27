@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "custard.h"
+#include "configuration.h"
 #include "grid.h"
 #include "ipc.h"
 #include "rules.h"
@@ -158,36 +159,23 @@ void ipc_command_wm_configure(char **arguments,
 
     if (!strcmp("debug", setting))
         debug_mode = boolean;
-    else if (!strcmp("grid.rows", setting))
-        grid_rows = uint;
-    else if (!strcmp("grid.columns", setting))
-        grid_columns = uint;
-    else if (!strcmp("grid.gap", setting))
-        grid_gap = uint;
-    else if (!strcmp("grid.offset.top", setting))
-        grid_offset_top = uint;
-    else if (!strcmp("grid.offset.bottom", setting))
-        grid_offset_bottom = uint;
-    else if (!strcmp("grid.offset.left", setting))
-        grid_offset_left = uint;
-    else if (!strcmp("grid.offset.right", setting))
-        grid_offset_right = uint;
-    else if (!strcmp("border.type", setting))
-        border_type = uint;
-    else if (!strcmp("border.inner.size", setting))
-        border_inner_size = uint;
-    else if (!strcmp("border.outer.size", setting))
-        border_outer_size = uint;
-    else if (!strcmp("border.color.focused", setting))
-        border_focused_color = argb;
-    else if (!strcmp("border.color.unfocused", setting))
-        border_unfocused_color = argb;
-    else if (!strcmp("border.color.background", setting))
-        border_background_color = argb;
+    else if (!strcmp("border.color.focused", setting) ||
+        !strcmp("border.color.unfocused", setting) ||
+        !strcmp("border.color.background", setting))
+        update_setting(configuration, setting, argb);
     else if (!strcmp("border.color.switch", setting))
-        border_invert_colors = boolean;
-    else if (!strcmp("workspaces", setting))
-        number_of_workspaces = uint;
+        update_setting(configuration, setting, boolean);
+    else
+        update_setting(configuration, setting, uint);
+
+    unsigned int border_total_size = 0;
+
+    unsigned int border_type = (unsigned int)query_setting(
+        configuration, "border.type");
+    unsigned int border_inner_size = (unsigned int)query_setting(configuration,
+        "border.inner.size");
+    unsigned int border_outer_size = (unsigned int)query_setting(configuration,
+        "border.outer.size");
 
     if (border_type == 0)
         border_total_size = 0;
@@ -200,6 +188,8 @@ void ipc_command_wm_configure(char **arguments,
         border_total_size = border_inner_size +
             ((border_type - 1) * border_outer_size);
     }
+
+    update_setting(configuration, "border.total.size", border_total_size);
 
 //    apply_configuration_to_grid();
 
@@ -220,6 +210,10 @@ void ipc_command_wm_configure(char **arguments,
     }
 
     index = 0;
+
+    unsigned int number_of_workspaces;
+    number_of_workspaces = (unsigned int)query_setting(
+        configuration, "workspaces");
 
     if (workspaces->size < number_of_workspaces) {
         number_of_workspaces = number_of_workspaces - workspaces->size;

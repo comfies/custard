@@ -4,6 +4,7 @@
 #include <xcb/xcb_icccm.h>
 
 #include "custard.h"
+#include "configuration.h"
 #include "grid.h"
 #include "ewmh.h"
 #include "monitor.h"
@@ -206,6 +207,9 @@ unsigned short manage_window(xcb_window_t window_id) {
     unsigned int data[] = { 0, 0, 1, colormap };
     unsigned int masked_data = XCB_CW_BACK_PIXEL | XCB_CW_BORDER_PIXEL |
         XCB_CW_OVERRIDE_REDIRECT | XCB_CW_COLORMAP;
+
+    unsigned int border_total_size = (unsigned int)query_setting(
+        configuration, "border.total.size");
 
     xcb_create_window(xcb_connection, 32, window->parent, screen->root,
         window->x, window->y, window->width, window->height, border_total_size,
@@ -453,6 +457,11 @@ void change_window_geometry(xcb_window_t window_id, monitor_t *monitor,
     debug_output("Geometry(%d %d %dx%d), Monitor(%s)",
         x, y, height, width, monitor->name);
 
+    unsigned int grid_offset_top = (unsigned int)query_setting(
+        configuration, "grid.offset.top");
+    unsigned int grid_offset_left = (unsigned int)query_setting(
+        configuration, "grid.offset.left");
+
     unsigned int data[4] = {
         (unsigned int)grid_get_x_offset(x, monitor) + grid_offset_left,
         (unsigned int)grid_get_y_offset(y, monitor) + grid_offset_top,
@@ -484,7 +493,12 @@ void change_window_geometry(xcb_window_t window_id, monitor_t *monitor,
 void border_update(xcb_window_t window_id) {
     window_t *window = get_window_from_id(window_id);
 
-    if (!window || border_type == 0)
+    unsigned int border_type = (unsigned int)query_setting(
+        configuration, "border.type");
+    unsigned int border_total_size = (unsigned int)query_setting(
+        configuration, "border.total.size");
+
+    if (!window || border_type == 0 || border_total_size == 0)
         return;
 
     debug_output("Border update issued");
@@ -497,6 +511,21 @@ void border_update(xcb_window_t window_id) {
         return;
 
     debug_output("Geometry check passed");
+
+    unsigned int border_inner_size = (unsigned int)query_setting(
+        configuration, "border.inner.size");
+    unsigned int border_outer_size = (unsigned int)query_setting(
+        configuration, "border.outer.size");
+
+    unsigned int border_focused_color = (unsigned int)query_setting(
+        configuration, "border.color.focused");
+    unsigned int border_unfocused_color = (unsigned int)query_setting(
+        configuration, "border.color.unfocused");
+    unsigned int border_background_color = (unsigned int)query_setting(
+        configuration, "border.color.background");
+
+    unsigned short border_invert_colors = (unsigned short)query_setting(
+        configuration, "border.color.switch");
 
     unsigned int data[1] = { border_total_size };
 

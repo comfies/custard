@@ -8,6 +8,7 @@
 #include <sys/select.h>
 
 #include "custard.h"
+#include "configuration.h"
 #include "ewmh.h"
 #include "grid.h"
 #include "handlers.h"
@@ -20,6 +21,7 @@
 
 unsigned short window_manager_is_running = 0;
 
+vector_t *configuration = NULL;
 vector_t *managed_windows = NULL;
 vector_t *named_geometries = NULL;
 vector_t *window_rules = NULL;
@@ -30,34 +32,37 @@ xcb_window_t focused_window = XCB_WINDOW_NONE;
 unsigned int focused_workspace = 1;
 
 /* configuration variables */
+
 unsigned short debug_mode = 0;
 char *rc_file;
 
-unsigned short border_type = 0;
-unsigned short border_invert_colors = 0;
-
-unsigned int border_inner_size = 0;
-unsigned int border_outer_size = 0;
-unsigned int border_total_size = 0;
-
-unsigned int border_focused_color = 0xffffffff;
-unsigned int border_unfocused_color = 0xff676767;
-unsigned int border_background_color = 0xff000000;
-
-unsigned int grid_rows = 2;
-unsigned int grid_columns = 2;
-
-unsigned int grid_gap = 0;
-unsigned int grid_offset_top = 0;
-unsigned int grid_offset_bottom = 0;
-unsigned int grid_offset_left = 0;
-unsigned int grid_offset_right = 0;
-
-unsigned int number_of_workspaces = 1;
 /* end configuration variables */
 
 int start_custard() {
     socket_mode = WINDOW_MANAGER;
+
+    /* Configuration */
+
+    configuration = construct_vector();
+
+    append_setting(configuration, "border.color.focused",    0xFFFFFFFF);
+    append_setting(configuration, "border.color.unfocused" , 0xFF676767);
+    append_setting(configuration, "border.color.background", 0xFF000000);
+
+    append_setting(configuration, "border.inner.size",   0);
+    append_setting(configuration, "border.outer.size",   0);
+    append_setting(configuration, "border.total.size",   0);
+    append_setting(configuration, "border.color.switch", 0);
+    append_setting(configuration, "border.type",         0);
+
+    append_setting(configuration, "grid.rows",          2);
+    append_setting(configuration, "grid.columns",       2);
+    append_setting(configuration, "grid.offset.top",    0);
+    append_setting(configuration, "grid.offset.bottom", 0);
+    append_setting(configuration, "grid.offset.left",   0);
+    append_setting(configuration, "grid.offset.right",  0);
+    append_setting(configuration, "grid.gap",           0);
+    append_setting(configuration, "workspaces",         0);
 
     if (!initialize_xcb_connection() || !initialize_ewmh_connection() ||
         !initialize_socket())
@@ -98,7 +103,7 @@ int start_custard() {
             max_file_descriptor = xcb_file_descriptor;
         else
             max_file_descriptor = socket_file_descriptor;
-        
+
         max_file_descriptor++;
 
         if (select(max_file_descriptor, &descriptor_set, NULL, NULL, NULL)) {
@@ -144,7 +149,7 @@ void stop_custard() {
         geometry = get_from_vector(named_geometries, index);
         free(geometry->name);
         free(geometry);
-        
+
     }
 
     deconstruct_vector(named_geometries);
@@ -183,6 +188,17 @@ void stop_custard() {
 
     deconstruct_vector(monitors);
 
+    index = 0;
+    setting_t *setting = NULL;
+
+    for (; index < configuration->size; index++) {
+        setting = get_from_vector(configuration, index);
+
+        free(setting->name);
+    }
+
+    deconstruct_vector(configuration);
+
     finalize_socket();
     finalize_ewmh_connection();
     finalize_xcb_connection();
@@ -217,4 +233,3 @@ void _debug_output(const char *file, const char *method, const int line,
     va_end(ap);
     fputs("\n", stderr);
 }
-
