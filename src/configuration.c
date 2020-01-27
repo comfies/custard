@@ -15,10 +15,23 @@ setting_t *create_setting(char *name, void *value) {
     return setting;
 }
 
+unsigned short setting_exists(vector_t *configuration, char *name) {
+    setting_t *setting;
+    unsigned int index = 0;
+    for (; index < configuration->size; index++) {
+        setting = get_from_vector(configuration, index);
+
+        if (!strcmp(setting->name, name))
+            return 1;
+    }
+
+    return 0;
+}
+
 void *query_setting(vector_t *configuration, char *name) {
     setting_t *setting;
     unsigned int index = 0;
-    for (; configuration->size; index++) {
+    for (; index < configuration->size; index++) {
         setting = get_from_vector(configuration, index);
 
         if (strcmp(setting->name, name))
@@ -45,7 +58,7 @@ unsigned short update_setting(vector_t *configuration, char *name,
     void *value) {
     setting_t *setting;
     unsigned int index = 0;
-    for (; configuration->size; index++) {
+    for (; index < configuration->size; index++) {
         setting = get_from_vector(configuration, index);
 
         if (strcmp(setting->name, name))

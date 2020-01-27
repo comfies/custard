@@ -9,6 +9,7 @@ typedef struct {
 } setting_t;
 
 setting_t *create_setting(char *name, void *);
+unsigned short setting_exists(vector_t *, char *name);
 void *query_setting(vector_t *, char *name);
 unsigned short append_setting(vector_t *, char *, void *);
 unsigned short update_setting(vector_t *, char *, void *);
