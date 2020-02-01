@@ -1,9 +1,9 @@
 #include <pcre.h>
-
 #include <stdlib.h>
 #include <string.h>
 
 #include "custard.h"
+#include "configuration.h"
 #include "ipc.h"
 #include "rules.h"
 #include "vector.h"
@@ -52,42 +52,6 @@ void create_new_rule(char **arguments) {
     else
         return;
 
-    char *named_geometry = VALUE_UNCHANGED;
-    unsigned int workspace = VALUE_UNCHANGED;
-    char *screen = VALUE_UNCHANGED;
-
-    unsigned int index = 2;
-    char *argument, *argument_pointer;
-    char *name;
-
-    debug_output("New rule created using attribute %s",
-        property);
-
-    while (arguments[index]) {
-        if (!strcmp(arguments[index], "\3"))
-            break;
-
-        argument_pointer = strdup(arguments[index]);
-        argument = argument_pointer;
-        name = strsep(&argument, "=");
-
-        if (!strcmp("workspace", name))
-            workspace = parse_unsigned_integer(argument);
-        else if (!strcmp("geometry", name)) {
-            named_geometry = (char *)malloc(sizeof(char));
-            strcpy(named_geometry, argument);
-        } else if (!strcmp("monitor", name)) {
-            screen = (char *)malloc(sizeof(char));
-            strcpy(screen, argument);
-        }
-
-        free(argument_pointer);
-
-        index++;
-    }
-
-    debug_output("Properties for rule gathered, testing for existing pattern");
-
     unsigned short modify_rule = 0;
     window_rule_t *rule = NULL;
     for (unsigned int index = 0; index < window_rules->size; index++) {
@@ -110,28 +74,43 @@ void create_new_rule(char **arguments) {
         rule->expression = (char *)malloc(sizeof(char));
         rule->property = window_property;
         strcpy(rule->expression, expression);
-
-        rule->workspace = 0;
-        rule->named_geometry = NULL;
-        rule->screen = NULL;
+        rule->ruleset = construct_vector();
 
         push_to_vector(window_rules, rule);
     }
 
-    if (workspace != VALUE_UNCHANGED)
-        rule->workspace = workspace;
+    unsigned int index = 2;
+    char *argument, *argument_pointer;
+    char *name;
 
-    if (named_geometry != VALUE_UNCHANGED) {
-        if (rule->named_geometry)
-            free(rule->named_geometry);
-        rule->named_geometry = named_geometry;
+    debug_output("New rule created using attribute %s",
+        property);
+
+    while (arguments[index]) {
+        if (!strcmp(arguments[index], "\3"))
+            break;
+
+        argument_pointer = strdup(arguments[index]);
+        argument = argument_pointer;
+        name = strsep(&argument, "=");
+
+        if (!strcmp("workspace", name))
+            append_setting(rule->ruleset, name,
+                parse_unsigned_integer(argument));
+        else if (!strcmp("geometry", name) || !strcmp("monitor", name)) {
+            append_setting(rule->ruleset, name, argument);
+        } else if (!strcmp("border.color.focused", name) ||
+            !strcmp("border.color.unfocused", name) ||
+            !strcmp("border.color.background", name))
+            append_setting(rule->ruleset, name,
+                parse_rgba_color(argument));
+
+        free(argument_pointer);
+
+        index++;
     }
 
-    if (screen != VALUE_UNCHANGED) {
-        if (rule->screen)
-            free(rule->screen);
-        rule->screen = screen;
-    }
+    debug_output("Properties for rule gathered, testing for existing pattern");
 
 }
 

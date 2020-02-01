@@ -3,6 +3,9 @@
 
 #define VALUE_UNCHANGED 0
 
+#include "configuration.h"
+#include "vector.h"
+
 typedef struct {
     char *name;
     unsigned int x;
@@ -19,10 +22,7 @@ typedef enum window_property {
 typedef struct {
     char *expression;
     window_property_t property;
-
-    char *named_geometry;
-    unsigned int workspace;
-    char *screen;
+    vector_t *ruleset;
 } window_rule_t;
 
 void create_new_geometry(char *, unsigned int, unsigned int, unsigned int,
