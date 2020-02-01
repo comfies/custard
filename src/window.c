@@ -16,8 +16,8 @@
 
 unsigned short window_should_be_managed(xcb_window_t window_id) {
     if (get_window_from_id(window_id) ||
-    window_id == screen->root || window_id == ewmh_window_id)
-    return 0;
+        window_id == screen->root || window_id == ewmh_window_id)
+        return 0;
 
     /*
     * Get cookies
@@ -111,7 +111,10 @@ unsigned short manage_window(xcb_window_t window_id) {
 
     window->id = window_id;
     window->parent = xcb_generate_id(xcb_connection);
+    window->rule = NULL;
+    window->x = window->y = window->height = window->width = 0;
 
+    unsigned short use_rule = 0;
     window_rule_t *rule = NULL;
     char *test_subject;
     unsigned int index = 0;
@@ -130,11 +133,10 @@ unsigned short manage_window(xcb_window_t window_id) {
                 continue;
         }
 
-        if (!regex_match(test_subject, rule->expression)) {
-            rule = NULL;
+        if (!regex_match(test_subject, rule->expression))
             continue;
-        }
 
+        use_rule = 1;
         break;
     }
 
@@ -145,16 +147,21 @@ unsigned short manage_window(xcb_window_t window_id) {
     window->workspace = focused_workspace;
     monitor_t *output = NULL;
 
-    if (rule) {
 
-        if (rule->named_geometry) {
+    if (use_rule) {
+        window->rule = rule;
+        debug_output("Following window rule");
+
+        if (setting_exists(rule->ruleset, "geometry")) {
             index = 0;
             named_geometry_t *geometry = NULL;
+            char *geometry_name = (char *)query_setting(rule->ruleset,
+                "geometry");
 
             for (; index < named_geometries->size; index++) {
                 geometry = get_from_vector(named_geometries, index);
 
-                if (strcmp(geometry->name, rule->named_geometry))
+                if (strcmp(geometry->name, geometry_name))
                     continue;
 
                 window->x = geometry->x;
@@ -167,14 +174,16 @@ unsigned short manage_window(xcb_window_t window_id) {
 
         }
 
-        if (rule->screen) {
+        if (setting_exists(rule->ruleset, "monitor")) {
             index = 0;
             monitor_t *monitor = NULL;
+            char *output_name = (char *)query_setting(rule->ruleset,
+                "monitor");
 
             for (; index < monitors->size; index++) {
                 monitor = get_from_vector(monitors, index);
 
-                if (strcmp(monitor->name, rule->screen))
+                if (strcmp(monitor->name, output_name))
                     continue;
 
                 output = monitor;
@@ -182,8 +191,9 @@ unsigned short manage_window(xcb_window_t window_id) {
             }
         }
 
-        if (rule->workspace)
-            window->workspace = rule->workspace;
+        if (setting_exists(rule->ruleset, "workspace"))
+            window->workspace = (unsigned int)query_setting(rule->ruleset,
+                "workspace");
 
     }
 
@@ -200,6 +210,7 @@ unsigned short manage_window(xcb_window_t window_id) {
 
     }
 
+
     /*
      * Create parent window
      */
@@ -211,8 +222,11 @@ unsigned short manage_window(xcb_window_t window_id) {
     unsigned int border_total_size = (unsigned int)query_setting(
         configuration, "border.total.size");
 
-    xcb_create_window(xcb_connection, 32, window->parent, screen->root,
-        window->x, window->y, window->width, window->height, border_total_size,
+    xcb_create_window(xcb_connection, 32,
+        window->parent, screen->root,
+        window->x, window->y,
+        window->height, window->width,
+        border_total_size,
         XCB_WINDOW_CLASS_INPUT_OUTPUT, visual->visual_id, masked_data, data);
 
     data[0] = XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY;
@@ -469,9 +483,10 @@ void change_window_geometry(xcb_window_t window_id, monitor_t *monitor,
         (unsigned int)grid_get_span_y(height, monitor)
     };
 
-    debug_output("Raw(%u %u %ux%u)", data[0], data[1], data[2], data[3]);
+    debug_output("Raw(X%u Y%u W%uxH%u)", data[0], data[1], data[2], data[3]);
 
     if (window) {
+
         window->x = x;
         window->y = y;
         window->height = height;
@@ -498,7 +513,7 @@ void border_update(xcb_window_t window_id) {
     unsigned int border_total_size = (unsigned int)query_setting(
         configuration, "border.total.size");
 
-    if (!window || border_type == 0 || border_total_size == 0)
+    if (!window || !border_type || !border_total_size)
         return;
 
     debug_output("Border update issued");
@@ -512,17 +527,31 @@ void border_update(xcb_window_t window_id) {
 
     debug_output("Geometry check passed");
 
-    unsigned int border_inner_size = (unsigned int)query_setting(
-        configuration, "border.inner.size");
-    unsigned int border_outer_size = (unsigned int)query_setting(
-        configuration, "border.outer.size");
-
     unsigned int border_focused_color = (unsigned int)query_setting(
         configuration, "border.color.focused");
     unsigned int border_unfocused_color = (unsigned int)query_setting(
         configuration, "border.color.unfocused");
     unsigned int border_background_color = (unsigned int)query_setting(
         configuration, "border.color.background");
+
+    if (window->rule) {
+        if (setting_exists(window->rule->ruleset, "border.color.focused"))
+            border_focused_color = (unsigned int)query_setting(
+                window->rule->ruleset, "border.color.focused");
+
+        if (setting_exists(window->rule->ruleset, "border.color.unfocused"))
+            border_unfocused_color = (unsigned int)query_setting(
+                window->rule->ruleset, "border.color.unfocused");
+
+        if (setting_exists(window->rule->ruleset, "border.color.background"))
+            border_background_color = (unsigned int)query_setting(
+                window->rule->ruleset, "border.color.background");
+    }
+
+    unsigned int border_inner_size = (unsigned int)query_setting(
+        configuration, "border.inner.size");
+    unsigned int border_outer_size = (unsigned int)query_setting(
+        configuration, "border.outer.size");
 
     unsigned short border_invert_colors = (unsigned short)query_setting(
         configuration, "border.color.switch");

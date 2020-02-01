@@ -3,6 +3,7 @@
 
 #include "grid.h"
 #include "monitor.h"
+#include "rules.h"
 
 typedef struct {
     xcb_window_t id;
@@ -12,6 +13,8 @@ typedef struct {
     unsigned int y;
     unsigned int height;
     unsigned int width;
+
+    window_rule_t *rule;
 
     unsigned short fullscreen;
     unsigned int workspace;
