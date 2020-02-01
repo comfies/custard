@@ -20,28 +20,6 @@ extern unsigned int focused_workspace;
 extern unsigned short debug_mode;
 extern char *rc_file;
 
-extern unsigned short border_type;
-extern unsigned short border_invert_colors;
-
-extern unsigned int border_inner_size;
-extern unsigned int border_outer_size;
-extern unsigned int border_total_size;
-
-extern unsigned int border_focused_color;
-extern unsigned int border_unfocused_color;
-extern unsigned int border_background_color;
-
-extern unsigned int grid_rows;
-extern unsigned int grid_columns;
-
-extern unsigned int grid_gap;
-extern unsigned int grid_offset_top;
-extern unsigned int grid_offset_bottom;
-extern unsigned int grid_offset_left;
-extern unsigned int grid_offset_right;
-
-extern unsigned int number_of_workspaces;
-
 int start_custard(void);
 void stop_custard(void);
 

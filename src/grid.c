@@ -21,20 +21,22 @@ void apply_configuration_to_monitor_grid(monitor_t *monitor) {
     grid_t *grid = monitor->grid;
 
     /* Until we get monitor-specifiy grid settings... */
-    unsigned int border_total_size = query_setting(
+    unsigned int border_total_size = (unsigned int)query_setting(
         configuration, "border.total.size");
-    unsigned int grid_columns = query_setting(configuration, "grid.columns");
-    unsigned int grid_rows = query_setting(configuration, "grid.rows");
+    unsigned int grid_columns = (unsigned int)query_setting(configuration,
+        "grid.columns");
+    unsigned int grid_rows = (unsigned int)query_setting(configuration,
+        "grid.rows");
 
-    unsigned int grid_offset_left = query_setting(
+    unsigned int grid_offset_left = (unsigned int)query_setting(
         configuration, "grid.offset.left");
-    unsigned int grid_offset_right = query_setting(
+    unsigned int grid_offset_right = (unsigned int)query_setting(
         configuration, "grid.offset.right");
-    unsigned int grid_offset_top = query_setting(
+    unsigned int grid_offset_top = (unsigned int)query_setting(
         configuration, "grid.offset.top");
-    unsigned int grid_offset_bottom = query_setting(
+    unsigned int grid_offset_bottom = (unsigned int)query_setting(
         configuration, "grid.offset.bottom");
-    unsigned int grid_gap = query_setting(
+    unsigned int grid_gap = (unsigned int)query_setting(
         configuration, "grid.gap");
 
     unsigned int horizontal_border_sum = (border_total_size * 2) *
@@ -78,9 +80,9 @@ void apply_configuration_to_monitor_grid(monitor_t *monitor) {
 }
 
 float grid_get_span(float unit_size, unsigned int amount) {
-    unsigned int border_total_size = query_setting(
+    unsigned int border_total_size = (unsigned int)query_setting(
         configuration, "border.total.size");
-    unsigned int grid_gap = query_setting(
+    unsigned int grid_gap = (unsigned int)query_setting(
         configuration, "grid.gap");
 
     return (unit_size * amount) + (grid_gap * (amount - 1)) + (
@@ -88,9 +90,9 @@ float grid_get_span(float unit_size, unsigned int amount) {
 }
 
 float grid_get_offset(float unit_size, unsigned int amount) {
-    unsigned int border_total_size = query_setting(
+    unsigned int border_total_size = (unsigned int)query_setting(
         configuration, "border.total.size");
-    unsigned int grid_gap = query_setting(
+    unsigned int grid_gap = (unsigned int)query_setting(
         configuration, "grid.gap");
     return (grid_gap * (amount + 1)) + (unit_size * amount) + (
         (border_total_size * 2) * amount);

@@ -191,8 +191,6 @@ void ipc_command_wm_configure(char **arguments,
 
     update_setting(configuration, "border.total.size", border_total_size);
 
-//    apply_configuration_to_grid();
-
     unsigned int index = 0;
 
     monitor_t *monitor = NULL;

@@ -156,18 +156,25 @@ void stop_custard() {
 
     index = 0;
     window_rule_t *rule = NULL;
+    setting_t *setting = NULL;
 
     for (; index < window_rules->size; index++) {
         rule = get_from_vector(window_rules, index);
         free(rule->expression);
-        if (rule->named_geometry)
-            free(rule->named_geometry);
-        if (rule->screen)
-            free(rule->screen);
+
+        unsigned int r_index = 0;
+        for (; r_index < rule->ruleset->size; r_index++) {
+            setting = get_from_vector(rule->ruleset, r_index);
+            free(setting->name);
+
+            if (setting->value)
+                free(setting->value);
+        }
+
         free(rule);
     }
 
-    deconstruct_vector(window_rules);
+    deconstruct_vector(window_rules); // fuck it man I'll fix the segfault later
 
     index = 0;
 
@@ -189,12 +196,15 @@ void stop_custard() {
     deconstruct_vector(monitors);
 
     index = 0;
-    setting_t *setting = NULL;
+    setting = NULL;
 
     for (; index < configuration->size; index++) {
         setting = get_from_vector(configuration, index);
 
         free(setting->name);
+
+        if (setting->value)
+            free(setting->value);
     }
 
     deconstruct_vector(configuration);
