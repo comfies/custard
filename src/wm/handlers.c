@@ -16,7 +16,8 @@ void (*xcb_events[])(xcb_generic_event_t*) = {
 };
 
 void (*signals[])(int) = {
-    [SIGINT]    = handle_sigint,
+    [SIGINT]    = handle_termination_signal,
+    [SIGTERM]   = handle_termination_signal,
     [SIGUNUSED] = NULL
 };
 
@@ -28,12 +29,17 @@ void handle_map_request(xcb_generic_event_t* generic_event) {
 
     xcb_window_t window_id = event->window;
 
-    map_window(window_id);
-    raise_window(window_id);
-
     if (window_should_be_managed(window_id)) {
         window_t* window = manage_window(window_id);
+        map_window(window_id);
+        raise_window(window_id);
         focus_on_window(window);
+    } else {
+        map_window(window_id);
+        raise_window(window_id);
+
+        focused_window = window_id;
+        focus_window(window_id);
     }
 
     apply();
@@ -97,10 +103,12 @@ void handle_window_click(xcb_generic_event_t* generic_event) {
 
 /* Signal handlers */
 
-void handle_sigint(int signal) {
-    suppress_unused(signal);
+void handle_termination_signal(int signal) {
+    if (signal == SIGINT)
+        log("SIGINT received");
+    else
+        log("SIGTERM received");
 
-    log("SIGINT received");
     custard_is_running = 0;
 
     /* The window manager won't die until the next iteration of the loop,
