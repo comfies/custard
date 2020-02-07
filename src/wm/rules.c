@@ -3,7 +3,7 @@
 
 #include "rules.h"
 
-vector_t* rules;
+vector_t* rules = NULL;
 
 rule_t* create_or_get_rule(window_attribute_t attribute, char* expression) {
     rule_t* rule;
