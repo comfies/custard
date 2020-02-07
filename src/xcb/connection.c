@@ -7,6 +7,8 @@
 
 xcb_connection_t* xcb_connection;
 xcb_screen_t* xcb_screen;
+xcb_visualtype_t* screen_visual;
+xcb_colormap_t screen_colormap;
 int xcb_file_descriptor;
 
 unsigned short initialize_xcb() {
@@ -37,6 +39,34 @@ unsigned short initialize_xcb() {
 
     xcb_change_window_attributes_checked(xcb_connection, xcb_screen->root,
         XCB_CW_EVENT_MASK, events);
+
+    xcb_depth_iterator_t depth_iterator = xcb_screen_allowed_depths_iterator(
+        xcb_screen);
+
+    if (depth_iterator.data) {
+        xcb_visualtype_iterator_t visual_iterator;
+
+        while (depth_iterator.rem) {
+
+            if (depth_iterator.data->depth == 32) {
+                visual_iterator = xcb_depth_visuals_iterator(
+                    depth_iterator.data);
+
+                /*while (visual_iterator.rem) {
+
+
+                    xcb_visualtype_next(&visual_iterator);
+                }*/
+                screen_visual = visual_iterator.data;
+            }
+
+            xcb_depth_next(&depth_iterator);
+        }
+    }
+
+    screen_colormap = xcb_generate_id(xcb_connection);
+    xcb_create_colormap(xcb_connection, XCB_COLORMAP_ALLOC_NONE,
+        screen_colormap, xcb_screen->root, screen_visual->visual_id);
 
     xcb_ungrab_key(xcb_connection, XCB_GRAB_ANY, xcb_screen->root,
         XCB_MOD_MASK_ANY);
