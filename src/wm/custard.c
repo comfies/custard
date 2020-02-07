@@ -19,7 +19,6 @@
 // TODO: workspaces need reimplementation
 
 unsigned short custard_is_running = 0;
-vector_t* windows;
 
 int custard() {
     if (!initialize())
@@ -80,8 +79,6 @@ unsigned short initialize() {
             signal(index, signals[index]);
     index = 0;
 
-    windows = construct_vector();
-
     // Potential TODO: manage pre-existing windows
 
     return 1;
@@ -92,13 +89,15 @@ void finalize() {
     unsigned int nested_index = 0;
 
     /* Free used memory for windows */
-    window_t* window;
-    for (; index < windows->size; index++) {
-        window = get_from_vector(windows, index);
-        unmanage_window(window->id);
+    if (windows) {
+        window_t* window;
+        for (; index < windows->size; index++) {
+            window = get_from_vector(windows, index);
+            unmanage_window(window->id);
+        }
+        deconstruct_vector(windows);
+        index = 0;
     }
-    deconstruct_vector(windows);
-    index = 0;
 
     kv_pair_t* kv_pair;
     monitor_t* monitor;

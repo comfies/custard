@@ -4,7 +4,6 @@
 #include "../vector.h"
 
 extern unsigned short custard_is_running;
-extern vector_t* windows;
 
 int custard(void);
 unsigned short initialize(void);

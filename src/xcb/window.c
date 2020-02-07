@@ -6,8 +6,6 @@
 
 #include "../wm/custard.h"
 
-// TODO: add focus methods
-
 void configure_window(xcb_window_t window_id, unsigned int value_mask,
     unsigned int* values) {
     xcb_configure_window(xcb_connection, window_id, value_mask, values);
@@ -23,6 +21,23 @@ void unmap_window(xcb_window_t window_id) {
     xcb_unmap_window(xcb_connection, window_id);
 
     log("Window(%08x) unmapped", window_id);
+}
+
+void focus_window(xcb_window_t window_id) {
+    unsigned int values[2] = {
+        XCB_ICCCM_WM_STATE_NORMAL,
+        XCB_NONE
+    };
+
+    xcb_change_property(xcb_connection, XCB_PROP_MODE_REPLACE, window_id,
+        ewmh_connection->_NET_WM_STATE, ewmh_connection->_NET_WM_STATE,
+        32, 2, values);
+
+    xcb_set_input_focus(xcb_connection, XCB_INPUT_FOCUS_POINTER_ROOT,
+        window_id, XCB_CURRENT_TIME);
+    xcb_ewmh_set_active_window(ewmh_connection, 0, window_id);
+
+    log("Window(%08x) focused", window_id);
 }
 
 void raise_window(xcb_window_t window_id) {

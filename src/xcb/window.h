@@ -8,6 +8,8 @@ void configure_window(xcb_window_t, unsigned int, unsigned int*);
 void map_window(xcb_window_t);
 void unmap_window(xcb_window_t);
 
+void focus_window(xcb_window_t);
+
 void raise_window(xcb_window_t);
 void lower_window(xcb_window_t);
 

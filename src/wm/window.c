@@ -11,8 +11,11 @@
 #include "../xcb/ewmh.h"
 #include "../xcb/window.h"
 
+vector_t* windows = NULL;
+xcb_window_t focused_window = XCB_WINDOW_NONE;
+
 unsigned short window_should_be_managed(xcb_window_t window_id) {
-    if (window_id == xcb_screen->root || window_id == ewmh_window) return 0;
+    if (window_is_managed(window_id)) return 0;
 
     xcb_get_window_attributes_cookie_t window_attributes_cookie;
     window_attributes_cookie = xcb_get_window_attributes(xcb_connection,
@@ -60,9 +63,39 @@ unsigned short window_should_be_managed(xcb_window_t window_id) {
     return 1;
 }
 
-void manage_window(xcb_window_t window_id) {
+unsigned short window_is_managed(xcb_window_t window_id) {
+    if (window_id == xcb_screen->root || window_id == ewmh_window)
+        return 0;
+
+    window_t* window = get_window_by_id(window_id);
+
+    if (!window)
+        return 0;
+
+    return 1;
+}
+
+window_t* get_window_by_id(xcb_window_t window_id) {
+    if (window_id == xcb_screen->root || window_id == ewmh_window)
+        return NULL;
+
+    if (windows) {
+        window_t* window;
+        for (unsigned int index = 0; index < windows->size; index++) {
+            window = get_from_vector(windows, index);
+
+            if (window->id == window_id)
+                return window;
+        }
+    }
+
+    return NULL;
+}
+
+window_t* manage_window(xcb_window_t window_id) {
     window_t* window = (window_t*)malloc(sizeof(window_t));
     window->id = window_id;
+    window->parent = XCB_WINDOW_NONE;
 
     /* Geometry */
     monitor_t* monitor = monitor_with_cursor_residence();
@@ -101,9 +134,15 @@ void manage_window(xcb_window_t window_id) {
     geometry->width = calculate_default_width(monitor);
 
     set_window_geometry(window, geometry);
+
+    if (!windows)
+        windows = construct_vector();
+
     push_to_vector(windows, window);
 
     log("Window(%08x) managed", window_id);
+
+    return window;
 }
 
 void unmanage_window(xcb_window_t window_id) {
@@ -134,4 +173,30 @@ void set_window_geometry(window_t* window, grid_geometry_t* geometry) {
     free(screen_geometry);
 
     log("Window(%08x) window geometry set", window->id);
+}
+
+void focus_on_window(window_t* window) {
+    if (focused_window == window->id)
+        return;
+
+    xcb_window_t previous_window = focused_window;
+    focused_window = XCB_WINDOW_NONE;
+
+    xcb_grab_button(xcb_connection, 0, previous_window,
+        XCB_EVENT_MASK_BUTTON_PRESS,
+        XCB_GRAB_MODE_ASYNC, XCB_GRAB_MODE_ASYNC,
+        XCB_NONE, XCB_NONE,
+        XCB_BUTTON_INDEX_ANY, XCB_MOD_MASK_ANY);
+    if (window_is_managed(previous_window))
+        border_update(get_window_by_id(previous_window));
+
+    focused_window = window->id;
+    xcb_ungrab_button(xcb_connection,
+        XCB_BUTTON_INDEX_ANY, window->id, XCB_MOD_MASK_ANY);
+    focus_window(window->id);
+    border_update(window);
+}
+
+void border_update(window_t* window) {
+    //
 }
