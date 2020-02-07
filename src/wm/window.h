@@ -4,6 +4,7 @@
 #include <xcb/xcb.h>
 
 #include "geometry.h"
+#include "rules.h"
 
 extern vector_t* windows;
 extern xcb_window_t focused_window;
@@ -12,6 +13,7 @@ typedef struct {
     xcb_window_t id;
     xcb_window_t parent;
     grid_geometry_t* geometry;
+    rule_t* rule;
 } window_t;
 
 unsigned short window_should_be_managed(xcb_window_t);

@@ -95,7 +95,7 @@ window_t* get_window_by_id(xcb_window_t window_id) {
 window_t* manage_window(xcb_window_t window_id) {
     window_t* window = (window_t*)malloc(sizeof(window_t));
     window->id = window_id;
-    window->parent = XCB_WINDOW_NONE;
+    window->parent = xcb_generate_id(xcb_connection);
 
     /* Geometry */
     monitor_t* monitor = monitor_with_cursor_residence();
@@ -103,7 +103,7 @@ window_t* manage_window(xcb_window_t window_id) {
     grid_geometry_t* geometry = (grid_geometry_t*)malloc(
         sizeof(grid_geometry_t));
 
-    unsigned short window_follows_rule = 0;
+    window->rule = NULL;
     if (rules) {
         rule_t* rule;
         for (unsigned int index = 0; index < rules->size; index++) {
@@ -118,13 +118,13 @@ window_t* manage_window(xcb_window_t window_id) {
                 subject = name_of_window(window_id); // unimplemented?
 
             if (expression_matches(rule->expression, subject)) {
-                window_follows_rule = 1;
+                window->rule = rule;
                 break;
             }
         }
-    }
+    };
 
-    if (window_follows_rule) {
+    if (window->rule) {
         // TODO: this
     }
 
@@ -133,11 +133,37 @@ window_t* manage_window(xcb_window_t window_id) {
     geometry->height = calculate_default_height(monitor);
     geometry->width = calculate_default_width(monitor);
 
-    set_window_geometry(window, geometry);
+    /* Parent window creation */
+
+    unsigned int values[] = {
+        0, 0, 1, screen_colormap
+    };
+    unsigned int masked_values = XCB_CW_BACK_PIXEL |
+        XCB_CW_BORDER_PIXEL | XCB_CW_OVERRIDE_REDIRECT | XCB_CW_COLORMAP;
+
+    xcb_create_window(xcb_connection, 32,
+        window->parent, xcb_screen->root,
+        0, 0, 1, 1,
+        0 /* border size */,
+        XCB_WINDOW_CLASS_INPUT_OUTPUT, screen_visual->visual_id,
+        masked_values, values);
+
+    values[0] = XCB_EVENT_MASK_BUTTON_PRESS |
+        XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY;
+    masked_values = XCB_CW_EVENT_MASK;
+
+    xcb_change_window_attributes(xcb_connection,
+        window->parent, masked_values, values);
+
+    /* Finalization */
 
     if (!windows)
         windows = construct_vector();
 
+    xcb_reparent_window(xcb_connection,
+        window_id, window->parent, 0, 0);
+    map_window(window->parent);
+    set_window_geometry(window, geometry);
     push_to_vector(windows, window);
 
     log("Window(%08x) managed", window_id);
@@ -166,6 +192,11 @@ void set_window_geometry(window_t* window, grid_geometry_t* geometry) {
     screen_geometry = get_equivalent_screen_geometry(geometry, monitor);
 
     change_window_geometry(window->id,
+        0, 0,
+        (unsigned int)screen_geometry->height,
+        (unsigned int)screen_geometry->width);
+
+    change_window_geometry(window->parent,
         (unsigned int)screen_geometry->x,
         (unsigned int)screen_geometry->y,
         (unsigned int)screen_geometry->height,
@@ -182,21 +213,23 @@ void focus_on_window(window_t* window) {
     xcb_window_t previous_window = focused_window;
     focused_window = XCB_WINDOW_NONE;
 
-    xcb_grab_button(xcb_connection, 0, previous_window,
-        XCB_EVENT_MASK_BUTTON_PRESS,
-        XCB_GRAB_MODE_ASYNC, XCB_GRAB_MODE_ASYNC,
-        XCB_NONE, XCB_NONE,
-        XCB_BUTTON_INDEX_ANY, XCB_MOD_MASK_ANY);
-    if (window_is_managed(previous_window))
+    if (window_is_managed(previous_window)) {
+        xcb_grab_button(xcb_connection, 0, previous_window,
+            XCB_EVENT_MASK_BUTTON_PRESS,
+            XCB_GRAB_MODE_ASYNC, XCB_GRAB_MODE_ASYNC,
+            XCB_NONE, XCB_NONE,
+            XCB_BUTTON_INDEX_ANY, XCB_MOD_MASK_ANY);
         border_update(get_window_by_id(previous_window));
+    }
 
     focused_window = window->id;
     xcb_ungrab_button(xcb_connection,
         XCB_BUTTON_INDEX_ANY, window->id, XCB_MOD_MASK_ANY);
     focus_window(window->id);
     border_update(window);
+
+    log("Window(%08x) focused in place of Window(%08x)",
+        window->id, previous_window);
 }
 
-void border_update(window_t* window) {
-    //
-}
+void border_update(window_t* window) {}
