@@ -55,6 +55,9 @@ void handle_window_close(xcb_generic_event_t* generic_event) {
     if (window_is_managed(window_id))
         unmanage_window(window_id);
 
+    if (focused_window == window_id)
+        focused_window = XCB_WINDOW_NONE;
+
     apply();
 }
 
