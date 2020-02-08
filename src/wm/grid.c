@@ -136,12 +136,16 @@ float span_height_over_screen(unsigned int span, monitor_t* monitor) {
 
 float get_x_offset(unsigned int offset, monitor_t* monitor) {
     float unit_in_pixels = calculate_horizontal_unit_size(monitor);
+    float left_offset = (float)get_value_from_key_with_fallback(
+        monitor->configuration, "grid.margin.left")->number;
 
-    return get_unit_offset(unit_in_pixels, offset, monitor);
+    return get_unit_offset(unit_in_pixels, offset, monitor) + left_offset;
 }
 
 float get_y_offset(unsigned int offset, monitor_t* monitor) {
     float unit_in_pixels = calculate_vertical_unit_size(monitor);
+    float top_offset = (float)get_value_from_key_with_fallback(
+        monitor->configuration, "grid.margin.top")->number;
 
-    return get_unit_offset(unit_in_pixels, offset, monitor);
+    return get_unit_offset(unit_in_pixels, offset, monitor) + top_offset;
 }
