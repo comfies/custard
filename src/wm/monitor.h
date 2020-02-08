@@ -10,6 +10,7 @@ extern vector_t* monitors;
 struct monitor {
     char* name;
     screen_geometry_t* geometry;
+    vector_t* geometries;
     vector_t* configuration;
 };
 

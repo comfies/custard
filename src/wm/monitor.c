@@ -27,6 +27,8 @@ void setup_monitors() {
         monitor->geometry->height = (float)xcb_screen->height_in_pixels;
         monitor->geometry->width = (float)xcb_screen->width_in_pixels;
 
+        monitor->geometries = NULL;
+
         strcpy(monitor->name, "<xorg>");
         push_to_vector(monitors, monitor);
 
@@ -59,6 +61,8 @@ void setup_monitors() {
 
         monitor->geometry->height = (float)monitor_information->height;
         monitor->geometry->width = (float)monitor_information->width;
+
+        monitor->geometries = NULL;
 
         strcpy(monitor->name, output_name);
         push_to_vector(monitors, monitor);
