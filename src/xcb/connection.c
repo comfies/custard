@@ -52,11 +52,6 @@ unsigned short initialize_xcb() {
                 visual_iterator = xcb_depth_visuals_iterator(
                     depth_iterator.data);
 
-                /*while (visual_iterator.rem) {
-
-
-                    xcb_visualtype_next(&visual_iterator);
-                }*/
                 screen_visual = visual_iterator.data;
             }
 
