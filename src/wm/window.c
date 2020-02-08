@@ -67,9 +67,6 @@ unsigned short window_should_be_managed(xcb_window_t window_id) {
 }
 
 unsigned short window_is_managed(xcb_window_t window_id) {
-    if (window_id == xcb_screen->root || window_id == ewmh_window)
-        return 0;
-
     window_t* window = get_window_by_id(window_id);
 
     if (!window)
@@ -79,7 +76,8 @@ unsigned short window_is_managed(xcb_window_t window_id) {
 }
 
 window_t* get_window_by_id(xcb_window_t window_id) {
-    if (window_id == xcb_screen->root || window_id == ewmh_window)
+    if (window_id == xcb_screen->root || window_id == ewmh_window ||
+        window_id == XCB_WINDOW_NONE)
         return NULL;
 
     if (windows) {
