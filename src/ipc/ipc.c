@@ -11,6 +11,7 @@
 #include "../wm/rules.h"
 #include "../wm/window.h"
 #include "../xcb/connection.h"
+#include "../xcb/window.h"
 
 void ipc_process_input(char* feed) {
     unsigned short update = 0;
@@ -28,6 +29,8 @@ void ipc_process_input(char* feed) {
         ipc_command_geometry(input, &update);
     else if (!strcmp(qualifier, "match"))
         ipc_command_match(input, &update);
+    else if (!strcmp(qualifier, "window"))
+        ipc_command_window(input, &update);
 
     if (update) {
         apply();
@@ -77,52 +80,45 @@ void ipc_command_geometry(vector_t* input, unsigned short* screen_update) {
      *  custard - geometry [monitor or '*'] [label] [width]x[height] [x],[y]
      */
 
-    char* monitor_name = get_from_vector(input, 1);
-
-    char* label = get_from_vector(input, 2);
-    char* size = get_from_vector(input, 3);
-    char* position = get_from_vector(input, 4);
+    char* monitor_name;
+    char* label;
+    char* size;
+    char* position;
 
     char* token;
-
-    token = strsep(&size, "x");
-
-    unsigned int width = string_to_integer(token);
-    unsigned int height = string_to_integer(size);
-
-    token = strsep(&position, ",");
-
-    unsigned int x = string_to_integer(token);
-    unsigned int y = string_to_integer(position);
+    unsigned int height;
+    unsigned int width;
+    unsigned int x;
+    unsigned int y;
 
     monitor_t* monitor;
     grid_geometry_t* geometry = NULL;
     labeled_grid_geometry_t* labeled_geometry = NULL;
 
-    if (strcmp(monitor_name, "*")) {
-        monitor = monitor_from_name(monitor_name);
+    for (unsigned int index = 1; index < input->size; index += 4) {
+        labeled_geometry = NULL;
+        geometry = NULL;
 
-        if (!monitor)
-            return;
+        monitor_name = get_from_vector(input, index);
+        label = get_from_vector(input, index + 1);
+        size = get_from_vector(input, index + 2);
+        position = get_from_vector(input, index + 3);
 
-        geometry = get_geometry_from_monitor(monitor, label);
-        if (geometry) {
-            geometry->x = x;
-            geometry->y = y;
-            geometry->height = height;
-            geometry->width = width;
-        } else {
-            if (!monitor->geometries)
-                monitor->geometries = construct_vector();
+        token = strsep(&size, "x");
 
-            labeled_geometry = create_labeled_geometry(label,
-                x, y, height, width);
-            push_to_vector(monitor->geometries, labeled_geometry);
-        }
+        width = string_to_integer(token);
+        height = string_to_integer(size);
 
-    } else {
-        for (unsigned int index = 0; index < monitors->size; index++) {
-            monitor = get_from_vector(monitors, index);
+        token = strsep(&position, ",");
+
+        x = string_to_integer(token);
+        y = string_to_integer(position);
+
+        if (strcmp(monitor_name, "*")) {
+            monitor = monitor_from_name(monitor_name);
+
+            if (!monitor)
+                return;
 
             geometry = get_geometry_from_monitor(monitor, label);
             if (geometry) {
@@ -130,22 +126,44 @@ void ipc_command_geometry(vector_t* input, unsigned short* screen_update) {
                 geometry->y = y;
                 geometry->height = height;
                 geometry->width = width;
-                break; // everything using this geometry is good now,
-                // should iterate once since this would be a global geometry
             } else {
                 if (!monitor->geometries)
                     monitor->geometries = construct_vector();
 
-                if (!labeled_geometry)
-                    labeled_geometry = create_labeled_geometry(label,
-                        x, y, height, width);
+                labeled_geometry = create_labeled_geometry(label,
+                    x, y, height, width);
                 push_to_vector(monitor->geometries, labeled_geometry);
             }
+
+        } else {
+            for (unsigned int index = 0; index < monitors->size; index++) {
+                monitor = get_from_vector(monitors, index);
+
+                geometry = get_geometry_from_monitor(monitor, label);
+                if (geometry) {
+                    geometry->x = x;
+                    geometry->y = y;
+                    geometry->height = height;
+                    geometry->width = width;
+                    break; // everything using this geometry is good now,
+                    // should iterate once since this would be a global geometry
+                } else {
+                    if (!monitor->geometries)
+                        monitor->geometries = construct_vector();
+
+                    if (!labeled_geometry)
+                        labeled_geometry = create_labeled_geometry(label,
+                            x, y, height, width);
+                    push_to_vector(monitor->geometries, labeled_geometry);
+                }
+            }
         }
+
+        log("Geometry (%s[%s]: %d,%d %dx%d)", label, monitor_name,
+            x, y, width, height);
     }
 
-    log("Geometry (%s[%s]: %d,%d %dx%d)", label, monitor_name,
-        x, y, width, height);
+    return;
 }
 
 void ipc_command_match(vector_t* input, unsigned short* screen_update) {
@@ -222,4 +240,36 @@ void ipc_command_match(vector_t* input, unsigned short* screen_update) {
         add_rule(rule);
 
     }
+}
+
+void ipc_command_window(vector_t* input, unsigned short* screen_update) {
+    char* variable = get_from_vector(input, 1);
+
+    /*
+     * Usage:
+     * custard - window close
+     *  custard - window geometry [label]
+     */
+
+    if (!strcmp(variable, "close")) {
+        close_window(focused_window);
+        *screen_update = 1;
+    } else if (!strcmp(variable, "geometry")) {
+        char* label = get_from_vector(input, 2);
+        grid_geometry_t* geometry;
+
+        geometry = get_geometry_from_monitor(
+            monitor_with_cursor_residence(), label);
+
+        if (!geometry)
+            return;
+
+        window_t* window = get_window_by_id(focused_window);
+        if (window) {
+            set_window_geometry(window, geometry);
+            *screen_update = 1;
+        }
+
+    }
+
 }
