@@ -122,7 +122,7 @@ unsigned short initialize() {
 
 void finalize() {
     unsigned int index = 0;
-    unsigned int nested_index = 0;
+    unsigned int sub_index = 0;
 
     /* Free used memory for windows */
     if (windows) {
@@ -137,32 +137,48 @@ void finalize() {
 
     kv_pair_t* kv_pair;
     monitor_t* monitor;
+    labeled_grid_geometry_t* labeled_geometry;
     for (; index < monitors->size; index++) {
         monitor = get_from_vector(monitors, index);
 
         free(monitor->name);
         free(monitor->geometry);
 
+        if (monitor->geometries) {
+            for (; sub_index < monitor->geometries->size; sub_index++) {
+                labeled_geometry = get_from_vector(monitor->geometries,
+                    sub_index);
+
+                free(labeled_geometry->label);
+                free(labeled_geometry->geometry);
+                free(labeled_geometry);
+            }
+            sub_index = 0;
+
+            deconstruct_vector(monitor->geometries);
+        }
+
         if (monitor->configuration) {
-            for (; nested_index < monitor->configuration->size;
-                nested_index++) {
-                kv_pair = get_from_vector(monitor->configuration, index);
+            for (; sub_index < monitor->configuration->size; sub_index++) {
+                kv_pair = get_from_vector(monitor->configuration, sub_index);
 
                 free(kv_pair->key);
                 free(kv_pair->value);
                 free(kv_pair);
             }
-            nested_index = 0;
+            sub_index = 0;
 
             deconstruct_vector(monitor->configuration);
         }
     }
-    nested_index = index = 0;
+    sub_index = index = 0;
 
     for (; index < configuration->size; index++) {
         kv_pair = get_from_vector(configuration, index);
 
         free(kv_pair->key);
+        if (kv_pair->value->string)
+            free(kv_pair->value->string);
         free(kv_pair->value);
         free(kv_pair);
     }
@@ -179,17 +195,21 @@ void finalize() {
             free(rule->expression);
 
             if (rule->rules) {
-/*                for (; nested_index < rule->rules->size; nested_index++) {
-                    kv_pair = get_from_vector(rule->rules, nested_index);
+                for (; sub_index < rule->rules->size; sub_index++) {
+                    kv_pair = get_from_vector(rule->rules, sub_index);
 
                     free(kv_pair->key);
+                    if (kv_pair->value->string)
+                        free(kv_pair->value->string);
                     free(kv_pair->value);
                     free(kv_pair);
                 }
-                nested_index = 0;*/
+
+                sub_index = 0;
+
+                deconstruct_vector(rule->rules);
             }
 
-            deconstruct_vector(rule->rules);
         }
 
         deconstruct_vector(rules);
