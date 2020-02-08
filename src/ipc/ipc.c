@@ -40,6 +40,11 @@ void ipc_process_input(char* feed) {
 void ipc_command_configure(vector_t* input, unsigned short* screen_update) {
     suppress_unused(screen_update);
 
+    /*
+     * Usage:
+     *  custard - configure ([configurable] [value])...
+     */
+
     char* variable;
     char* value_string;
 
@@ -66,6 +71,11 @@ void ipc_command_configure(vector_t* input, unsigned short* screen_update) {
 
 void ipc_command_geometry(vector_t* input, unsigned short* screen_update) {
     suppress_unused(screen_update);
+
+    /*
+     * Usage:
+     *  custard - geometry [monitor or '*'] [label] [width]x[height] [x],[y]
+     */
 
     char* monitor_name = get_from_vector(input, 1);
 
@@ -150,8 +160,8 @@ void ipc_command_match(vector_t* input, unsigned short* screen_update) {
 
         /*
          * Usage:
-         *  custard - match window.name [expression] [configurable value]...
-         *  custard - match window.class [expression] [configurable value]...
+         *  custard - match window.name [expression] ([configurable] [value])...
+         * custard - match window.class [expression] ([configurable] [value])...
          */
 
         window_attribute_t attribute;
