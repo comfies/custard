@@ -1,3 +1,4 @@
+#include <poll.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -50,6 +51,8 @@ int custard(int argc, char** argv) {
         }
     }
 
+    /* initialize window manager */
+
     if (!initialize()) {
         finalize();
         return EXIT_FAILURE;
@@ -65,22 +68,15 @@ int custard(int argc, char** argv) {
     xcb_generic_event_t *xcb_event;
     unsigned int xcb_event_type;
 
-    fd_set descriptors;
-    int descriptor;
+    struct pollfd descriptors[2] = {
+        { xcb_file_descriptor,    .events = POLLIN },
+        { socket_file_descriptor, .events = POLLIN }
+    };
 
     while (custard_is_running) {
-        FD_ZERO(&descriptors);
-        FD_SET(xcb_file_descriptor, &descriptors);
-        FD_SET(socket_file_descriptor, &descriptors);
 
-        descriptor = xcb_file_descriptor;
-        if (xcb_file_descriptor < socket_file_descriptor)
-            descriptor = socket_file_descriptor;
-        descriptor++;
-
-        if (select(descriptor, &descriptors, NULL, NULL, NULL)) {
-            if (FD_ISSET(xcb_file_descriptor, &descriptors)) {
-
+        if (poll(descriptors, 2, -1)) {
+            if (descriptors[0].revents & POLLIN) {
                 while ((xcb_event = xcb_poll_for_event(xcb_connection))) {
                     xcb_event_type = xcb_event->response_type & ~0x80;
 
@@ -88,10 +84,9 @@ int custard(int argc, char** argv) {
                         xcb_events[xcb_event_type](xcb_event);
 
                 }
-
             }
 
-            if (FD_ISSET(socket_file_descriptor, &descriptors)) {
+            if (descriptors[1].revents & POLLIN) {
                 ipc_process_input(read_from_socket());
             }
         }
@@ -129,6 +124,9 @@ void finalize() {
         window_t* window;
         for (; index < windows->size; index++) {
             window = get_from_vector(windows, index);
+
+            xcb_reparent_window(xcb_connection,
+                window->id, xcb_screen->root, 0, 0);
             unmanage_window(window->id);
         }
         deconstruct_vector(windows);
@@ -177,8 +175,6 @@ void finalize() {
         kv_pair = get_from_vector(configuration, index);
 
         free(kv_pair->key);
-        if (kv_pair->value->string)
-            free(kv_pair->value->string);
         free(kv_pair->value);
         free(kv_pair);
     }
@@ -199,8 +195,6 @@ void finalize() {
                     kv_pair = get_from_vector(rule->rules, sub_index);
 
                     free(kv_pair->key);
-                    if (kv_pair->value->string)
-                        free(kv_pair->value->string);
                     free(kv_pair->value);
                     free(kv_pair);
                 }
