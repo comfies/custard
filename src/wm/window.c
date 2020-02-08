@@ -1,3 +1,6 @@
+#include <string.h>
+
+#include "config.h"
 #include "custard.h"
 #include "geometry.h"
 #include "grid.h"
@@ -97,16 +100,12 @@ window_t* manage_window(xcb_window_t window_id) {
     window->id = window_id;
     window->parent = xcb_generate_id(xcb_connection);
 
-    /* Geometry */
-    monitor_t* monitor = monitor_with_cursor_residence();
-
-    grid_geometry_t* geometry = (grid_geometry_t*)malloc(
-        sizeof(grid_geometry_t));
+    unsigned int index = 0;
 
     window->rule = NULL;
     if (rules) {
         rule_t* rule;
-        for (unsigned int index = 0; index < rules->size; index++) {
+        for (; index < rules->size; index++) {
             rule = get_from_vector(rules, index);
 
             char* subject = NULL;
@@ -127,16 +126,35 @@ window_t* manage_window(xcb_window_t window_id) {
                 break;
             }
         }
+        index = 0;
     };
 
+    grid_geometry_t* geometry = NULL;
+    monitor_t* monitor = monitor_with_cursor_residence();
+
     if (window->rule) {
-        // TODO: this
+        if (window->rule->rules) {
+            kv_value_t* value;
+            value = get_value_from_key(window->rule->rules, "monitor");
+
+            if (value)
+                if (monitor_from_name(value->string))
+                    monitor = monitor_from_name(value->string);
+
+            value = get_value_from_key(window->rule->rules, "geometry");
+            if (value)
+                geometry = get_geometry_from_monitor(monitor, value->string);
+        }
     }
 
-    geometry->x = calculate_default_x(monitor);
-    geometry->y = calculate_default_y(monitor);
-    geometry->height = calculate_default_height(monitor);
-    geometry->width = calculate_default_width(monitor);
+    if (!geometry) {
+        geometry = (grid_geometry_t*)malloc(sizeof(grid_geometry_t));
+
+        geometry->x = calculate_default_x(monitor);
+        geometry->y = calculate_default_y(monitor);
+        geometry->height = calculate_default_height(monitor);
+        geometry->width = calculate_default_width(monitor);
+    }
 
     /* Parent window creation */
 
