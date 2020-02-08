@@ -3,9 +3,10 @@
 
 #include "../vector.h"
 
+extern char* rc_path;
 extern unsigned short custard_is_running;
 
-int custard(void);
+int custard(int, char**);
 unsigned short initialize(void);
 void finalize(void);
 

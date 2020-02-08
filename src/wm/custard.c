@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <string.h>
+#include <unistd.h>
 
 #include "custard.h"
 #include "config.h"
@@ -18,11 +20,45 @@
 #include "../xcb/xrandr.h"
 // TODO: workspaces need reimplementation
 
+char* rc_path = NULL;
 unsigned short custard_is_running = 0;
 
-int custard() {
-    if (!initialize())
+int custard(int argc, char** argv) {
+    /* Process arguments */
+
+    char* argument;
+    for (int index = 1; index < argc; index++) {
+        argument = argv[index];
+
+        if (!strcmp(argument, "--rc")) {
+            if (!argv[index + 1] || !strlen(argv[index + 1])) {
+                log("No rc specified, exiting.");
+                return EXIT_FAILURE;
+            }
+
+            if (access(argv[index + 1], X_OK | F_OK | R_OK) > -1) {
+                rc_path = (char*)malloc(sizeof(char) *
+                    (strlen(argv[index + 1]) + 1));
+                strcpy(rc_path, argv[index + 1]);
+
+                index++;
+                continue;
+            } else {
+                log("Specified rc is not executable, exiting.");
+                return EXIT_FAILURE;
+            }
+        }
+    }
+
+    if (!initialize()) {
+        finalize();
         return EXIT_FAILURE;
+    }
+
+
+    if (rc_path)
+        if (fork() == 0)
+            execl(rc_path, rc_path, NULL);
 
     custard_is_running = 1;
 
@@ -143,20 +179,21 @@ void finalize() {
             free(rule->expression);
 
             if (rule->rules) {
-                for (; nested_index < rule->rules->size; nested_index++) {
+/*                for (; nested_index < rule->rules->size; nested_index++) {
                     kv_pair = get_from_vector(rule->rules, nested_index);
 
                     free(kv_pair->key);
                     free(kv_pair->value);
                     free(kv_pair);
                 }
-                nested_index = 0;
+                nested_index = 0;*/
             }
 
             deconstruct_vector(rule->rules);
         }
 
         deconstruct_vector(rules);
+        index = 0;
     }
 
     finalize_xcb();

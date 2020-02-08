@@ -8,6 +8,6 @@
 int main(int argc, char** argv) {
     if (should_become_controller(argc, argv))
         return controller(argc, argv);
-    
-    return custard();
+
+    return custard(argc, argv);
 }
