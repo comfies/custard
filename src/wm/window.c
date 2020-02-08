@@ -109,13 +109,18 @@ window_t* manage_window(xcb_window_t window_id) {
         for (unsigned int index = 0; index < rules->size; index++) {
             rule = get_from_vector(rules, index);
 
-            char* subject;
-            if (rule->attribute == class)
-                subject = class_of_window(window_id);
-            else if (rule->attribute == name)
-                subject = name_of_window(window_id);
-            else
-                subject = name_of_window(window_id); // unimplemented?
+            char* subject = NULL;
+            switch (rule->attribute) {
+                case class:
+                    subject = class_of_window(window_id);
+                    break;
+                case name:
+                    subject = name_of_window(window_id);
+                    break;
+                default:
+                    index = rules->size;
+                    break; // Unimplemented, somehow, return
+            }
 
             if (expression_matches(rule->expression, subject)) {
                 window->rule = rule;
@@ -177,6 +182,8 @@ void unmanage_window(xcb_window_t window_id) {
         window = get_from_vector(windows, index);
 
         if (window->id == window_id) {
+            xcb_destroy_window(xcb_connection, window->parent);
+
             pull_from_vector(windows, index);
             log("Window(%08x) unmanaged", window_id);
             return;
