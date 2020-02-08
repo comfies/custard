@@ -3,8 +3,6 @@
 
 #include "../vector.h"
 
-extern vector_t* geometries;
-
 typedef struct monitor monitor_t;
 
 typedef struct {
