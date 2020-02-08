@@ -3,6 +3,7 @@
 
 #include "config.h"
 
+char* rc_path;
 vector_t* configuration;
 
 void setup_global_configuration() {
@@ -97,8 +98,9 @@ kv_value_t* get_value_from_key_with_fallback(vector_t* passed_configuration,
     kv_value_t* value;
     value = get_value_from_key(passed_configuration, key);
 
-    if (!value)
-        value = get_value_from_key(configuration, key);
+    if (passed_configuration != configuration)
+        if (!value)
+            value = get_value_from_key(configuration, key);
 
     return value;
 }

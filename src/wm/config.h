@@ -8,6 +8,7 @@ extern vector_t* configuration;
 typedef union kv_value {
     unsigned short boolean;
     unsigned int number;
+    char* string;
 } kv_value_t;
 
 typedef struct {
