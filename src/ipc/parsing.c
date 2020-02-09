@@ -24,7 +24,7 @@ unsigned int string_to_color(char* string) {
         return rgba;
 
     unsigned int length = strlen(string);
-    if (length != 4 || length != 7 || length != 9)
+    if (length <= 4 || (5 < length && length < 7) || length == 8 || length > 9)
         return rgba;
 
     unsigned int offset = 0;
