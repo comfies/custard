@@ -37,7 +37,7 @@ and [howm](https://github.com/HarveyHunt/howm).
 |Arch Linux  |`libxcb xcb-util xcb-util-wm`                           |
 |Debian Linux|`xcb libxcb-ewmh-dev libxcb-icccm4-dev libxcb-util0-dev libxcb-randr0-dev libpcre3-dev`|
 |Gentoo Linux|`x11-libs/libxcb x11-libs/xcb-util x11-libs/xcb-util-wm`|
-|Void Linux  |`libxcb-devel xcb-util-devel xcb-util-wm-devel`         |
+|Void Linux  |`libxcb-devel xcb-util-devel xcb-util-wm-devel pcre-devel`|
 |OpenBSD     |`/usr/ports/x11/xcb`                                    |
 
 If the dependencies for your operating system are not listed yet, feel free to
@@ -54,13 +54,7 @@ $ git clone git://anongit.freedesktop.org/xcb/util-wm
 
 ###### [return to table of contents](#table-of-contents)
 
-## automatic install
-
-TODO: this
-
-###### [return to table of contents](#table-of-contents)
-
-## manual install
+## Installation
 
 ```
 $ git clone https://github.com/Sweets/custard
@@ -81,8 +75,8 @@ $ make clean
 |`--debug`|Enables the debug mode from the command-line|
 |`--rc`|Sets the rc file that will be ran when custard starts. The next argument must be a file that is both readable and executable.|
 
-If the first argument of the commandline after the `custard` binary is two hyphens
-(`--`) then custard will start as a controller and not as a window manager.
+If the first argument of the commandline after the `custard` binary is a single hyphen
+(`-`) then custard will start as a controller and not a window manager.
 
 ###### [return to table of contents](#table-of-contents)
 
@@ -100,83 +94,62 @@ TODO: this
 
 # configuration
 
-The command structure for configuring custard is the setting name followed
-by the setting value.
-
 ```
-$ custard -- configure [setting name] [setting value]
+$ custard - configure ([setting name] [setting value])...
 ```
 
-To apply the new configuration to custard you must issue the reconfigure command
-to the socket.
+The configure command allows you  to change variables that are used by the
+window manager as a whole.
 
-```
-$ custard -- reconfigure
-```
+Any amount of setting name and value pairs can be provided to the controller,
+and all of the settings will be changed.
 
-###### [return to table of contents](#table-of-contents)
-
-## configuring the virtual grid
-
-custard creates a virtual grid that windows are moved and sized about. By default, there is only two rows and two columns. The grid may also be offset from the top, left, right, or bottom of the screen, as well as create gaps between windows.
-
-The settings related to the virtual grid, as well as their default values, are listed below.
-
-|Setting Name|Default Value|Accepted Values|
-|-|-|-|
-|`grid.rows`|2|Any positive integer|
-|`grid.columns`|2|Any positive integer|
-|`grid.gap`|0|Any positive integer|
-|`grid.offset.top`|0|Any positive integer|
-|`grid.offset.bottom`|0|Any positive integer|
-|`grid.offset.left`|0|Any positive integer|
-|`grid.offset.right`|0|Any positive integer|
-
-###### [return to table of contents](#table-of-contents)
-
-## window borders
-
-### types and sizes
-
-Windows can have one of four border types, as well as specific sizes.
-
-If the border type is set to single, the border size is equal to the outer border
-size.
-
-|Setting|Default Value|Accepted Values|
-|-|-|-|
-|`border.type`|0|Any positive number less than 4|
-|`border.inner.size`|0|Any positive integer|
-|`border.outer.size`|0|Any positive integer|
-
-###### [return to table of contents](#table-of-contents)
-
-### border colors
-
-Borders can use up to three different colors depending on the border type. You can also swap colors using the `switch` color setting, but a specific set of conditions applies to how this setting works based on the used border type.
-
-|Setting|Default Value|Accepted Values|Conditions|
+|Setting name|Default value|Accepted inputs|Behavior|
 |-|-|-|-|
-|`border.color.focused`|#ffffffff|0x00000000 - 0xffffffff|Only shown when a window is focused|
-|`border.color.unfocused`|#ffffffff|0x00000000 - 0xffffffff|Only shown when a window is not focused|
-|`border.color.background`|#ffffffff|0x00000000 - 0xffffffff|Only shown when the border type is `2` or `3`|
-|`border.color.switch`|`False`|`True` or `False`|Conditions outlined below|
+|`grid.rows`|`2`|Any positive integer|Sets the default amount of rows for a grid|
+|`grid.columns`|`3`|Any positive integer|Sets the default amount of columns for a grid|
+|`grid.margins`|`0`|Any positive integer|Sets the default grid gap size|
+|`grid.margin.top`|`0`|Any position integer|Sets the default grid offset from the top of the screen|
+|`grid.margin.bottom`|`0`|Any position integer|Sets the default grid offset from the bottom of the screen|
+|`grid.margin.left`|`0`|Any position integer|Sets the default grid offset from the left of the screen|
+|`grid.margin.right`|`0`|Any position integer|Sets the default grid offset from the right of the screen|
+|`borders`|`0`|Any positive integer|Sets the default amount of borders for a window. Currently a maximum of three borders is supported.|
+|`border.size.inner`|`0`|Any positive integer|Sets the default inner-border size for a window. Unused for single-border windows|
+|`border.size.outer`|`0`|Any positive integer|Sets the default inner-border size for a window|
+|`border.color.focused`|`#FFFFFFFF`|Any hexadecimal color, with or without an alpha channel|Sets the default focused color for a window border|
+|`border.color.unfocused`|`#676767FF`|Any hexadecimal color, with or without an alpha channel|Sets the default unfocused color for a window border|
+|`border.color.background`|`#000000FF`|Any hexadecimal color, with or without an alpha channel|Sets the default background color for a window. Also used as a border background color for two or more borders|
+|`border.colors.flipped`|`False`|Any boolean (`True` or `False`)|Flips border colors between the focus-state color and background color|
+|`workspaces`|`1`|Any positive integer|Sets the amount of available workspaces. Workspaces are available per monitor|
 
-If `border.color.switch` is set to `True`, then custard will swap the focused and unfocused colors. If the border type is set to `1`, this setting will swap the focused color with the background color. If the border type is set to either `2` or `3`, then the setting will swap based on the focused state. If a given window is focused, the background and focused colors are swapped, and if a given window is not focused, the background and unfocused colors are swapped.
+### Example usage
+
+```
+$ custard - configure \
+    grid.rows               2 \
+    grid.columns            3 \
+    grid.margins            0 \
+    grid.margin.top         0 \
+    grid.margin.bottom      0 \
+    grid.margin.left        0 \
+    grid.margin.right       0 \
+    borders                 0 \
+    border.size.outer       0 \
+    border.size.inner       0 \
+    border.color.focused    '#FFFFFFFF' \
+    border.color.unfocused  '#676767FF' \
+    border.color.background '#000000FF'
+```
 
 ###### [return to table of contents](#table-of-contents)
 
-### miscellaneous
+# configuring the virtual grid
 
-|Setting|Default Value|Accepted Values|Description|
-|-|-|-|-|
-|`debug`|`False`|`True` or `False`|Outputs debug data to STDERR|
-|`workspaces`|`1`|Any positive integer|The number of workspaces|
+custard uses a virtual grid to size and position windows on the screen.
+There are global settings that the window manager uses to configure a grid,
+but each grid is per monitor output, and as such, each monitor can have their
+own grid settings.
 
 ###### [return to table of contents](#table-of-contents)
 
 ---
-
-# contributing
-
-## commit standards
