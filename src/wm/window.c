@@ -131,19 +131,17 @@ window_t* manage_window(xcb_window_t window_id) {
     grid_geometry_t* geometry = NULL;
     monitor_t* monitor = monitor_with_cursor_residence();
 
-    if (window->rule) {
-        if (window->rule->rules) {
-            kv_value_t* value;
-            value = get_value_from_key(window->rule->rules, "monitor");
+    if (window->rule && window->rule->rules) {
+        kv_value_t* value;
+        value = get_value_from_key(window->rule->rules, "monitor");
 
-            if (value)
-                if (monitor_from_name(value->string))
-                    monitor = monitor_from_name(value->string);
+        if (value)
+            if (monitor_from_name(value->string))
+                monitor = monitor_from_name(value->string);
 
-            value = get_value_from_key(window->rule->rules, "geometry");
-            if (value)
-                geometry = get_geometry_from_monitor(monitor, value->string);
-        }
+        value = get_value_from_key(window->rule->rules, "geometry");
+        if (value)
+            geometry = get_geometry_from_monitor(monitor, value->string);
     }
 
     if (!geometry) {
@@ -214,9 +212,9 @@ void unmanage_window(xcb_window_t window_id) {
 
 void set_window_geometry(window_t* window, grid_geometry_t* geometry) {
     window->geometry = geometry;
-    monitor_t* monitor;
+    monitor_t* monitor = NULL;
 
-    if (window->rule && window->rules) {
+    if (window->rule && window->rule->rules) {
         kv_value_t* value;
         value = get_value_from_key(window->rule->rules, "monitor");
 
