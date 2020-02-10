@@ -270,3 +270,10 @@ void focus_on_window(window_t* window) {
     log("Window(%08x) focused in place of Window(%08x)",
         window->id, previous_window);
 }
+
+kv_value_t* get_setting_from_window_rules(window_t* window, char* setting) {
+    if (window->rule)
+        return get_value_from_key_with_fallback(
+            window->rule->rules, setting);
+    return get_value_from_key(configuration, setting);
+}

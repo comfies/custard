@@ -2,10 +2,11 @@
 
 #include "grid.h"
 #include "decorations.h"
+#include "window.h"
 #include "../xcb/connection.h"
 
 void decorate(window_t* window) {
-    unsigned int number_of_borders = get_value_from_key(configuration,
+    unsigned int number_of_borders = get_setting_from_window_rules(window,
         "borders")->number;
 
     if (number_of_borders > 3)
@@ -34,12 +35,13 @@ unsigned int get_raw_color_value(color_t color) {
 }
 
 unsigned int determine_border_size(window_t* window) {
-    unsigned int outer_size = get_value_from_key(configuration,
+
+    unsigned int outer_size = get_setting_from_window_rules(window,
         "border.size.outer")->number;
-    unsigned int inner_size = get_value_from_key(configuration,
+    unsigned int inner_size = get_setting_from_window_rules(window,
         "border.size.inner")->number;
 
-    unsigned int number_of_borders = get_value_from_key(configuration,
+    unsigned int number_of_borders = get_setting_from_window_rules(window,
         "borders")->number;
 
     if (!outer_size)
@@ -78,8 +80,8 @@ void decorate_with_one_border(window_t* window) {
     if (focused_window == window->id)
         color_setting = "border.color.focused";
 
-    color_t color = get_value_from_key(configuration,
-        color_setting)->color;
+    color_t color = get_setting_from_window_rules(window,
+            color_setting)->color;
 
     unsigned int values[1] = {
         determine_border_size(window)
@@ -105,20 +107,21 @@ void decorate_with_multiple_borders(window_t* window,
 
     unsigned int values[1];
 
-    color_t primary_color = get_value_from_key(configuration,
+    color_t primary_color = get_setting_from_window_rules(window,
         "border.color.background")->color;
+
     char* color_setting = "border.color.unfocused";
     if (focused_window == window->id)
         color_setting = "border.color.focused";
-    color_t secondary_color = get_value_from_key(configuration,
+    color_t secondary_color = get_setting_from_window_rules(window,
         color_setting)->color;
 
     xcb_pixmap_t pixmap = xcb_generate_id(xcb_connection);
     xcb_gcontext_t graphics_context = xcb_generate_id(xcb_connection);
 
-    unsigned int outer_size = get_value_from_key(configuration,
+    unsigned int outer_size = get_setting_from_window_rules(window,
         "border.size.outer")->number;
-    unsigned int inner_size = get_value_from_key(configuration,
+    unsigned int inner_size = get_setting_from_window_rules(window,
         "border.size.inner")->number;
 
     unsigned int total_border_size = determine_border_size(window);

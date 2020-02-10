@@ -3,6 +3,7 @@
 
 #include <xcb/xcb.h>
 
+#include "config.h"
 #include "geometry.h"
 #include "monitor.h"
 #include "rules.h"
@@ -27,5 +28,7 @@ void unmanage_window(xcb_window_t);
 
 void set_window_geometry(window_t*, grid_geometry_t*);
 void focus_on_window(window_t*);
+
+kv_value_t* get_setting_from_window_rules(window_t*, char*);
 
 #endif
