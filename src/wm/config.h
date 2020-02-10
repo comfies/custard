@@ -5,10 +5,18 @@
 
 extern vector_t* configuration;
 
+typedef struct {
+    unsigned char red;
+    unsigned char green;
+    unsigned char blue;
+    unsigned char alpha;
+} color_t;
+
 typedef union kv_value {
     unsigned short boolean;
     unsigned int number;
     char* string;
+    color_t color;
 } kv_value_t;
 
 typedef struct {

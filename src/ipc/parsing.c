@@ -14,18 +14,20 @@ unsigned int string_to_integer(char* string) {
     return atoi(string);
 }
 
-unsigned int string_to_color(char* string) {
-    unsigned int rgba = 0xffffffff;
+color_t string_to_color(char* string) {
+    color_t color = {
+        .red   = 255,
+        .green = 255,
+        .blue  = 255,
+        .alpha = 255
+    };
 
-    if (!string)
-        return rgba;
-
-    if (string[0] != '#')
-        return rgba;
+    if (!string || string[0] != '#')
+        return color;
 
     unsigned int length = strlen(string);
     if (length <= 4 || (5 < length && length < 7) || length == 8 || length > 9)
-        return rgba;
+        return color;
 
     unsigned int offset = 0;
     if (length < 6) offset = 4;
@@ -34,21 +36,23 @@ unsigned int string_to_color(char* string) {
     for (unsigned int index = 0; index < (length - 1); index++)
         group[index + offset] = string[index + 1];
 
+    unsigned int rgba;
     rgba = strtol(group, NULL, 16);
 
-    unsigned int alpha, red, green, blue;
     if (offset) {
-        alpha = (rgba & 0x000F) * 0x11;
-        red   = ((rgba & 0xF000) / 0x1000) * 0x11;
-        green = ((rgba & 0x0F00) / 0x100) * 0x11;
-        blue  = ((rgba & 0x00F0) / 0x10) * 0x11;
+        color.alpha = (rgba & 0x000F) * 0x11;
+        color.red   = ((rgba & 0xF000) / 0x1000) * 0x11;
+        color.green = ((rgba & 0x0F00) / 0x100) * 0x11;
+        color.blue  = ((rgba & 0x00F0) / 0x10) * 0x11;
     } else {
-        alpha = (rgba & 0x000000FF);
-        red   = (rgba & 0xFF000000) / 0x1000000;
-        green = (rgba & 0x00FF0000) / 0x10000;
-        blue  = (rgba & 0x0000FF00) / 0x100;
+        color.alpha = (rgba & 0x000000FF);
+        color.red   = (rgba & 0xFF000000) / 0x1000000;
+        color.green = (rgba & 0x00FF0000) / 0x10000;
+        color.blue  = (rgba & 0x0000FF00) / 0x100;
     }
 
+    return color;
+/*
     red   = (red * alpha) / 0xFF;
     green = (green * alpha) / 0xFF;
     blue  = (blue * alpha) / 0xFF;
@@ -57,5 +61,5 @@ unsigned int string_to_color(char* string) {
     red   *= 0x10000;
     green *= 0x100;
 
-    return alpha | red | green | blue;
+    return alpha | red | green | blue;*/
 }

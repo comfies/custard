@@ -1,6 +1,5 @@
 #include <xcb/xcb.h>
 
-#include "config.h"
 #include "grid.h"
 #include "decorations.h"
 #include "../xcb/connection.h"
@@ -21,6 +20,17 @@ void decorate(window_t* window) {
         decorate_with_one_border(window);
     else
         decorate_with_multiple_borders(window, number_of_borders);
+}
+
+unsigned int get_raw_color_value(color_t color) {
+    unsigned int value;
+
+    value = (color.alpha) * 0x1000000 |
+        ((color.red   * color.alpha) / 0xff) * 0x10000 |
+        ((color.green * color.alpha) / 0xff) * 0x100   |
+        ((color.blue  * color.alpha) / 0xff);
+
+    return value;
 }
 
 unsigned int determine_border_size(window_t* window) {
@@ -68,8 +78,8 @@ void decorate_with_one_border(window_t* window) {
     if (focused_window == window->id)
         color_setting = "border.color.focused";
 
-    unsigned int color = get_value_from_key(configuration,
-        color_setting)->number;
+    color_t color = get_value_from_key(configuration,
+        color_setting)->color;
 
     unsigned int values[1] = {
         determine_border_size(window)
@@ -78,7 +88,7 @@ void decorate_with_one_border(window_t* window) {
     xcb_configure_window(xcb_connection, window->parent,
         XCB_CONFIG_WINDOW_BORDER_WIDTH, values);
 
-    values[0] = color;
+    values[0] = get_raw_color_value(color);
 
     xcb_change_window_attributes(xcb_connection, window->parent,
         XCB_CW_BORDER_PIXEL, values);
@@ -95,13 +105,13 @@ void decorate_with_multiple_borders(window_t* window,
 
     unsigned int values[1];
 
-    unsigned int primary_color = get_value_from_key(configuration,
-        "border.color.background")->number;
+    color_t primary_color = get_value_from_key(configuration,
+        "border.color.background")->color;
     char* color_setting = "border.color.unfocused";
     if (focused_window == window->id)
         color_setting = "border.color.focused";
-    unsigned int secondary_color = get_value_from_key(configuration,
-        color_setting)->number;
+    color_t secondary_color = get_value_from_key(configuration,
+        color_setting)->color;
 
     xcb_pixmap_t pixmap = xcb_generate_id(xcb_connection);
     xcb_gcontext_t graphics_context = xcb_generate_id(xcb_connection);
@@ -132,13 +142,13 @@ void decorate_with_multiple_borders(window_t* window,
     xcb_rectangle_t outer_border[4] = {
         { 0, 0, width, height }
     };
-    values[0] = primary_color;
+    values[0] = get_raw_color_value(primary_color);
     xcb_change_gc(xcb_connection, graphics_context,
         XCB_GC_FOREGROUND, values);
     xcb_poly_fill_rectangle(xcb_connection, pixmap, graphics_context,
         4, outer_border);
 
-    values[0] = secondary_color;
+    values[0] = get_raw_color_value(secondary_color);
     xcb_change_gc(xcb_connection, graphics_context,
         XCB_GC_FOREGROUND, values);
 
@@ -224,7 +234,7 @@ void decorate_with_multiple_borders(window_t* window,
         xcb_poly_fill_rectangle(xcb_connection, pixmap, graphics_context,
             8, inner_border);
 
-        values[0] = primary_color;
+        values[0] = get_raw_color_value(primary_color);
     }
 
     xcb_change_window_attributes(xcb_connection, window->parent,

@@ -52,7 +52,7 @@ void ipc_command_configure(vector_t* input, unsigned short* screen_update) {
     unsigned int index = 1;
 
     // There's a missing setting name-value pair
-    if ((input->size - 1 % 2)) return;
+    if (((input->size - 1) % 2)) return;
 
     kv_value_t* value = NULL;
     for (; index < input->size; index += 2) {
@@ -66,10 +66,10 @@ void ipc_command_configure(vector_t* input, unsigned short* screen_update) {
 
         if (!strcmp(variable, "border.colors.flipped"))
             value->boolean = string_to_boolean(value_string);
-        if (!strcmp(variable, "border.color.background") ||
+        else if (!strcmp(variable, "border.color.background") ||
             !strcmp(variable, "border.color.focused") ||
             !strcmp(variable, "border.color.unfocused"))
-            value->number = string_to_color(value_string);
+            value->color = string_to_color(value_string);
         else
             value->number = string_to_integer(value_string);
     }
@@ -254,11 +254,14 @@ void ipc_command_match(vector_t* input, unsigned short* screen_update) {
                 !strcmp(variable, "monitor")) {
                 setting->value->string = (char*)malloc(sizeof(char));
                 strcpy(setting->value->string, value_string);
-            } else if (!strcmp(variable, "border.colors.flipped")) {
+            } else if (!strcmp(variable, "border.colors.flipped"))
                 setting->value->boolean = string_to_boolean(value_string);
-            } else {
+            else if (!strcmp(variable, "border.color.background") ||
+                !strcmp(variable, "border.color.focused") ||
+                !strcmp(variable, "border.color.unfocused"))
+                setting->value->color = string_to_color(value_string);
+            else
                 setting->value->number = string_to_integer(value_string);
-            }
 
             configurable = NULL;
         }
