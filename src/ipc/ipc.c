@@ -298,6 +298,7 @@ void ipc_command_window(vector_t* input, unsigned short* screen_update) {
         window_t* window = get_window_by_id(focused_window);
         if (window) {
             set_window_geometry(window, geometry);
+            decorate(window);
             *screen_update = 1;
         }
 
