@@ -41,13 +41,13 @@ void setup_global_configuration() {
     setting->value->number = 0;
 
     setting = create_or_get_kv_pair(configuration, "border.color.focused");
-    setting->value->number = 0;
+    setting->value->number = 0xFFFFFFFF;
 
     setting = create_or_get_kv_pair(configuration, "border.color.unfocused");
-    setting->value->number = 0;
+    setting->value->number = 0xFF676767;
 
     setting = create_or_get_kv_pair(configuration, "border.color.background");
-    setting->value->number = 0;
+    setting->value->number = 0xFF000000;
 
     setting = create_or_get_kv_pair(configuration, "border.colors.flipped");
     setting->value->boolean = 0;
