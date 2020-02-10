@@ -220,7 +220,7 @@ void set_window_geometry(window_t* window, grid_geometry_t* geometry) {
 
     screen_geometry_t* screen_geometry;
     screen_geometry = get_equivalent_screen_geometry(geometry, monitor);
-    apply_decoration_to_window_screen_geometry(screen_geometry);
+    apply_decoration_to_window_screen_geometry(window, screen_geometry);
 
     change_window_geometry(window->id,
         0, 0,

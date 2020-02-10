@@ -5,14 +5,6 @@
 #include "decorations.h"
 #include "../xcb/connection.h"
 
-/*
- * Settings:
- * borders
- * border.colors.flipped
- * border.color.[focused, unfocused, background]
- * border.size.[outer, inner]
- */
-
 void decorate(window_t* window) {
     unsigned int number_of_borders = get_value_from_key(configuration,
         "borders")->number;
@@ -31,33 +23,45 @@ void decorate(window_t* window) {
         decorate_with_multiple_borders(window, number_of_borders);
 }
 
-void apply_decoration_to_window_screen_geometry(screen_geometry_t* geometry) {
-
+unsigned int determine_border_size(window_t* window) {
     unsigned int outer_size = get_value_from_key(configuration,
         "border.size.outer")->number;
     unsigned int inner_size = get_value_from_key(configuration,
         "border.size.inner")->number;
+
     unsigned int number_of_borders = get_value_from_key(configuration,
         "borders")->number;
 
-    unsigned int total_border_size = 0;
-    if (number_of_borders) {
-        if (number_of_borders == 1)
-            total_border_size = outer_size;
-        else if (number_of_borders == 2)
-            total_border_size = outer_size + inner_size;
-        else
-            total_border_size = (outer_size * 2) + inner_size;
-    } else return;
+    if (!outer_size)
+        outer_size = 1;
 
-    geometry->height -= (total_border_size * 2);
-    geometry->width -= (total_border_size * 2);
+    if (!inner_size)
+        inner_size = 1;
+
+    switch (number_of_borders) {
+        case 1:
+            return outer_size;
+        case 2:
+            return outer_size + inner_size;
+        case 3:
+            return (outer_size * 2) + inner_size;
+        default:
+            return 0;
+    }
+
+    return 0;
+}
+
+void apply_decoration_to_window_screen_geometry(window_t* window,
+    screen_geometry_t* geometry) {
+
+    unsigned int border_size = determine_border_size(window);
+
+    geometry->height -= (border_size * 2);
+    geometry->width -= (border_size * 2);
 }
 
 void decorate_with_one_border(window_t* window) {
-    unsigned int outer_size = get_value_from_key(configuration,
-        "border.size.outer")->number;
-
     char* color_setting = "border.color.unfocused";
     if (focused_window == window->id)
         color_setting = "border.color.focused";
@@ -65,7 +69,9 @@ void decorate_with_one_border(window_t* window) {
     unsigned int color = get_value_from_key(configuration,
         color_setting)->number;
 
-    unsigned int values[1] = { outer_size };
+    unsigned int values[1] = {
+        determine_border_size(window)
+    };
 
     xcb_configure_window(xcb_connection, window->parent,
         XCB_CONFIG_WINDOW_BORDER_WIDTH, values);
@@ -76,6 +82,8 @@ void decorate_with_one_border(window_t* window) {
         XCB_CW_BORDER_PIXEL, values);
 }
 
+
+// TODO: refactor this at some point
 void decorate_with_multiple_borders(window_t* window,
     unsigned int number_of_borders) {
 
@@ -101,11 +109,7 @@ void decorate_with_multiple_borders(window_t* window,
     unsigned int inner_size = get_value_from_key(configuration,
         "border.size.inner")->number;
 
-    unsigned int total_border_size;
-    if (number_of_borders == 2)
-        total_border_size = outer_size + inner_size;
-    else
-        total_border_size = (outer_size * 2) + inner_size;
+    unsigned int total_border_size = determine_border_size(window);
 
     values[0] = total_border_size;
 
