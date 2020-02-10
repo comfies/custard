@@ -214,9 +214,19 @@ void unmanage_window(xcb_window_t window_id) {
 
 void set_window_geometry(window_t* window, grid_geometry_t* geometry) {
     window->geometry = geometry;
+    monitor_t* monitor;
 
-    monitor_t* monitor = monitor_with_cursor_residence();
-    // test for monitor rule here
+    if (window->rule && window->rules) {
+        kv_value_t* value;
+        value = get_value_from_key(window->rule->rules, "monitor");
+
+        if (value)
+            if (monitor_from_name(value->string))
+                monitor = monitor_from_name(value->string);
+    }
+
+    if (!monitor)
+        monitor = monitor_with_cursor_residence();
 
     screen_geometry_t* screen_geometry;
     screen_geometry = get_equivalent_screen_geometry(geometry, monitor);
