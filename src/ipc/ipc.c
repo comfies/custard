@@ -6,6 +6,7 @@
 
 #include "../wm/config.h"
 #include "../wm/custard.h"
+#include "../wm/decorations.h"
 #include "../wm/geometry.h"
 #include "../wm/monitor.h"
 #include "../wm/rules.h"
@@ -41,8 +42,6 @@ void ipc_process_input(char* feed) {
 }
 
 void ipc_command_configure(vector_t* input, unsigned short* screen_update) {
-    suppress_unused(screen_update);
-
     /*
      * Usage:
      *  custard - configure ([configurable] [value])...
@@ -50,9 +49,10 @@ void ipc_command_configure(vector_t* input, unsigned short* screen_update) {
 
     char* variable;
     char* value_string;
+    unsigned int index = 1;
 
     kv_value_t* value = NULL;
-    for (unsigned int index = 1; index < input->size; index += 2) {
+    for (; index < input->size; index += 2) {
         variable = get_from_vector(input, index);
         value_string = get_from_vector(input, index + 1);
 
@@ -61,7 +61,7 @@ void ipc_command_configure(vector_t* input, unsigned short* screen_update) {
         if (!value)
             continue;
 
-        if (!strcmp(variable, "border.colors.focused"))
+        if (!strcmp(variable, "border.colors.flipped"))
             value->boolean = string_to_boolean(value_string);
         if (!strcmp(variable, "border.color.background") ||
             !strcmp(variable, "border.color.focused") ||
@@ -70,6 +70,20 @@ void ipc_command_configure(vector_t* input, unsigned short* screen_update) {
         else
             value->number = string_to_integer(value_string);
     }
+    index = 0;
+
+    if (!windows)
+        return;
+
+    window_t* window;
+    for (; index < windows->size; index++) {
+        window = get_from_vector(windows, index);
+
+        set_window_geometry(window, window->geometry);
+        decorate(window);
+    }
+
+    *screen_update = 1;
 }
 
 void ipc_command_geometry(vector_t* input, unsigned short* screen_update) {
@@ -191,8 +205,8 @@ void ipc_command_match(vector_t* input, unsigned short* screen_update) {
 
         char* configurables[9] = {
             "borders",
-            "border.size.inner",
             "border.size.outer",
+            "border.size.inner",
             "border.color.focused",
             "border.color.unfocused",
             "border.color.background",

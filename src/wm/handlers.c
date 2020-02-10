@@ -2,6 +2,7 @@
 #include <xcb/xcb.h>
 
 #include "custard.h"
+#include "decorations.h"
 #include "handlers.h"
 #include "window.h"
 
@@ -34,6 +35,7 @@ void handle_map_request(xcb_generic_event_t* generic_event) {
         map_window(window_id);
         raise_window(window_id);
         focus_on_window(window);
+        decorate(window);
     } else {
         map_window(window_id);
         raise_window(window_id);
@@ -93,7 +95,7 @@ void handle_window_click(xcb_generic_event_t* generic_event) {
                 XCB_GRAB_MODE_ASYNC, XCB_GRAB_MODE_ASYNC,
                 XCB_NONE, XCB_NONE,
                 XCB_BUTTON_INDEX_ANY, XCB_MOD_MASK_ANY);
-            border_update(get_window_by_id(previous_window));
+            decorate(get_window_by_id(previous_window));
         }
 
         focus_window(window_id);

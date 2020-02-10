@@ -2,6 +2,7 @@
 
 #include "config.h"
 #include "custard.h"
+#include "decorations.h"
 #include "geometry.h"
 #include "grid.h"
 #include "monitor.h"
@@ -154,6 +155,8 @@ window_t* manage_window(xcb_window_t window_id) {
         geometry->width = calculate_default_width(monitor);
     }
 
+    window->monitor = monitor;
+
     /* Parent window creation */
 
     unsigned int values[] = {
@@ -198,9 +201,11 @@ void unmanage_window(xcb_window_t window_id) {
         window = get_from_vector(windows, index);
 
         if (window->id == window_id) {
-            xcb_destroy_window(xcb_connection, window->parent);
 
             pull_from_vector(windows, index);
+            xcb_destroy_window(xcb_connection, window->parent);
+            free(window);
+
             log("Window(%08x) unmanaged", window_id);
             return;
         }
@@ -211,8 +216,11 @@ void set_window_geometry(window_t* window, grid_geometry_t* geometry) {
     window->geometry = geometry;
 
     monitor_t* monitor = monitor_with_cursor_residence();
+    // test for monitor rule here
+
     screen_geometry_t* screen_geometry;
     screen_geometry = get_equivalent_screen_geometry(geometry, monitor);
+    apply_decoration_to_window_screen_geometry(screen_geometry);
 
     change_window_geometry(window->id,
         0, 0,
@@ -242,17 +250,15 @@ void focus_on_window(window_t* window) {
             XCB_GRAB_MODE_ASYNC, XCB_GRAB_MODE_ASYNC,
             XCB_NONE, XCB_NONE,
             XCB_BUTTON_INDEX_ANY, XCB_MOD_MASK_ANY);
-        border_update(get_window_by_id(previous_window));
+        decorate(get_window_by_id(previous_window));
     }
 
     focused_window = window->id;
     xcb_ungrab_button(xcb_connection,
         XCB_BUTTON_INDEX_ANY, window->id, XCB_MOD_MASK_ANY);
     focus_window(window->id);
-    border_update(window);
+    decorate(window);
 
     log("Window(%08x) focused in place of Window(%08x)",
         window->id, previous_window);
 }
-
-void border_update(window_t* window) {}
