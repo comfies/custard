@@ -52,14 +52,4 @@ color_t string_to_color(char* string) {
     }
 
     return color;
-/*
-    red   = (red * alpha) / 0xFF;
-    green = (green * alpha) / 0xFF;
-    blue  = (blue * alpha) / 0xFF;
-
-    alpha *= 0x1000000;
-    red   *= 0x10000;
-    green *= 0x100;
-
-    return alpha | red | green | blue;*/
 }
