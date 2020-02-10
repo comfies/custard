@@ -189,14 +189,64 @@ void ipc_command_geometry(vector_t* input, unsigned short* screen_update) {
 void ipc_command_match(vector_t* input, unsigned short* screen_update) {
     suppress_unused(screen_update);
 
+    // There is definitely a better way of programming this.
+    // For now, sleep deprived code works.
+    // In fact, the whole IPC is rather shitty. But it works. For now.
+
     // missing input
     if (input->size < 3) return;
 
     char* subject = get_from_vector(input, 1);
     char* expression = get_from_vector(input, 2);
 
+    char* variable;
+    char* value_string;
+    kv_pair_t* setting;
+    char* configurable = NULL;
+    unsigned int index = 0;
+
     if (!strcmp(subject, "monitor")) {
         // do shit
+        char* configurables[5] = {
+            "grid.rows",
+            "grid.columns",
+            "grid.margins",
+            "grid.margin.top",
+            "grid.margin.bottom"
+        };
+
+        monitor_t* monitor;
+        for (; index < monitors->size; index++) {
+            monitor = get_from_vector(monitors, index);
+
+            if (!strcmp(expression, monitor->name)) {
+                if (!monitor->configuration)
+                    monitor->configuration = construct_vector();
+
+                for (index = 3; index < input->size; index += 2) {
+                    variable = get_from_vector(input, index);
+                    value_string = get_from_vector(input, index + 1);
+
+                    for (unsigned int sub_index = 0; sub_index < 5; sub_index++) {
+                        if (!strcmp(configurables[sub_index], variable)) {
+                            configurable = variable;
+                            break;
+                        }
+                    }
+
+                    if (!configurable)
+                        continue;
+
+                    setting = create_or_get_kv_pair(monitor->configuration,
+                        variable);
+                    setting->value->number = string_to_integer(value_string);
+
+                    configurable = NULL;
+                }
+
+                return;
+            }
+        }
     } else {
 
         /*
@@ -231,11 +281,8 @@ void ipc_command_match(vector_t* input, unsigned short* screen_update) {
         rule_t* rule = create_or_get_rule(attribute, expression);
         rule->rules = construct_vector();
 
-        char* variable;
-        char* configurable = NULL;
-        char* value_string;
-        kv_pair_t* setting;
-        for (unsigned int index = 3; index < input->size; index += 2) {
+        index = 3;
+        for (; index < input->size; index += 2) {
             variable = get_from_vector(input, index);
             value_string = get_from_vector(input, index + 1);
 
