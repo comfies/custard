@@ -51,6 +51,9 @@ void ipc_command_configure(vector_t* input, unsigned short* screen_update) {
     char* value_string;
     unsigned int index = 1;
 
+    // There's a missing setting name-value pair
+    if ((input->size - 1 % 2)) return;
+
     kv_value_t* value = NULL;
     for (; index < input->size; index += 2) {
         variable = get_from_vector(input, index);
@@ -108,6 +111,9 @@ void ipc_command_geometry(vector_t* input, unsigned short* screen_update) {
     monitor_t* monitor;
     grid_geometry_t* geometry = NULL;
     labeled_grid_geometry_t* labeled_geometry = NULL;
+
+    // Missing geometry data
+    if ((input->size - 1) % 4) return;
 
     for (unsigned int index = 1; index < input->size; index += 4) {
         labeled_geometry = NULL;
@@ -183,6 +189,9 @@ void ipc_command_geometry(vector_t* input, unsigned short* screen_update) {
 void ipc_command_match(vector_t* input, unsigned short* screen_update) {
     suppress_unused(screen_update);
 
+    // missing input
+    if (input->size < 3) return;
+
     char* subject = get_from_vector(input, 1);
     char* expression = get_from_vector(input, 2);
 
@@ -195,6 +204,9 @@ void ipc_command_match(vector_t* input, unsigned short* screen_update) {
          *  custard - match window.name [expression] ([configurable] [value])...
          * custard - match window.class [expression] ([configurable] [value])...
          */
+
+        // Missing setting name-value pair
+        if ((input->size - 3) % 2) return;
 
         window_attribute_t attribute;
         if (!strcmp(subject, "window.name")) {
@@ -257,6 +269,8 @@ void ipc_command_match(vector_t* input, unsigned short* screen_update) {
 }
 
 void ipc_command_window(vector_t* input, unsigned short* screen_update) {
+    // Missing input
+    if (input->size < 2) return;
     char* variable = get_from_vector(input, 1);
 
     /*
