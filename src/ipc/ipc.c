@@ -215,38 +215,34 @@ void ipc_command_match(vector_t* input, unsigned short* screen_update) {
             "grid.margin.bottom"
         };
 
-        monitor_t* monitor;
-        for (; index < monitors->size; index++) {
-            monitor = get_from_vector(monitors, index);
+        monitor_t* monitor = monitor_from_name(expression);
 
-            if (!strcmp(expression, monitor->name)) {
-                if (!monitor->configuration)
-                    monitor->configuration = construct_vector();
+        if (!monitor) return;
 
-                for (index = 3; index < input->size; index += 2) {
-                    variable = get_from_vector(input, index);
-                    value_string = get_from_vector(input, index + 1);
+        if (!monitor->configuration)
+            monitor->configuration = construct_vector();
 
-                    for (unsigned int sub_index = 0; sub_index < 5; sub_index++) {
-                        if (!strcmp(configurables[sub_index], variable)) {
-                            configurable = variable;
-                            break;
-                        }
-                    }
+        for (index = 3; index < input->size; index += 2) {
+            variable = get_from_vector(input, index);
+            value_string = get_from_vector(input, index + 1);
 
-                    if (!configurable)
-                        continue;
-
-                    setting = create_or_get_kv_pair(monitor->configuration,
-                        variable);
-                    setting->value->number = string_to_integer(value_string);
-
-                    configurable = NULL;
+            for (unsigned int sub_index = 0; sub_index < 5; sub_index++) {
+                if (!strcmp(configurables[sub_index], variable)) {
+                    configurable = variable;
+                    break;
                 }
-
-                return;
             }
+
+            if (!configurable)
+                continue;
+
+            setting = create_or_get_kv_pair(monitor->configuration,
+                variable);
+            setting->value->number = string_to_integer(value_string);
+
+            configurable = NULL;
         }
+
     } else {
 
         /*
