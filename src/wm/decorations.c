@@ -57,8 +57,10 @@ void apply_decoration_to_window_screen_geometry(window_t* window,
 
     unsigned int border_size = determine_border_size(window);
 
-    geometry->height -= (border_size * 2);
-    geometry->width -= (border_size * 2);
+    if (border_size) {
+        geometry->height -= (border_size * 2);
+        geometry->width -= (border_size * 2);
+    }
 }
 
 void decorate_with_one_border(window_t* window) {
