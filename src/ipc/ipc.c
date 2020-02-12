@@ -4,7 +4,6 @@
 #include "ipc.h"
 #include "parsing.h"
 
-#include "../wm/config.h"
 #include "../wm/custard.h"
 #include "../wm/decorations.h"
 #include "../wm/geometry.h"
@@ -24,7 +23,9 @@ void ipc_process_input(char* feed) {
 
     char* qualifier = get_from_vector(input, 0);
 
-    if (!strcmp(qualifier, "configure"))
+    if (!strcmp(qualifier, "halt")) {
+        custard_is_running = 0;
+    } else if (!strcmp(qualifier, "configure"))
         ipc_command_configure(input, &update);
     else if (!strcmp(qualifier, "geometry"))
         ipc_command_geometry(input, &update);
@@ -39,6 +40,39 @@ void ipc_process_input(char* feed) {
     }
 
     deconstruct_vector(input);
+}
+
+void ipc_helper_typecast_and_assign(kv_value_t* kv_value, char* variable,
+    char* input) {
+
+    // Assign all color values
+
+    if (!strcmp(variable, "border.color.focused") ||
+        !strcmp(variable, "border.color.unfocused") ||
+        !strcmp(variable, "border.color.background")) {
+        kv_value->color = string_to_color(input);
+        return;
+    }
+
+    // Assign all boolean values
+
+    if (!strcmp(variable, "border.colors.flipped")) {
+        kv_value->boolean = string_to_boolean(input);
+        return;
+    }
+
+    // Assign all string values
+
+    if (!strcmp(variable, "geometry") ||
+        !strcmp(variable, "monitor")) {
+        kv_value->string = (char*)malloc(sizeof(char));
+        strcpy(kv_value->string, input);
+        return;
+    }
+
+    // If all else fails, it's an integer, since strings aren't a valid type
+
+    kv_value->number = string_to_integer(input);
 }
 
 void ipc_command_configure(vector_t* input, unsigned short* screen_update) {
@@ -64,14 +98,7 @@ void ipc_command_configure(vector_t* input, unsigned short* screen_update) {
         if (!value)
             continue;
 
-        if (!strcmp(variable, "border.colors.flipped"))
-            value->boolean = string_to_boolean(value_string);
-        else if (!strcmp(variable, "border.color.background") ||
-            !strcmp(variable, "border.color.focused") ||
-            !strcmp(variable, "border.color.unfocused"))
-            value->color = string_to_color(value_string);
-        else
-            value->number = string_to_integer(value_string);
+        ipc_helper_typecast_and_assign(value, variable, value_string);
     }
     index = 0;
 
@@ -156,26 +183,29 @@ void ipc_command_geometry(vector_t* input, unsigned short* screen_update) {
             }
 
         } else {
-            for (unsigned int index = 0; index < monitors->size; index++) {
-                monitor = get_from_vector(monitors, index);
+            while ((monitor = vector_iterator(monitors))) {
 
-                geometry = get_geometry_from_monitor(monitor, label);
-                if (geometry) {
-                    geometry->x = x;
-                    geometry->y = y;
-                    geometry->height = height;
-                    geometry->width = width;
-                    break; // everything using this geometry is good now,
-                    // should iterate once since this would be a global geometry
-                } else {
-                    if (!monitor->geometries)
-                        monitor->geometries = construct_vector();
+                if (!monitor->geometries)
+                    monitor->geometries = construct_vector();
+                else {
+                    geometry = get_geometry_from_monitor(monitor, label);
 
-                    if (!labeled_geometry)
-                        labeled_geometry = create_labeled_geometry(label,
-                            x, y, height, width);
-                    push_to_vector(monitor->geometries, labeled_geometry);
+                    if (geometry) {
+                        geometry->x = x;
+                        geometry->y = y;
+                        geometry->height = height;
+                        geometry->width = width;
+
+                        break; // everything using this geometry is good now,
+                        // should iterate once since this would be a global geometry
+                    }
                 }
+
+                if (!labeled_geometry)
+                    labeled_geometry = create_labeled_geometry(label,
+                        x, y, height, width);
+
+                push_to_vector(monitor->geometries, labeled_geometry);
             }
         }
 
@@ -293,18 +323,8 @@ void ipc_command_match(vector_t* input, unsigned short* screen_update) {
                 continue;
 
             setting = create_or_get_kv_pair(rule->rules, variable);
-            if (!strcmp(variable, "geometry") ||
-                !strcmp(variable, "monitor")) {
-                setting->value->string = (char*)malloc(sizeof(char));
-                strcpy(setting->value->string, value_string);
-            } else if (!strcmp(variable, "border.colors.flipped"))
-                setting->value->boolean = string_to_boolean(value_string);
-            else if (!strcmp(variable, "border.color.background") ||
-                !strcmp(variable, "border.color.focused") ||
-                !strcmp(variable, "border.color.unfocused"))
-                setting->value->color = string_to_color(value_string);
-            else
-                setting->value->number = string_to_integer(value_string);
+            ipc_helper_typecast_and_assign(setting->value, variable,
+                value_string);
 
             configurable = NULL;
         }
