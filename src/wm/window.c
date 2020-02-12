@@ -83,11 +83,11 @@ window_t* get_window_by_id(xcb_window_t window_id) {
 
     if (windows) {
         window_t* window;
-        for (unsigned int index = 0; index < windows->size; index++) {
-            window = get_from_vector(windows, index);
-
-            if (window->id == window_id)
+        while ((window = vector_iterator(windows))) {
+            if (window->id == window_id) {
+                reset_vector_iterator(windows);
                 return window;
+            }
         }
     }
 

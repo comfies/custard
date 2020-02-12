@@ -8,8 +8,25 @@ vector_t* construct_vector() {
     vector->memory = 1;
     vector->size = 0;
     vector->elements = malloc(sizeof(void*));
+    vector->remaining = 0;
 
     return vector;
+}
+
+void* vector_iterator(vector_t* vector) {
+    if (!vector->remaining) {
+        vector->remaining = vector->size;
+        return NULL;
+    }
+
+    unsigned int index = (vector->size - vector->remaining);
+    vector->remaining--;
+
+    return get_from_vector(vector, index);
+}
+
+void reset_vector_iterator(vector_t* vector) {
+    vector->remaining = vector->size;
 }
 
 void push_to_vector(vector_t* vector, void* data) {
@@ -20,6 +37,7 @@ void push_to_vector(vector_t* vector, void* data) {
     }
 
     vector->elements[vector->size++] = (void*)data;
+    vector->remaining++;
 }
 
 void pull_from_vector(vector_t* vector, unsigned int index) {
@@ -30,6 +48,7 @@ void pull_from_vector(vector_t* vector, unsigned int index) {
         vector->elements[index] = vector->elements[index + 1];
 
     vector->elements[vector->size--] = NULL;
+    vector->remaining--;
 
     if ((vector->size * 2) == vector->memory) {
         vector->memory /= 2;

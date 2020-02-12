@@ -39,11 +39,11 @@ grid_geometry_t* get_geometry_from_monitor(monitor_t* monitor, char* label) {
         return NULL;
 
     labeled_grid_geometry_t* labeled_geometry;
-    for (unsigned int index = 0; index < monitor->geometries->size; index++) {
-        labeled_geometry = get_from_vector(monitor->geometries, index);
-
-        if (!strcmp(labeled_geometry->label, label))
+    while ((labeled_geometry = vector_iterator(monitor->geometries))) {
+        if (!strcmp(labeled_geometry->label, label)) {
+            reset_vector_iterator(monitor->geometries);
             return labeled_geometry->geometry;
+        }
     }
 
     return NULL;

@@ -59,10 +59,11 @@ void setup_global_configuration() {
 kv_pair_t* create_or_get_kv_pair(vector_t* configuration, char* key) {
     kv_pair_t* kv_pair;
 
-    for (unsigned int index = 0; index < configuration->size; index++) {
-        kv_pair = get_from_vector(configuration, index);
-        if (!strcmp(kv_pair->key, key))
+    while ((kv_pair = vector_iterator(configuration))) {
+        if (!strcmp(kv_pair->key, key)) {
+            reset_vector_iterator(configuration);
             return kv_pair;
+        }
     }
 
     kv_pair = (kv_pair_t*)malloc(sizeof(kv_pair_t));
@@ -78,10 +79,10 @@ kv_pair_t* create_or_get_kv_pair(vector_t* configuration, char* key) {
 
 kv_value_t* get_value_from_key(vector_t* configuration, char* key) {
     kv_pair_t* kv_pair;
-    for (unsigned int index = 0; index < configuration->size; index++) {
-        kv_pair = get_from_vector(configuration, index);
 
+    while ((kv_pair = vector_iterator(configuration))) {
         if (!strcmp(kv_pair->key, key)) {
+            reset_vector_iterator(configuration);
             return kv_pair->value;
         }
     }

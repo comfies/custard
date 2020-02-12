@@ -73,11 +73,11 @@ void setup_monitors() {
 
 monitor_t* monitor_from_name(char* name) {
     monitor_t* monitor;
-    for (unsigned int index = 0; index < monitors->size; index++) {
-        monitor = get_from_vector(monitors, index);
-
-        if (!strcmp(monitor->name, name))
+    while ((monitor = vector_iterator(monitors))) {
+        if (!strcmp(monitor->name, name)) {
+            reset_vector_iterator(monitors);
             return monitor;
+        }
     }
 
     return NULL;

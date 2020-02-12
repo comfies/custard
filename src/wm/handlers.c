@@ -71,15 +71,14 @@ void handle_window_click(xcb_generic_event_t* generic_event) {
 
     window_t* window;
     if (windows) {
-        for (unsigned int index = 0; index < windows->size; index++) {
-            window = get_from_vector(windows, index);
-
+        while ((window = vector_iterator(windows))) {
             if (window->parent == window_id) {
+                reset_vector_iterator(windows);
                 window_id = window->id;
                 break;
             }
         }
-    } // redirect the parent to the child
+    }// redirect the parent to the child
 
     log("Window(%08x) clicked", window_id);
 

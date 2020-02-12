@@ -9,12 +9,12 @@ rule_t* create_or_get_rule(window_attribute_t attribute, char* expression) {
     rule_t* rule;
 
     if (rules) {
-        for (unsigned int index = 0; index < rules->size; index++) {
-            rule = get_from_vector(rules, index);
-
+        while ((rule = vector_iterator(rules))) {
             if (!strcmp(rule->expression, expression) &&
-                rule->attribute == attribute)
+                rule->attribute == attribute) {
+                reset_vector_iterator(rules);
                 return rule;
+            }
         }
     }
 
@@ -31,8 +31,9 @@ rule_t* create_or_get_rule(window_attribute_t attribute, char* expression) {
 
 void add_rule(rule_t* rule) {
     if (rules) {
-        for (unsigned int index = 0; index < rules->size; index++)
-            if (rule == get_from_vector(rules, index))
+        rule_t* existing_rule;
+        while ((existing_rule = vector_iterator(rules)))
+            if (rule == existing_rule)
                 return;
     } else rules = construct_vector();
 
