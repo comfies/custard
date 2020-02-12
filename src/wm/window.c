@@ -99,33 +99,23 @@ window_t* manage_window(xcb_window_t window_id) {
     window->id = window_id;
     window->parent = xcb_generate_id(xcb_connection);
 
-    unsigned int index = 0;
-
     window->rule = NULL;
     if (rules) {
         rule_t* rule;
-        for (; index < rules->size; index++) {
-            rule = get_from_vector(rules, index);
+        char* subject;
 
-            char* subject = NULL;
-            switch (rule->attribute) {
-                case class:
-                    subject = class_of_window(window_id);
-                    break;
-                case name:
-                    subject = name_of_window(window_id);
-                    break;
-                default:
-                    index = rules->size;
-                    break; // Unimplemented, somehow, return
-            }
+        while ((rule = vector_iterator(rules))) {
+            if (rule->attribute == class)
+                subject = class_of_window(window_id);
+            else
+                subject = name_of_window(window_id);
 
             if (expression_matches(rule->expression, subject)) {
                 window->rule = rule;
+                reset_vector_iterator(rules);
                 break;
             }
         }
-        index = 0;
     };
 
     grid_geometry_t* geometry = NULL;
