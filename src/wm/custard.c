@@ -116,98 +116,64 @@ unsigned short initialize() {
 }
 
 void finalize() {
-    unsigned int index = 0;
-    unsigned int sub_index = 0;
-
     /* Free used memory for windows */
     if (windows) {
         window_t* window;
-        for (; index < windows->size; index++) {
-            window = get_from_vector(windows, index);
-
-            xcb_reparent_window(xcb_connection,
-                window->id, xcb_screen->root, 0, 0);
+        while ((window = vector_iterator(windows)))
             unmanage_window(window->id);
-        }
         deconstruct_vector(windows);
-        index = 0;
     }
 
     kv_pair_t* kv_pair;
     monitor_t* monitor;
     labeled_grid_geometry_t* labeled_geometry;
-    for (; index < monitors->size; index++) {
-        monitor = get_from_vector(monitors, index);
-
+    while ((monitor = vector_iterator(monitors))) {
         free(monitor->name);
         free(monitor->geometry);
 
         if (monitor->geometries) {
-            for (; sub_index < monitor->geometries->size; sub_index++) {
-                labeled_geometry = get_from_vector(monitor->geometries,
-                    sub_index);
-
+            while ((labeled_geometry = vector_iterator(monitor->geometries))) {
                 free(labeled_geometry->label);
                 free(labeled_geometry->geometry);
                 free(labeled_geometry);
             }
-            sub_index = 0;
-
             deconstruct_vector(monitor->geometries);
         }
 
         if (monitor->configuration) {
-            for (; sub_index < monitor->configuration->size; sub_index++) {
-                kv_pair = get_from_vector(monitor->configuration, sub_index);
-
+            while ((kv_pair = vector_iterator(monitor->configuration))) {
                 free(kv_pair->key);
                 free(kv_pair->value);
                 free(kv_pair);
             }
-            sub_index = 0;
-
             deconstruct_vector(monitor->configuration);
         }
     }
-    sub_index = index = 0;
 
-    for (; index < configuration->size; index++) {
-        kv_pair = get_from_vector(configuration, index);
-
+    while ((kv_pair = vector_iterator(configuration))) {
         free(kv_pair->key);
         free(kv_pair->value);
         free(kv_pair);
     }
     deconstruct_vector(configuration);
-    index = 0;
 
     /* Free rules, if any */
 
     if (rules) {
         rule_t* rule;
-        for (; index < rules->size; index++) {
-            rule = get_from_vector(rules, index);
-
+        while ((rule = vector_iterator(rules))) {
             free(rule->expression);
 
             if (rule->rules) {
-                for (; sub_index < rule->rules->size; sub_index++) {
-                    kv_pair = get_from_vector(rule->rules, sub_index);
-
+                while ((kv_pair = vector_iterator(rule->rules))) {
                     free(kv_pair->key);
                     free(kv_pair->value);
                     free(kv_pair);
                 }
-
-                sub_index = 0;
-
                 deconstruct_vector(rule->rules);
             }
-
         }
-
         deconstruct_vector(rules);
-        index = 0;
     }
 
     finalize_xcb();
