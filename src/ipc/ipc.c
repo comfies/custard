@@ -21,7 +21,7 @@ void ipc_process_input(char* feed) {
     while ((token = strsep(&feed, "\31")))
         push_to_vector(input, token);
 
-    char* qualifier = get_from_vector(input, 0);
+    char* qualifier = vector_iterator(input);
 
     if (!strcmp(qualifier, "halt")) {
         custard_is_running = 0;
@@ -70,7 +70,7 @@ void ipc_helper_typecast_and_assign(kv_value_t* kv_value, char* variable,
         return;
     }
 
-    // If all else fails, it's an integer, since strings aren't a valid type
+    // If all else fails, it's an integer
 
     kv_value->number = string_to_integer(input);
 }
@@ -83,32 +83,23 @@ void ipc_command_configure(vector_t* input, unsigned short* screen_update) {
 
     char* variable;
     char* value_string;
-    unsigned int index = 1;
-
-    // There's a missing setting name-value pair
-    if (((input->size - 1) % 2)) return;
-
     kv_value_t* value = NULL;
-    for (; index < input->size; index += 2) {
-        variable = get_from_vector(input, index);
-        value_string = get_from_vector(input, index + 1);
 
-        value = get_value_from_key(configuration, variable);
+    while (input->remaining) {
+        variable = vector_iterator(input);
+        value_string = vector_iterator(input);
 
-        if (!value)
+        if (!(value = get_value_from_key(configuration, variable)))
             continue;
 
         ipc_helper_typecast_and_assign(value, variable, value_string);
     }
-    index = 0;
 
     if (!windows)
         return;
 
     window_t* window;
-    for (; index < windows->size; index++) {
-        window = get_from_vector(windows, index);
-
+    while ((window = vector_iterator(windows))) {
         set_window_geometry(window, window->geometry);
         decorate(window);
     }
@@ -142,14 +133,14 @@ void ipc_command_geometry(vector_t* input, unsigned short* screen_update) {
     // Missing geometry data
     if ((input->size - 1) % 4) return;
 
-    for (unsigned int index = 1; index < input->size; index += 4) {
+    while (input->remaining) {
         labeled_geometry = NULL;
         geometry = NULL;
 
-        monitor_name = get_from_vector(input, index);
-        label = get_from_vector(input, index + 1);
-        size = get_from_vector(input, index + 2);
-        position = get_from_vector(input, index + 3);
+        monitor_name = vector_iterator(input);
+        label = vector_iterator(input);
+        size = vector_iterator(input);
+        position = vector_iterator(input);
 
         token = strsep(&size, "x");
 
@@ -161,183 +152,52 @@ void ipc_command_geometry(vector_t* input, unsigned short* screen_update) {
         x = string_to_integer(token);
         y = string_to_integer(position);
 
-        if (strcmp(monitor_name, "*")) {
-            monitor = monitor_from_name(monitor_name);
+        /* bullshit here */
 
-            if (!monitor)
-                return;
+        while ((monitor = vector_iterator(monitors))) {
+            if (!strcmp(monitor_name, "*") ||
+                !strcmp(monitor_name, monitor->name)) {
 
-            geometry = get_geometry_from_monitor(monitor, label);
-            if (geometry) {
-                geometry->x = x;
-                geometry->y = y;
-                geometry->height = height;
-                geometry->width = width;
-            } else {
-                if (!monitor->geometries)
-                    monitor->geometries = construct_vector();
-
-                labeled_geometry = create_labeled_geometry(label,
-                    x, y, height, width);
-                push_to_vector(monitor->geometries, labeled_geometry);
-            }
-
-        } else {
-            while ((monitor = vector_iterator(monitors))) {
-
-                if (!monitor->geometries)
-                    monitor->geometries = construct_vector();
-                else {
+                if (monitor->geometries) {
                     geometry = get_geometry_from_monitor(monitor, label);
-
                     if (geometry) {
                         geometry->x = x;
                         geometry->y = y;
                         geometry->height = height;
                         geometry->width = width;
+                        free(labeled_geometry);
 
-                        break; // everything using this geometry is good now,
-                        // should iterate once since this would be a global geometry
+                        continue;
                     }
                 }
 
-                if (!labeled_geometry)
-                    labeled_geometry = create_labeled_geometry(label,
-                        x, y, height, width);
-
+                monitor->geometries = construct_vector();
+                labeled_geometry = create_labeled_geometry(label,
+                    x, y, height, width);
                 push_to_vector(monitor->geometries, labeled_geometry);
             }
         }
-
-        log("Geometry (%s[%s]: %d,%d %dx%d)", label, monitor_name,
-            x, y, width, height);
     }
 
-    return;
 }
 
 void ipc_command_match(vector_t* input, unsigned short* screen_update) {
     suppress_unused(screen_update);
 
-    // There is definitely a better way of programming this.
-    // For now, sleep deprived code works.
-    // In fact, the whole IPC is rather shitty. But it works. For now.
-
-    // missing input
     if (input->size < 3) return;
 
-    char* subject = get_from_vector(input, 1);
-    char* expression = get_from_vector(input, 2);
+    char* subject = vector_iterator(input);
 
-    char* variable;
-    char* value_string;
-    kv_pair_t* setting;
-    char* configurable = NULL;
-    unsigned int index = 0;
-
-    if (!strcmp(subject, "monitor")) {
-        // do shit
-        char* configurables[5] = {
-            "grid.rows",
-            "grid.columns",
-            "grid.margins",
-            "grid.margin.top",
-            "grid.margin.bottom"
-        };
-
-        monitor_t* monitor = monitor_from_name(expression);
-
-        if (!monitor) return;
-
-        if (!monitor->configuration)
-            monitor->configuration = construct_vector();
-
-        for (index = 3; index < input->size; index += 2) {
-            variable = get_from_vector(input, index);
-            value_string = get_from_vector(input, index + 1);
-
-            for (unsigned int sub_index = 0; sub_index < 5; sub_index++) {
-                if (!strcmp(configurables[sub_index], variable)) {
-                    configurable = variable;
-                    break;
-                }
-            }
-
-            if (!configurable)
-                continue;
-
-            setting = create_or_get_kv_pair(monitor->configuration,
-                variable);
-            setting->value->number = string_to_integer(value_string);
-
-            configurable = NULL;
-        }
-
-    } else {
-
-        /*
-         * Usage:
-         *  custard - match window.name [expression] ([configurable] [value])...
-         * custard - match window.class [expression] ([configurable] [value])...
-         */
-
-        // Missing setting name-value pair
-        if ((input->size - 3) % 2) return;
-
-        window_attribute_t attribute;
-        if (!strcmp(subject, "window.name")) {
-            attribute = name;
-        } else if (!strcmp(subject, "window.class")) {
-            attribute = class;
-        } else return;
-
-        char* configurables[9] = {
-            "borders",
-            "border.size.outer",
-            "border.size.inner",
-            "border.color.focused",
-            "border.color.unfocused",
-            "border.color.background",
-            "border.colors.flipped",
-            "geometry",
-            "monitor"
-            // "workspace" eventually
-        };
-
-        rule_t* rule = create_or_get_rule(attribute, expression);
-        rule->rules = construct_vector();
-
-        index = 3;
-        for (; index < input->size; index += 2) {
-            variable = get_from_vector(input, index);
-            value_string = get_from_vector(input, index + 1);
-
-            for (unsigned int sub_index = 0; sub_index < 9; sub_index++) {
-                if (!strcmp(configurables[sub_index], variable)) {
-                    configurable = variable;
-                    break;
-                }
-            }
-
-            if (!configurable)
-                continue;
-
-            setting = create_or_get_kv_pair(rule->rules, variable);
-            ipc_helper_typecast_and_assign(setting->value, variable,
-                value_string);
-
-            configurable = NULL;
-        }
-
-        add_rule(rule);
-
-    }
+    if (!strcmp(subject, "monitor"))
+        ipc_sub_command_match_monitor(input);
+    else
+        ipc_sub_command_match_window(input);
 }
 
 void ipc_command_window(vector_t* input, unsigned short* screen_update) {
     // Missing input
     if (input->size < 2) return;
-    char* variable = get_from_vector(input, 1);
+    char* variable = vector_iterator(input);
 
     /*
      * Usage:
@@ -349,7 +209,7 @@ void ipc_command_window(vector_t* input, unsigned short* screen_update) {
         close_window(focused_window);
         *screen_update = 1;
     } else if (!strcmp(variable, "geometry")) {
-        char* label = get_from_vector(input, 2);
+        char* label = vector_iterator(input);
         grid_geometry_t* geometry;
 
         geometry = get_geometry_from_monitor(
@@ -367,4 +227,107 @@ void ipc_command_window(vector_t* input, unsigned short* screen_update) {
 
     }
 
+}
+
+/* Sub-commands */
+
+void ipc_sub_command_match_monitor(vector_t* input) {
+    char* monitor_name = vector_iterator(input);
+    monitor_t* monitor = monitor_from_name(monitor_name);
+
+    if (!monitor)
+        return;
+
+    if (!monitor->configuration)
+        monitor->configuration = construct_vector();
+
+    char* configurables[7] = {
+        "grid.rows,"
+        "grid.columns",
+        "grid.margins",
+        "grid.margin.top",
+        "grid.margin.bottom",
+        "grid.margin.left",
+        "grid.margin.right"
+    };
+    unsigned int index = 0;
+    kv_pair_t* setting;
+
+    char* variable;
+    char* value_string;
+
+    while (input->remaining) {
+        variable = vector_iterator(input);
+        value_string = vector_iterator(input);
+
+        log("%s = %s", variable, value_string);
+
+        for (index = 0; index < 7;) {
+            if (!strcmp(configurables[index++], variable)) {
+                setting = create_or_get_kv_pair(monitor->configuration,
+                    variable);
+                setting->value->number = string_to_integer(value_string);
+                break;
+            }
+        }
+    }
+
+}
+
+void ipc_sub_command_match_window(vector_t* input) {
+    /*
+     * Usage:
+     *  custard - match window.name [expression] ([configurable] [value])...
+     * custard - match window.class [expression] ([configurable] [value])...
+     */
+
+    input->remaining++;
+    char* subject = vector_iterator(input);
+    char* expression = vector_iterator(input);
+
+    window_attribute_t attribute;
+
+    if (!strcmp(subject, "window.name"))
+        attribute = name;
+    else if (!strcmp(subject, "window.class"))
+        attribute = class;
+    else return;
+
+    rule_t* rule = create_or_get_rule(attribute, expression);
+    if (!rule->rules)
+        rule->rules = construct_vector();
+
+    char* configurables[9] = {
+        "borders",
+        "border.size.outer",
+        "border.size.inner",
+        "border.color.focused",
+        "border.color.unfocused",
+        "border.color.background",
+        "border.colors.flipped",
+        "geometry",
+        "monitor",
+        // "workspace" eventually
+    };
+    unsigned int index = 0;
+    kv_pair_t* setting;
+
+    char* variable;
+    char* value_string;
+
+    while (input->remaining > 0) {
+        variable = vector_iterator(input);
+        value_string = vector_iterator(input);
+
+        for (index = 0; index < 9;) {
+            if (!strcmp(configurables[index++], variable)) {
+                setting = create_or_get_kv_pair(rule->rules, variable);
+                ipc_helper_typecast_and_assign(setting->value,
+                    variable, value_string);
+                break;
+            }
+        }
+    }
+
+    add_rule(rule);
 }
