@@ -10,12 +10,12 @@
 #include "../xcb/connection.h"
 #include "../xcb/xrandr.h"
 
-vector_t* monitors;
+vector_t *monitors;
 
 void setup_monitors() {
     monitors = construct_vector();
 
-    monitor_t* monitor;
+    monitor_t *monitor;
     if (!xrandr_is_available()) {
         monitor = (monitor_t*)malloc(sizeof(monitor_t));
         monitor->name = (char*)malloc(sizeof(char));
@@ -28,6 +28,7 @@ void setup_monitors() {
         monitor->geometry->width = (float)xcb_screen->width_in_pixels;
 
         monitor->geometries = NULL;
+        monitor->workspace = 1;
 
         strcpy(monitor->name, "<xorg>");
         push_to_vector(monitors, monitor);
@@ -35,13 +36,13 @@ void setup_monitors() {
         return;
     }
 
-    xcb_randr_get_monitors_reply_t* outputs = get_xrandr_outputs();
+    xcb_randr_get_monitors_reply_t *outputs = get_xrandr_outputs();
 
     xcb_randr_monitor_info_iterator_t iterator;
     iterator = xcb_randr_get_monitors_monitors_iterator(outputs);
 
-    xcb_randr_monitor_info_t* monitor_information;
-    char* output_name;
+    xcb_randr_monitor_info_t *monitor_information;
+    char *output_name;
 
     while (iterator.rem) {
         monitor = (monitor_t*)malloc(sizeof(monitor_t));
@@ -63,6 +64,7 @@ void setup_monitors() {
         monitor->geometry->width = (float)monitor_information->width;
 
         monitor->geometries = NULL;
+        monitor->workspace = 1;
 
         strcpy(monitor->name, output_name);
         push_to_vector(monitors, monitor);
@@ -71,8 +73,8 @@ void setup_monitors() {
     }
 }
 
-monitor_t* monitor_from_name(char* name) {
-    monitor_t* monitor;
+monitor_t *monitor_from_name(char *name) {
+    monitor_t *monitor;
     while ((monitor = vector_iterator(monitors))) {
         if (!strcmp(monitor->name, name)) {
             reset_vector_iterator(monitors);
@@ -83,17 +85,17 @@ monitor_t* monitor_from_name(char* name) {
     return NULL;
 }
 
-monitor_t* monitor_with_cursor_residence() {
+monitor_t *monitor_with_cursor_residence() {
     xcb_query_pointer_cookie_t pointer_cookie;
     pointer_cookie = xcb_query_pointer(xcb_connection, xcb_screen->root);
 
-    xcb_query_pointer_reply_t* pointer = xcb_query_pointer_reply(xcb_connection,
+    xcb_query_pointer_reply_t *pointer = xcb_query_pointer_reply(xcb_connection,
         pointer_cookie, NULL);
 
     float x = 0;
     float y = 0;
 
-    monitor_t* monitor;
+    monitor_t *monitor;
     for (unsigned int index = 0; index < monitors->size; index++) {
         monitor = get_from_vector(monitors, index);
 
