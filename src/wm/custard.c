@@ -66,15 +66,19 @@ int custard(int argc, char **argv) {
 
     /* initialize window manager */
 
+    log_debug("Initializing window manager connections");
     if (!initialize()) {
+        log_fatal("Initialization of window manager failed");
         finalize();
         return EXIT_FAILURE;
     }
 
 
-    if (rc_path)
+    if (rc_path) {
+        log_debug("Executing provided rc path");
         if (fork() == 0)
             execl(rc_path, rc_path, NULL);
+    }
 
     custard_is_running = 1;
 
@@ -86,6 +90,7 @@ int custard(int argc, char **argv) {
         { socket_file_descriptor, .events = POLLIN }
     };
 
+    log_debug("Starting event loop");
     while (custard_is_running) {
 
         if (poll(descriptors, 2, -1)) {
@@ -99,9 +104,8 @@ int custard(int argc, char **argv) {
                 }
             }
 
-            if (descriptors[1].revents & POLLIN) {
+            if (descriptors[1].revents & POLLIN)
                 ipc_process_input(read_from_socket());
-            }
         }
     }
 
@@ -113,15 +117,19 @@ int custard(int argc, char **argv) {
 unsigned short initialize() {
     if (!initialize_xcb() || !initialize_ewmh() || !initialize_socket())
         return 0;
+    log_debug("XCB, EWMH, and socket setup");
 
     setup_monitors();
+    log_debug("Monitors setup");
     setup_global_configuration();
+    log_debug("Global configuration setup");
 
     unsigned int index = 0;
     for (; index < SIGUNUSED; index++)
         if (signals[index])
             signal(index, signals[index]);
     index = 0;
+    log_debug("Signal handlers setup");
 
     // Potential TODO: manage pre-existing windows
 
@@ -131,6 +139,7 @@ unsigned short initialize() {
 void finalize() {
     /* Free used memory for windows */
     if (windows) {
+        log_debug("Freeing memory for windows");
         window_t *window;
         while ((window = vector_iterator(windows)))
             unmanage_window(window->id);
@@ -141,6 +150,7 @@ void finalize() {
     monitor_t *monitor;
     labeled_grid_geometry_t *labeled_geometry;
     if (monitors) {
+        log_debug("Freeing memory for monitors");
         while ((monitor = vector_iterator(monitors))) {
             free(monitor->name);
             free(monitor->geometry);
@@ -167,6 +177,7 @@ void finalize() {
     }
 
     if (configuration) {
+        log_debug("Freeing memory for configuration");
         while ((kv_pair = vector_iterator(configuration))) {
             free(kv_pair->key);
             free(kv_pair->value);
@@ -178,6 +189,7 @@ void finalize() {
     /* Free rules, if any */
 
     if (rules) {
+        log_debug("Freeing memory for rules");
         rule_t *rule;
         while ((rule = vector_iterator(rules))) {
             free(rule->expression);
@@ -202,8 +214,18 @@ void finalize() {
 void _log(unsigned short level, const char *file, const char *function,
     const int line, char *formatting, ...) {
 
-    if (level >= loglevel)
-        fprintf(stderr, "%s:%s L%d: ", file, function, line);
+    /*
+     * Loglevels:
+     * 0 - Absolutely fucking nothing
+     * 1 - Fatal
+     * 2 - Message
+     * 3 - Debug
+     */
+
+     if (loglevel < level)
+        return;
+
+    fprintf(stderr, "%s:%s L%d: ", file, function, line);
 
     va_list ap;
     va_start(ap, formatting);
