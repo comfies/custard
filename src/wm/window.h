@@ -1,5 +1,4 @@
-#ifndef WM_WINDOW_H
-#define WM_WINDOW_H
+#pragma once
 
 #include <xcb/xcb.h>
 
@@ -31,5 +30,3 @@ void set_window_geometry(window_t*, grid_geometry_t*);
 void focus_on_window(window_t*);
 
 kv_value_t *get_setting_from_window_rules(window_t*, char*);
-
-#endif

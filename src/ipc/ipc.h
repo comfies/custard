@@ -1,5 +1,4 @@
-#ifndef IPC_H
-#define IPC_H
+#pragma once
 
 #include "../vector.h"
 #include "../wm/config.h"
@@ -16,5 +15,3 @@ void ipc_command_workspace(vector_t*, unsigned short*);
 
 void ipc_sub_command_match_monitor(vector_t *input);
 void ipc_sub_command_match_window(vector_t *input);
-
-#endif

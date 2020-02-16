@@ -1,5 +1,4 @@
-#ifndef HANDLERS_H
-#define HANDLERS_H
+#pragma once
 
 #include <xcb/xcb.h>
 #include <signal.h>
@@ -15,5 +14,3 @@ void handle_map_request(xcb_generic_event_t*);
 void handle_window_close(xcb_generic_event_t*);
 void handle_window_click(xcb_generic_event_t*);
 void handle_termination_signal(int);
-
-#endif

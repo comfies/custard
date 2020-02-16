@@ -1,5 +1,4 @@
-#ifndef SOCKET_H
-#define SOCKET_H
+#pragma once
 
 typedef enum {
     WINDOW_MANAGER = 0,
@@ -14,5 +13,3 @@ void finalize_socket(void);
 
 void write_to_socket(char*);
 char* read_from_socket(void);
-
-#endif

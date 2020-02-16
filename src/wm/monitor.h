@@ -1,5 +1,4 @@
-#ifndef MONITOR_H
-#define MONITOR_H
+#pragma once
 
 #include "geometry.h"
 
@@ -18,5 +17,3 @@ struct monitor {
 void setup_monitors(void);
 monitor_t *monitor_from_name(char*);
 monitor_t *monitor_with_cursor_residence(void);
-
-#endif

@@ -1,7 +1,4 @@
-#ifndef CONTROLLER_H
-#define CONTROLLER_H
+#pragma once
 
 unsigned short should_become_controller(int, char**);
 int controller(int, char**);
-
-#endif
