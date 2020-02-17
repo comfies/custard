@@ -231,6 +231,21 @@ void ipc_command_window(vector_t *input, unsigned short *screen_update) {
         else
             lower_window(focused_window);
 
+    } else if (!strcmp(variable, "workspace")) {
+
+        unsigned int workspace = string_to_integer(vector_iterator(input));
+
+        if (window) {
+            if (window->workspace == workspace)
+                return;
+
+            window->workspace = workspace;
+
+            monitor_t *monitor = monitor_with_cursor_residence();
+            if (monitor->workspace != window->workspace)
+                unmap_window(window->parent);
+        }
+
     } else if (!strcmp(variable, "geometry")) {
         char *label = vector_iterator(input);
 
