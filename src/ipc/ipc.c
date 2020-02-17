@@ -172,9 +172,9 @@ void ipc_command_geometry(vector_t *input, unsigned short *screen_update) {
 
                         continue;
                     }
-                }
-
-                monitor->geometries = construct_vector();
+                } else
+                    monitor->geometries = construct_vector();
+                
                 labeled_geometry = create_labeled_geometry(label,
                     x, y, height, width);
                 push_to_vector(monitor->geometries, labeled_geometry);
@@ -213,10 +213,14 @@ void ipc_command_window(vector_t *input, unsigned short *screen_update) {
         *screen_update = 1;
     } else if (!strcmp(variable, "geometry")) {
         char *label = vector_iterator(input);
-        grid_geometry_t *geometry;
 
-        geometry = get_geometry_from_monitor(
-            monitor_with_cursor_residence(), label);
+        grid_geometry_t *geometry;
+        monitor_t *monitor = monitor_with_cursor_residence();
+
+        log_debug("Looking for geometry(%s) in monitor(%s)",
+            label, monitor->name);
+
+        geometry = get_geometry_from_monitor(monitor, label);
 
         if (!geometry)
             return;
@@ -274,7 +278,7 @@ void ipc_sub_command_match_monitor(vector_t *input) {
         variable = vector_iterator(input);
         value_string = vector_iterator(input);
 
-        log("%s = %s", variable, value_string);
+        log_debug("%s = %s", variable, value_string);
 
         for (index = 0; index < 7;) {
             if (!strcmp(configurables[index++], variable)) {
