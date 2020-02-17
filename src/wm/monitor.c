@@ -10,7 +10,7 @@
 #include "../xcb/connection.h"
 #include "../xcb/xrandr.h"
 
-vector_t *monitors;
+vector_t *monitors = NULL;
 
 void setup_monitors() {
     monitors = construct_vector();

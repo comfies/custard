@@ -2,14 +2,15 @@
 #include <stdlib.h>
 
 #include "config.h"
+#include "custard.h"
 
-char* rc_path;
-vector_t* configuration;
+char *rc_path;
+vector_t *configuration = NULL;
 
 void setup_global_configuration() {
     configuration = construct_vector();
 
-    kv_pair_t* setting;
+    kv_pair_t *setting;
     setting = create_or_get_kv_pair(configuration, "grid.rows");
     setting->value->number = 2;
 
@@ -56,8 +57,8 @@ void setup_global_configuration() {
     setting->value->number = 1;
 }
 
-kv_pair_t* create_or_get_kv_pair(vector_t* configuration, char* key) {
-    kv_pair_t* kv_pair;
+kv_pair_t *create_or_get_kv_pair(vector_t *configuration, char *key) {
+    kv_pair_t *kv_pair;
 
     while ((kv_pair = vector_iterator(configuration))) {
         if (!strcmp(kv_pair->key, key)) {
@@ -72,13 +73,14 @@ kv_pair_t* create_or_get_kv_pair(vector_t* configuration, char* key) {
     strcpy(kv_pair->key, key);
 
     kv_pair->value = (kv_value_t*)malloc(sizeof(kv_value_t));
+    log_debug("New key-value pair created with key(%s)", key);
 
     push_to_vector(configuration, kv_pair);
     return kv_pair;
 }
 
-kv_value_t* get_value_from_key(vector_t* configuration, char* key) {
-    kv_pair_t* kv_pair;
+kv_value_t *get_value_from_key(vector_t *configuration, char *key) {
+    kv_pair_t *kv_pair;
 
     while ((kv_pair = vector_iterator(configuration))) {
         if (!strcmp(kv_pair->key, key)) {
@@ -90,13 +92,13 @@ kv_value_t* get_value_from_key(vector_t* configuration, char* key) {
     return NULL;
 }
 
-kv_value_t* get_value_from_key_with_fallback(vector_t* passed_configuration,
-    char* key) {
+kv_value_t *get_value_from_key_with_fallback(vector_t *passed_configuration,
+    char *key) {
 
     if (!passed_configuration)
         passed_configuration = configuration;
 
-    kv_value_t* value;
+    kv_value_t *value;
     value = get_value_from_key(passed_configuration, key);
 
     if (passed_configuration != configuration)

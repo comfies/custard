@@ -3,10 +3,10 @@
 
 #include "rules.h"
 
-vector_t* rules = NULL;
+vector_t *rules = NULL;
 
-rule_t* create_or_get_rule(window_attribute_t attribute, char* expression) {
-    rule_t* rule;
+rule_t *create_or_get_rule(window_attribute_t attribute, char *expression) {
+    rule_t *rule;
 
     if (rules) {
         while ((rule = vector_iterator(rules))) {
@@ -29,9 +29,9 @@ rule_t* create_or_get_rule(window_attribute_t attribute, char* expression) {
     return rule;
 }
 
-void add_rule(rule_t* rule) {
+void add_rule(rule_t *rule) {
     if (rules) {
-        rule_t* existing_rule;
+        rule_t *existing_rule;
         while ((existing_rule = vector_iterator(rules)))
             if (rule == existing_rule)
                 return;
@@ -40,11 +40,11 @@ void add_rule(rule_t* rule) {
     push_to_vector(rules, rule);
 }
 
-unsigned short expression_matches(char* expression, char* subject) {
-    pcre* compiled;
-    pcre_extra* optimized;
+unsigned short expression_matches(char *expression, char *subject) {
+    pcre *compiled;
+    pcre_extra *optimized;
 
-    const char* error;
+    const char *error;
     int offset;
 
     if (!(compiled = pcre_compile(expression, PCRE_UTF8, &error, &offset,

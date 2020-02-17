@@ -186,7 +186,7 @@ window_t *manage_window(xcb_window_t window_id) {
         map_window(window->parent);
 
     push_to_vector(windows, window);
-    log("Window(%08x) managed", window_id);
+    log_debug("Window(%08x) managed", window_id);
 
     return window;
 }
@@ -202,7 +202,7 @@ void unmanage_window(xcb_window_t window_id) {
             xcb_destroy_window(xcb_connection, window->parent);
             free(window);
 
-            log("Window(%08x) unmanaged", window_id);
+            log_debug("Window(%08x) unmanaged", window_id);
             return;
         }
     }
@@ -240,7 +240,7 @@ void set_window_geometry(window_t *window, grid_geometry_t *geometry) {
         (unsigned int)screen_geometry->width);
     free(screen_geometry);
 
-    log("Window(%08x) window geometry set", window->id);
+    log_debug("Window(%08x) window geometry set", window->id);
 }
 
 void focus_on_window(window_t *window) {
@@ -265,7 +265,7 @@ void focus_on_window(window_t *window) {
     focus_window(window->id);
     decorate(window);
 
-    log("Window(%08x) focused in place of Window(%08x)",
+    log_debug("Window(%08x) focused in place of Window(%08x)",
         window->id, previous_window);
 }
 
