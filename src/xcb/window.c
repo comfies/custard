@@ -7,20 +7,20 @@
 #include "../wm/custard.h"
 
 void configure_window(xcb_window_t window_id, unsigned int value_mask,
-    unsigned int* values) {
+    unsigned int *values) {
     xcb_configure_window(xcb_connection, window_id, value_mask, values);
 }
 
 void map_window(xcb_window_t window_id) {
     xcb_map_window(xcb_connection, window_id);
 
-    log("Window(%08x) mapped", window_id);
+    log_debug("Window(%08x) mapped", window_id);
 }
 
 void unmap_window(xcb_window_t window_id) {
     xcb_unmap_window(xcb_connection, window_id);
 
-    log("Window(%08x) unmapped", window_id);
+    log_debug("Window(%08x) unmapped", window_id);
 }
 
 void focus_window(xcb_window_t window_id) {
@@ -37,7 +37,7 @@ void focus_window(xcb_window_t window_id) {
         window_id, XCB_CURRENT_TIME);
     xcb_ewmh_set_active_window(ewmh_connection, 0, window_id);
 
-    log("Window(%08x) focused", window_id);
+    log_debug("Window(%08x) focused", window_id);
 }
 
 void raise_window(xcb_window_t window_id) {
@@ -48,7 +48,7 @@ void raise_window(xcb_window_t window_id) {
 
     configure_window(window_id, value_mask, values);
 
-    log("Window(%08x) raised", window_id);
+    log_debug("Window(%08x) raised", window_id);
 }
 
 void lower_window(xcb_window_t window_id) {
@@ -59,7 +59,7 @@ void lower_window(xcb_window_t window_id) {
 
     configure_window(window_id, value_mask, values);
 
-    log("Window(%08x) lowered", window_id);
+    log_debug("Window(%08x) lowered", window_id);
 }
 
 void close_window(xcb_window_t window_id) {
@@ -74,7 +74,7 @@ void close_window(xcb_window_t window_id) {
     xcb_icccm_get_wm_protocols_reply(xcb_connection, protocols_cookie,
         &protocols, NULL);
 
-    xcb_intern_atom_reply_t* reply = xcb_intern_atom_reply(xcb_connection,
+    xcb_intern_atom_reply_t *reply = xcb_intern_atom_reply(xcb_connection,
         delete_cookie, NULL);
 
     if (reply) {
@@ -96,7 +96,7 @@ void close_window(xcb_window_t window_id) {
                     XCB_EVENT_MASK_NO_EVENT, (char*)&event);
                 xcb_icccm_get_wm_protocols_reply_wipe(&protocols);
 
-                log("Window(%08x) closed(WM_PROTOCOLS)", window_id);
+                log_debug("Window(%08x) closed(WM_PROTOCOLS)", window_id);
                 return;
             }
         }
@@ -105,7 +105,7 @@ void close_window(xcb_window_t window_id) {
     xcb_icccm_get_wm_protocols_reply_wipe(&protocols);
     xcb_kill_client(xcb_connection, window_id);
 
-    log("Window(%08x) closed(xcb_kill_client)", window_id);
+    log_debug("Window(%08x) closed(xcb_kill_client)", window_id);
 }
 
 void change_window_geometry(xcb_window_t window_id, unsigned int x,
@@ -119,11 +119,11 @@ void change_window_geometry(xcb_window_t window_id, unsigned int x,
 
     configure_window(window_id, value_mask, values);
 
-    log("Window(%08x) geometry changed %dx%d (%d,%d)", window_id,
+    log_debug("Window(%08x) geometry changed %dx%d (%d,%d)", window_id,
         width, height, x, y);
 }
 
-void* get_window_property(xcb_window_t window_id, xcb_atom_t property,
+void *get_window_property(xcb_window_t window_id, xcb_atom_t property,
     xcb_atom_t atom_type) {
     xcb_get_property_cookie_t atom_cookie;
     atom_cookie = xcb_get_property(xcb_connection, 0, window_id, property,
@@ -132,21 +132,21 @@ void* get_window_property(xcb_window_t window_id, xcb_atom_t property,
     xcb_get_property_reply_t *property_cookie;
     property_cookie = xcb_get_property_reply(xcb_connection, atom_cookie, NULL);
 
-    void* window_property;
+    void *window_property;
     window_property = xcb_get_property_value(property_cookie);
 
     return window_property;
 }
 
-char* name_of_window(xcb_window_t window_id) {
-    char* name = (char*)get_window_property(window_id, XCB_ATOM_WM_NAME,
+char *name_of_window(xcb_window_t window_id) {
+    char *name = (char*)get_window_property(window_id, XCB_ATOM_WM_NAME,
         XCB_GET_PROPERTY_TYPE_ANY);
 
     return name;
 }
 
-char* class_of_window(xcb_window_t window_id) {
-    char* class = (char*)get_window_property(window_id, XCB_ATOM_WM_CLASS,
+char *class_of_window(xcb_window_t window_id) {
+    char *class = (char*)get_window_property(window_id, XCB_ATOM_WM_CLASS,
         XCB_GET_PROPERTY_TYPE_ANY);
 
     return class;

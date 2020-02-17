@@ -6,7 +6,7 @@
 
 #include "../wm/custard.h"
 
-xcb_ewmh_connection_t* ewmh_connection;
+xcb_ewmh_connection_t *ewmh_connection;
 xcb_window_t ewmh_window;
 
 unsigned short initialize_ewmh() {
@@ -25,13 +25,13 @@ unsigned short initialize_ewmh() {
     ewmh_connection = (xcb_ewmh_connection_t*)malloc(
         sizeof(xcb_ewmh_connection_t));
 
-    xcb_intern_atom_cookie_t* initialize_atoms_cookie;
+    xcb_intern_atom_cookie_t *initialize_atoms_cookie;
     initialize_atoms_cookie = xcb_ewmh_init_atoms(xcb_connection,
         ewmh_connection);
 
     if (!xcb_ewmh_init_atoms_replies(ewmh_connection, initialize_atoms_cookie,
         NULL)) {
-        log("Unable to initialize atoms");
+        log_fatal("Unable to initialize atoms");
         free(ewmh_connection);
         return 0;
     }
