@@ -174,7 +174,7 @@ void ipc_command_geometry(vector_t *input, unsigned short *screen_update) {
                     }
                 } else
                     monitor->geometries = construct_vector();
-                
+
                 labeled_geometry = create_labeled_geometry(label,
                     x, y, height, width);
                 push_to_vector(monitor->geometries, labeled_geometry);
@@ -208,9 +208,29 @@ void ipc_command_window(vector_t *input, unsigned short *screen_update) {
      *  custard - window geometry [label]
      */
 
+    window_t *window = NULL;
+    if (focused_window == XCB_WINDOW_NONE)
+        return;
+
+    if (window_is_managed(focused_window))
+        window = get_window_by_id(focused_window);
+
     if (!strcmp(variable, "close")) {
         close_window(focused_window);
-        *screen_update = 1;
+    } else if (!strcmp(variable, "raise")) {
+
+        if (window)
+            raise_window(window->parent);
+        else
+            raise_window(focused_window);
+
+    } else if (!strcmp(variable, "lower")) {
+
+        if (window)
+            lower_window(window->parent);
+        else
+            lower_window(focused_window);
+
     } else if (!strcmp(variable, "geometry")) {
         char *label = vector_iterator(input);
 
@@ -229,11 +249,11 @@ void ipc_command_window(vector_t *input, unsigned short *screen_update) {
         if (window) {
             set_window_geometry(window, geometry);
             decorate(window);
-            *screen_update = 1;
         }
 
     }
 
+    *screen_update = 1;
 }
 
 void ipc_command_workspace(vector_t *input, unsigned short *screen_update) {
