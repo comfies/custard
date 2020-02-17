@@ -62,6 +62,11 @@ unsigned short initialize_xcb() {
         }
     }
 
+    if (!screen_visual) {
+        log_fatal("Unable to obtain a screen visual with depth of 32");
+        return 0;
+    }
+
     screen_colormap = xcb_generate_id(xcb_connection);
     xcb_create_colormap(xcb_connection, XCB_COLORMAP_ALLOC_NONE,
         screen_colormap, xcb_screen->root, screen_visual->visual_id);
