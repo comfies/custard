@@ -5,16 +5,19 @@
 
 #include "../wm/custard.h"
 
-xcb_connection_t* xcb_connection;
-xcb_screen_t* xcb_screen;
-xcb_visualtype_t* screen_visual;
+xcb_connection_t *xcb_connection;
+xcb_screen_t *xcb_screen;
+xcb_visualtype_t *screen_visual;
 xcb_colormap_t screen_colormap;
 int xcb_file_descriptor;
 
 unsigned short initialize_xcb() {
     xcb_connection = xcb_connect(NULL, NULL);
 
-    if (xcb_connection_has_error(xcb_connection)) return 0;
+    if (!xcb_connection || xcb_connection_has_error(xcb_connection)) {
+        log_fatal("Unable to create XCB connection; is the X server running?");
+        return 0;
+    }
 
     xcb_screen = xcb_setup_roots_iterator(xcb_get_setup(xcb_connection)).data;
 
@@ -31,7 +34,7 @@ unsigned short initialize_xcb() {
         xcb_screen->root, XCB_CW_EVENT_MASK, events);
 
     if (xcb_request_check(xcb_connection, window_attributes_cookie)) {
-        log("It appears another window manager is running.");
+        log_fatal("It appears another window manager is running.");
         return 0;
     }
 
