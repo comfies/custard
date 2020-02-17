@@ -16,6 +16,7 @@ typedef struct {
     grid_geometry_t *geometry;
     rule_t *rule;
     monitor_t *monitor;
+    unsigned short fullscreen;
     unsigned int workspace;
 } window_t;
 

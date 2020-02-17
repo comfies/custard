@@ -97,6 +97,7 @@ window_t *get_window_by_id(xcb_window_t window_id) {
 window_t *manage_window(xcb_window_t window_id) {
     window_t *window = (window_t*)malloc(sizeof(window_t));
     window->id = window_id;
+    window->fullscreen = 0;
     window->parent = xcb_generate_id(xcb_connection);
 
     window->rule = NULL;
