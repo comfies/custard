@@ -233,18 +233,14 @@ void ipc_command_window(vector_t *input, unsigned short *screen_update) {
         if (!strcmp(cardinal, "north")) {
             window->geometry->y--;
             window->geometry->height++;
-        }
-
-        if (!strcmp(cardinal, "south"))
+        } else if (!strcmp(cardinal, "south"))
             window->geometry->height++;
-
-        if (!strcmp(cardinal, "east"))
+        else if (!strcmp(cardinal, "east"))
             window->geometry->width++;
-
-        if (!strcmp(cardinal, "west")) {
+        else if (!strcmp(cardinal, "west")) {
             window->geometry->x--;
             window->geometry->width++;
-        }
+        } else return;
 
         set_window_geometry(window, window->geometry);
         decorate(window);
@@ -259,21 +255,38 @@ void ipc_command_window(vector_t *input, unsigned short *screen_update) {
         if (!strcmp(cardinal, "north")) {
             window->geometry->y++;
             window->geometry->height--;
-        }
-
-        if (!strcmp(cardinal, "south"))
+        } else if (!strcmp(cardinal, "south"))
             window->geometry->height--;
-
-        if (!strcmp(cardinal, "east"))
+        else if (!strcmp(cardinal, "east"))
             window->geometry->width--;
-
-        if (!strcmp(cardinal, "west")) {
+        else if (!strcmp(cardinal, "west")) {
             window->geometry->x++;
             window->geometry->width--;
-        }
+        } else return;
 
         set_window_geometry(window, window->geometry);
         decorate(window);
+
+    } else if (!strcmp(variable, "move")) {
+
+        if (!window)
+            return;
+
+        char *cardinal = vector_iterator(input);
+
+        if (!strcmp(cardinal, "north"))
+            window->geometry->y--;
+        else if (!strcmp(cardinal, "south"))
+            window->geometry->y++;
+        else if (!strcmp(cardinal, "east"))
+            window->geometry->x++;
+        else if (!strcmp(cardinal, "west"))
+            window->geometry->x--;
+        else return;
+
+        set_window_geometry(window, window->geometry);
+        decorate(window);
+
 
     } else if (!strcmp(variable, "lower")) {
 

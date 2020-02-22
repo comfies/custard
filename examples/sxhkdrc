@@ -2,7 +2,7 @@ super + Return
     urxvt
 
 super + {_,ctrl + ,alt + }{Up,Down,Left,Right}
-    custardctl window --{move,expand,contract} {north,south,west,east}
+    custardctl - window {move,expand,contract} {north,south,west,east}
 
 super + shift + {Up,Down}
     custardctl window --{raise,lower}
