@@ -8,6 +8,7 @@ extern unsigned short custard_is_running;
 
 int custard(int, char**);
 unsigned short initialize(void);
+void manage_pre_existing_windows(void);
 void finalize(void);
 
 void _log(unsigned short, const char*, const char*, const int, char*, ...);

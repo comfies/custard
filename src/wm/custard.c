@@ -7,6 +7,7 @@
 
 #include "custard.h"
 #include "config.h"
+#include "decorations.h"
 #include "handlers.h"
 #include "monitor.h"
 #include "rules.h"
@@ -19,8 +20,8 @@
 #include "../ipc/socket.h"
 #include "../xcb/connection.h"
 #include "../xcb/ewmh.h"
+#include "../xcb/window.h"
 #include "../xcb/xrandr.h"
-// TODO: workspaces need reimplementation
 
 char *rc_path = NULL;
 unsigned short loglevel = 0;
@@ -81,6 +82,7 @@ int custard(int argc, char **argv) {
     }
 
     custard_is_running = 1;
+    manage_pre_existing_windows();
 
     xcb_generic_event_t *xcb_event;
     unsigned int xcb_event_type;
@@ -131,9 +133,42 @@ unsigned short initialize() {
     index = 0;
     log_debug("Signal handlers setup");
 
-    // Potential TODO: manage pre-existing windows
-
     return 1;
+}
+
+void manage_pre_existing_windows() {
+    unsigned int index = 0;
+    xcb_query_tree_cookie_t query_cookie;
+    query_cookie = xcb_query_tree(xcb_connection,
+        xcb_screen->root);
+
+    xcb_query_tree_reply_t *tree_reply;
+    tree_reply = xcb_query_tree_reply(xcb_connection, query_cookie, NULL);
+
+    if (!tree_reply)
+        return;
+
+    window_t *window = NULL;
+    xcb_window_t child;
+    xcb_window_t *children = xcb_query_tree_children(tree_reply);
+    unsigned int number_of_children = (unsigned int)
+        xcb_query_tree_children_length(tree_reply);
+
+    for (; index < number_of_children; index++) {
+        child = children[index];
+
+        if (window_should_be_managed(child)) {
+            window = manage_window(child);
+            map_window(child);
+            raise_window(window->parent);
+            focus_on_window(window);
+            decorate(window);
+            log_debug("Pre-existing window(%08x) managed",
+                child, window->workspace);
+        }
+    }
+
+    apply();
 }
 
 void finalize() {
