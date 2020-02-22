@@ -211,7 +211,6 @@ void ipc_command_window(vector_t *input, unsigned short *screen_update) {
     window_t *window = NULL;
     if (focused_window == XCB_WINDOW_NONE)
         return;
-
     if (window_is_managed(focused_window))
         window = get_window_by_id(focused_window);
 
@@ -223,6 +222,58 @@ void ipc_command_window(vector_t *input, unsigned short *screen_update) {
             raise_window(window->parent);
         else
             raise_window(focused_window);
+
+    } else if (!strcmp(variable, "expand")) {
+
+        if (!window)
+            return;
+
+        char *cardinal = vector_iterator(input);
+
+        if (!strcmp(cardinal, "north")) {
+            window->geometry->y--;
+            window->geometry->height++;
+        }
+
+        if (!strcmp(cardinal, "south"))
+            window->geometry->height++;
+
+        if (!strcmp(cardinal, "east"))
+            window->geometry->width++;
+
+        if (!strcmp(cardinal, "west")) {
+            window->geometry->x--;
+            window->geometry->width++;
+        }
+
+        set_window_geometry(window, window->geometry);
+        decorate(window);
+
+    } else if (!strcmp(variable, "contract")) {
+
+        if (!window)
+            return;
+
+        char *cardinal = vector_iterator(input);
+
+        if (!strcmp(cardinal, "north")) {
+            window->geometry->y++;
+            window->geometry->height--;
+        }
+
+        if (!strcmp(cardinal, "south"))
+            window->geometry->height--;
+
+        if (!strcmp(cardinal, "east"))
+            window->geometry->width--;
+
+        if (!strcmp(cardinal, "west")) {
+            window->geometry->x++;
+            window->geometry->width--;
+        }
+
+        set_window_geometry(window, window->geometry);
+        decorate(window);
 
     } else if (!strcmp(variable, "lower")) {
 
