@@ -2,10 +2,10 @@ super + Return
     urxvt
 
 super + {_,ctrl + ,alt + }{Up,Down,Left,Right}
-    custardctl - window {move,expand,contract} {north,south,west,east}
+    custard - window {move,expand,contract} {north,south,west,east}
 
 super + shift + {Up,Down}
-    custardctl window --{raise,lower}
+    custard - window {raise,lower}
 
 super + {1-9,0}
     custard - workspace {1-9,10}
