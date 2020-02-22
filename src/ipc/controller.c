@@ -15,7 +15,7 @@ unsigned short should_become_controller(int argc, char** argv) {
 }
 
 int controller(int argc, char** argv) {
-    log("Instance became controller");
+    log_debug("Instance became controller");
 
     socket_mode = CONTROLLER;
 
