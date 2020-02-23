@@ -24,45 +24,35 @@
 #include "../xcb/xrandr.h"
 
 char *rc_path = NULL;
-unsigned short loglevel = 0;
+unsigned short loglevel = 1;
 unsigned short custard_is_running = 0;
 
 int custard(int argc, char **argv) {
     /* Process arguments */
 
     char *argument;
-    for (int index = 1; index < argc; index++) {
-        argument = argv[index];
+    int index = 1;
+
+    while (index < argc) {
+        argument = argv[index++];
+        log_message("arg = %s", argument);
+
+        if (!argv[index] || !strlen(argv[index])) {
+            log_fatal("No argument provided with %s, exiting.", argument);
+            return EXIT_FAILURE;
+        }
 
         if (!strcmp(argument, "--rc")) {
-            if (!argv[index + 1] || !strlen(argv[index + 1])) {
-                log_fatal("No rc specified with --rc, exiting.");
-                return EXIT_FAILURE;
-            }
-
-            if (access(argv[index + 1], X_OK | F_OK | R_OK) > -1) {
+            if (access(argv[index], X_OK | F_OK | R_OK) > -1) {
                 rc_path = (char*)malloc(sizeof(char) *
-                    (strlen(argv[index + 1]) + 1));
-                strcpy(rc_path, argv[index + 1]);
-
-                index++;
-                continue;
-            } else {
-                log_fatal("Specified rc is not executable, exiting.");
-                return EXIT_FAILURE;
+                    (strlen(argv[index]) + 1));
+                strcpy(rc_path, argv[index]);
             }
+        } else if (!strcmp(argument, "--loglevel")) {
+            loglevel = (short)string_to_integer(argv[index]);
         }
 
-        if (!strcmp(argument, "--loglevel")) {
-            if (!argv[index + 1] || !strlen(argv[index + 1])) {
-                log_fatal("No loglevel specified with --loglevel, exiting.");
-                return EXIT_FAILURE;
-            }
-
-            loglevel = (short)string_to_integer(argv[index + 1]);
-            index++;
-            continue;
-        }
+        index++;
     }
 
     /* initialize window manager */
