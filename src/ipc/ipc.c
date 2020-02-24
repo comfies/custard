@@ -225,66 +225,85 @@ void ipc_command_window(vector_t *input, unsigned short *screen_update) {
 
     } else if (!strcmp(variable, "expand")) {
 
-        if (!window)
+        if (!window || window->floating)
             return;
 
         char *cardinal = vector_iterator(input);
+        grid_geometry_t *geometry = (grid_geometry_t*)window->geometry;
 
         if (!strcmp(cardinal, "north")) {
-            window->geometry->y--;
-            window->geometry->height++;
+            if (geometry->y == 0)
+                return;
+            geometry->y--;
+            geometry->height++;
         } else if (!strcmp(cardinal, "south"))
-            window->geometry->height++;
+            geometry->height++;
         else if (!strcmp(cardinal, "east"))
-            window->geometry->width++;
+            geometry->width++;
         else if (!strcmp(cardinal, "west")) {
-            window->geometry->x--;
-            window->geometry->width++;
+            if (geometry->x == 0)
+                return;
+            geometry->x--;
+            geometry->width++;
         } else return;
 
-        set_window_geometry(window, window->geometry);
+        set_window_geometry(window, geometry);
         decorate(window);
 
     } else if (!strcmp(variable, "contract")) {
 
-        if (!window)
+        if (!window || window->floating)
             return;
 
         char *cardinal = vector_iterator(input);
+        grid_geometry_t *geometry = (grid_geometry_t*)window->geometry;
 
         if (!strcmp(cardinal, "north")) {
-            window->geometry->y++;
-            window->geometry->height--;
-        } else if (!strcmp(cardinal, "south"))
-            window->geometry->height--;
-        else if (!strcmp(cardinal, "east"))
-            window->geometry->width--;
-        else if (!strcmp(cardinal, "west")) {
-            window->geometry->x++;
-            window->geometry->width--;
+            geometry->y++;
+            if (geometry->height == 1)
+                return;
+            geometry->height--;
+        } else if (!strcmp(cardinal, "south")) {
+            if (geometry->height == 1)
+                return;
+            geometry->height--;
+        } else if (!strcmp(cardinal, "east")) {
+            if (geometry->width == 1)
+                return;
+            geometry->width--;
+        } else if (!strcmp(cardinal, "west")) {
+            geometry->x++;
+            if (geometry->width == 1)
+                return;
+            geometry->width--;
         } else return;
 
-        set_window_geometry(window, window->geometry);
+        set_window_geometry(window, geometry);
         decorate(window);
 
     } else if (!strcmp(variable, "move")) {
 
-        if (!window)
+        if (!window || window->floating)
             return;
 
         char *cardinal = vector_iterator(input);
+        grid_geometry_t *geometry = (grid_geometry_t*)window->geometry;
 
-        if (!strcmp(cardinal, "north"))
-            window->geometry->y--;
-        else if (!strcmp(cardinal, "south"))
-            window->geometry->y++;
+        if (!strcmp(cardinal, "north")) {
+            if (geometry->y == 0)
+                return;
+            geometry->y--;
+        } else if (!strcmp(cardinal, "south"))
+            geometry->y++;
         else if (!strcmp(cardinal, "east"))
-            window->geometry->x++;
-        else if (!strcmp(cardinal, "west"))
-            window->geometry->x--;
-        else return;
+            geometry->x++;
+        else if (!strcmp(cardinal, "west")) {
+            if (geometry->x == 0)
+                return;
+            geometry->x--;
+        } else return;
 
-        set_window_geometry(window, window->geometry);
+        set_window_geometry(window, geometry);
         decorate(window);
 
 
