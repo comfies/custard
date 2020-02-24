@@ -19,6 +19,8 @@ vector_t *windows = NULL;
 xcb_window_t focused_window = XCB_WINDOW_NONE;
 
 unsigned short window_should_be_managed(xcb_window_t window_id) {
+    if (window_id == xcb_screen->root || window_id == ewmh_window ||
+        window_id == XCB_WINDOW_NONE) return 0;
     if (window_is_managed(window_id)) return 0;
 
     xcb_get_window_attributes_cookie_t window_attributes_cookie;
@@ -97,7 +99,7 @@ window_t *get_window_by_id(xcb_window_t window_id) {
 window_t *manage_window(xcb_window_t window_id) {
     window_t *window = (window_t*)malloc(sizeof(window_t));
     window->id = window_id;
-    window->fullscreen = 0;
+    window->fullscreen = window->floating = 0;
     window->parent = xcb_generate_id(xcb_connection);
 
     window->rule = NULL;
@@ -209,10 +211,10 @@ void unmanage_window(xcb_window_t window_id) {
     }
 }
 
-void set_window_geometry(window_t *window, grid_geometry_t *geometry) {
+void set_window_geometry(window_t *window, void *geometry) {
     window->geometry = geometry;
-    monitor_t *monitor = NULL;
 
+    monitor_t *monitor = NULL;
     if (window->rule && window->rule->rules) {
         kv_value_t *value;
         value = get_value_from_key(window->rule->rules, "monitor");
@@ -225,8 +227,12 @@ void set_window_geometry(window_t *window, grid_geometry_t *geometry) {
     if (!monitor)
         monitor = monitor_with_cursor_residence();
 
-    screen_geometry_t *screen_geometry;
-    screen_geometry = get_equivalent_screen_geometry(geometry, monitor);
+    screen_geometry_t *screen_geometry = NULL;
+    if (window->floating)
+        screen_geometry = (screen_geometry_t*)geometry;
+    else
+        screen_geometry = get_equivalent_screen_geometry(
+            (grid_geometry_t*)geometry, monitor);
     apply_decoration_to_window_screen_geometry(window, screen_geometry);
 
     change_window_geometry(window->id,
