@@ -259,9 +259,9 @@ void ipc_command_window(vector_t *input, unsigned short *screen_update) {
         grid_geometry_t *geometry = (grid_geometry_t*)window->geometry;
 
         if (!strcmp(cardinal, "north")) {
-            geometry->y++;
             if (geometry->height == 1)
                 return;
+            geometry->y++;
             geometry->height--;
         } else if (!strcmp(cardinal, "south")) {
             if (geometry->height == 1)
@@ -272,9 +272,9 @@ void ipc_command_window(vector_t *input, unsigned short *screen_update) {
                 return;
             geometry->width--;
         } else if (!strcmp(cardinal, "west")) {
-            geometry->x++;
             if (geometry->width == 1)
                 return;
+            geometry->x++;
             geometry->width--;
         } else return;
 
