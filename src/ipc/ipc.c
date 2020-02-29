@@ -345,10 +345,43 @@ void ipc_command_window(vector_t *input, unsigned short *screen_update) {
 
         window_t *window = get_window_by_id(focused_window);
         if (window) {
+            window->floating = 0;
+
             set_window_geometry(window, geometry);
             decorate(window);
         }
 
+    } else if (!strcmp(variable, "float")) {
+        char *token;
+        char *size;
+        char *position;
+        unsigned int height;
+        unsigned int width;
+        unsigned int x;
+        unsigned int y;
+
+        size = vector_iterator(input);
+        position = vector_iterator(input);
+
+        token = strsep(&size, "x");
+
+        width = string_to_integer(token);
+        height = string_to_integer(size);
+
+        token = strsep(&position, ",");
+
+        x = string_to_integer(token);
+        y = string_to_integer(position);
+
+        window_t *window = get_window_by_id(focused_window);
+        if (window) {
+            window->floating = 1;
+            screen_geometry_t *geometry = create_screen_geometry(x, y, height,
+                width);
+
+            set_window_geometry(window, geometry);
+            decorate(window);
+        }
     }
 
     *screen_update = 1;
