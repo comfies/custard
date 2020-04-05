@@ -22,7 +22,7 @@ unsigned short initialize_ewmh() {
         XCB_WINDOW_CLASS_INPUT_OUTPUT, XCB_COPY_FROM_PARENT,
         XCB_CW_EVENT_MASK, events);
 
-    ewmh_connection = (xcb_ewmh_connection_t*)malloc(
+    ewmh_connection = (xcb_ewmh_connection_t*)calloc(1,
         sizeof(xcb_ewmh_connection_t));
 
     xcb_intern_atom_cookie_t *initialize_atoms_cookie;

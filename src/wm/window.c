@@ -97,7 +97,7 @@ window_t *get_window_by_id(xcb_window_t window_id) {
 }
 
 window_t *manage_window(xcb_window_t window_id) {
-    window_t *window = (window_t*)malloc(sizeof(window_t));
+    window_t *window = (window_t*)calloc(1, sizeof(window_t));
     window->id = window_id;
     window->fullscreen = window->floating = 0;
     window->parent = xcb_generate_id(xcb_connection);
@@ -142,7 +142,7 @@ window_t *manage_window(xcb_window_t window_id) {
     }
 
     if (!geometry) {
-        geometry = (grid_geometry_t*)malloc(sizeof(grid_geometry_t));
+        geometry = (grid_geometry_t*)calloc(1, sizeof(grid_geometry_t));
 
         geometry->x = calculate_default_x(monitor);
         geometry->y = calculate_default_y(monitor);

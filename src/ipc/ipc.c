@@ -68,7 +68,7 @@ void ipc_helper_typecast_and_assign(kv_value_t *kv_value, char *variable,
 
     if (!strcmp(variable, "geometry") ||
         !strcmp(variable, "monitor")) {
-        kv_value->string = (char*)malloc(sizeof(char));
+        kv_value->string = (char*)calloc(1, sizeof(char));
         strcpy(kv_value->string, input);
         return;
     }

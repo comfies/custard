@@ -22,7 +22,7 @@ int controller(int argc, char** argv) {
     if (!initialize_socket())
         return EXIT_FAILURE;
 
-    char* input_feed = malloc(sizeof(char) * 1023);
+    char* input_feed = calloc(1024, sizeof(char));
 
     for (int index = 2; index < argc; index++) {
         strcat(input_feed, argv[index]);

@@ -17,9 +17,9 @@ void setup_monitors() {
 
     monitor_t *monitor;
     if (!xrandr_is_available()) {
-        monitor = (monitor_t*)malloc(sizeof(monitor_t));
-        monitor->name = (char*)malloc(sizeof(char));
-        monitor->geometry = (screen_geometry_t*)malloc(
+        monitor = (monitor_t*)calloc(1, sizeof(monitor_t));
+        monitor->name = (char*)calloc(1, sizeof(char));
+        monitor->geometry = (screen_geometry_t*)calloc(1,
             sizeof(screen_geometry_t));
         monitor->configuration = NULL;
 
@@ -45,9 +45,9 @@ void setup_monitors() {
     char *output_name;
 
     while (iterator.rem) {
-        monitor = (monitor_t*)malloc(sizeof(monitor_t));
-        monitor->name = (char*)malloc(sizeof(char));
-        monitor->geometry = (screen_geometry_t*)malloc(
+        monitor = (monitor_t*)calloc(1, sizeof(monitor_t));
+        monitor->name = (char*)calloc(1, sizeof(char));
+        monitor->geometry = (screen_geometry_t*)calloc(1,
             sizeof(screen_geometry_t));
         monitor->configuration = NULL;
 

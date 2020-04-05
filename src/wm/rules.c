@@ -18,9 +18,9 @@ rule_t *create_or_get_rule(window_attribute_t attribute, char *expression) {
         }
     }
 
-    rule = (rule_t*)malloc(sizeof(rule_t));
+    rule = (rule_t*)calloc(1, sizeof(rule_t));
 
-    rule->expression = (char*)malloc(sizeof(char));
+    rule->expression = (char*)calloc(1, sizeof(char));
     strcpy(rule->expression, expression);
 
     rule->attribute = attribute;

@@ -44,8 +44,8 @@ int custard(int argc, char **argv) {
 
         if (!strcmp(argument, "--rc")) {
             if (access(argv[index], X_OK | F_OK | R_OK) > -1) {
-                rc_path = (char*)malloc(sizeof(char) *
-                    (strlen(argv[index]) + 1));
+                rc_path = (char*)calloc((strlen(argv[index]) + 1),
+                    sizeof(char));
                 strcpy(rc_path, argv[index]);
             }
         } else if (!strcmp(argument, "--loglevel")) {

@@ -4,10 +4,10 @@
 #include "vector.h"
 
 vector_t *construct_vector() {
-    vector_t *vector = (vector_t*)malloc(sizeof(vector_t));
+    vector_t *vector = (vector_t*)calloc(1, sizeof(vector_t));
     vector->memory = 1;
     vector->size = 0;
-    vector->elements = malloc(sizeof(void*));
+    vector->elements = calloc(1, sizeof(void*));
     vector->remaining = 0;
 
     return vector;

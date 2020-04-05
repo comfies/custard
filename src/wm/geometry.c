@@ -6,10 +6,10 @@
 
 labeled_grid_geometry_t *create_labeled_geometry(char *label, unsigned int x,
     unsigned int y, unsigned int height, unsigned int width) {
-    labeled_grid_geometry_t *geometry = (labeled_grid_geometry_t*)malloc(
+    labeled_grid_geometry_t *geometry = (labeled_grid_geometry_t*)calloc(1,
         sizeof(labeled_grid_geometry_t));
-    geometry->label = (char*)malloc(sizeof(char));
-    geometry->geometry = (grid_geometry_t*)malloc(sizeof(grid_geometry_t));
+    geometry->label = (char*)calloc(1, sizeof(char));
+    geometry->geometry = (grid_geometry_t*)calloc(1, sizeof(grid_geometry_t));
 
     strcpy(geometry->label, label);
     geometry->geometry->x = x;
@@ -22,7 +22,7 @@ labeled_grid_geometry_t *create_labeled_geometry(char *label, unsigned int x,
 
 screen_geometry_t *create_screen_geometry(unsigned int x, unsigned int y,
     unsigned int height, unsigned int width) {
-    screen_geometry_t *geometry = (screen_geometry_t*)malloc(
+    screen_geometry_t *geometry = (screen_geometry_t*)calloc(1,
         sizeof(screen_geometry_t));
 
     geometry->x = x;

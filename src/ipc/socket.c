@@ -21,8 +21,8 @@ unsigned short initialize_socket() {
     char *display = getenv("DISPLAY");
     char *user = getenv("USER");
 
-    socket_path = (char*)malloc(sizeof(char) *
-        (20 + strlen(user) + strlen(display)));
+    socket_path = (char*)calloc((20 + strlen(user) + strlen(display)),
+        sizeof(char));
     sprintf(socket_path, "/tmp/custard.%s_%s.sock", user, display);
     snprintf(address.sun_path, sizeof(address.sun_path), "%s", socket_path);
 
