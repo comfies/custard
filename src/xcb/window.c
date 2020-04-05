@@ -9,6 +9,8 @@
 void configure_window(xcb_window_t window_id, unsigned int value_mask,
     unsigned int *values) {
     xcb_configure_window(xcb_connection, window_id, value_mask, values);
+
+    log_debug("Window(%08x) configured", window_id);
 }
 
 void map_window(xcb_window_t window_id) {

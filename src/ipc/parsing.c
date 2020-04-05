@@ -3,18 +3,18 @@
 
 #include "parsing.h"
 
-unsigned short string_to_boolean(char* string) {
+unsigned short string_to_boolean(char *string) {
     if (!strcmp(string, "True") || !strcmp(string, "true"))
         return 1;
 
     return 0;
 }
 
-unsigned int string_to_integer(char* string) {
+unsigned int string_to_integer(char *string) {
     return atoi(string);
 }
 
-color_t string_to_color(char* string) {
+color_t string_to_color(char *string) {
     color_t color = {
         .red   = 255,
         .green = 255,

@@ -87,9 +87,9 @@ void handle_window_message(xcb_generic_event_t *generic_event) {
         xcb_atom_t attribute = event->data.data32[1];
 
         if (attribute == ewmh_connection->_NET_WM_STATE_FULLSCREEN) {
-            if (state_action == XCB_EWMH_WM_STATE_TOGGLE) {
+            if (state_action == XCB_EWMH_WM_STATE_TOGGLE)
                 window->fullscreen = !window->fullscreen;
-            } else
+            else
                 window->fullscreen = state_action;
 
             monitor_t *monitor = window->monitor;
@@ -151,8 +151,6 @@ void handle_window_click(xcb_generic_event_t *generic_event) {
 
     apply();
 }
-
-// TODO: handle fullscreen toggles
 
 /* Signal handlers */
 

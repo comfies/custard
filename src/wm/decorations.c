@@ -5,7 +5,7 @@
 #include "window.h"
 #include "../xcb/connection.h"
 
-void decorate(window_t* window) {
+void decorate(window_t *window) {
     unsigned int number_of_borders = get_setting_from_window_rules(window,
         "borders")->number;
 
@@ -34,7 +34,7 @@ unsigned int get_raw_color_value(color_t color) {
     return value;
 }
 
-unsigned int determine_border_size(window_t* window) {
+unsigned int determine_border_size(window_t *window) {
 
     unsigned int outer_size = get_setting_from_window_rules(window,
         "border.size.outer")->number;
@@ -64,8 +64,8 @@ unsigned int determine_border_size(window_t* window) {
     return 0;
 }
 
-void apply_decoration_to_window_screen_geometry(window_t* window,
-    screen_geometry_t* geometry) {
+void apply_decoration_to_window_screen_geometry(window_t *window,
+    screen_geometry_t *geometry) {
 
     unsigned int border_size = determine_border_size(window);
 
@@ -75,8 +75,8 @@ void apply_decoration_to_window_screen_geometry(window_t* window,
     }
 }
 
-void decorate_with_one_border(window_t* window) {
-    char* color_setting = "border.color.unfocused";
+void decorate_with_one_border(window_t *window) {
+    char *color_setting = "border.color.unfocused";
     if (focused_window == window->id)
         color_setting = "border.color.focused";
 
@@ -98,19 +98,19 @@ void decorate_with_one_border(window_t* window) {
 
 
 // TODO: refactor this at some point
-void decorate_with_multiple_borders(window_t* window,
+void decorate_with_multiple_borders(window_t *window,
     unsigned int number_of_borders) {
 
     xcb_get_geometry_cookie_t geometry_cookie = xcb_get_geometry(xcb_connection,
         window->parent);
-    xcb_get_geometry_reply_t* geometry;
+    xcb_get_geometry_reply_t *geometry;
 
     unsigned int values[1];
 
     color_t primary_color = get_setting_from_window_rules(window,
         "border.color.background")->color;
 
-    char* color_setting = "border.color.unfocused";
+    char *color_setting = "border.color.unfocused";
     if (focused_window == window->id)
         color_setting = "border.color.focused";
     color_t secondary_color = get_setting_from_window_rules(window,

@@ -5,7 +5,7 @@
 
 /* Calculations */
 
-unsigned int calculate_default_height(monitor_t* monitor) {
+unsigned int calculate_default_height(monitor_t *monitor) {
     unsigned int rows = get_value_from_key_with_fallback(
         monitor->configuration, "grid.rows")->number;
 
@@ -14,7 +14,7 @@ unsigned int calculate_default_height(monitor_t* monitor) {
     return 2;
 }
 
-unsigned int calculate_default_width(monitor_t* monitor) {
+unsigned int calculate_default_width(monitor_t *monitor) {
     unsigned int columns = get_value_from_key_with_fallback(
         monitor->configuration, "grid.columns")->number;
 
@@ -23,7 +23,7 @@ unsigned int calculate_default_width(monitor_t* monitor) {
     return 2;
 }
 
-unsigned int calculate_default_x(monitor_t* monitor) {
+unsigned int calculate_default_x(monitor_t *monitor) {
     unsigned int columns = get_value_from_key_with_fallback(
         monitor->configuration, "grid.columns")->number;
 
@@ -34,7 +34,7 @@ unsigned int calculate_default_x(monitor_t* monitor) {
     return default_value;
 }
 
-unsigned int calculate_default_y(monitor_t* monitor) {
+unsigned int calculate_default_y(monitor_t *monitor) {
     unsigned int rows = get_value_from_key_with_fallback(
         monitor->configuration, "grid.rows")->number;
 
@@ -45,7 +45,7 @@ unsigned int calculate_default_y(monitor_t* monitor) {
     return default_value;
 }
 
-float calculate_horizontal_unit_size(monitor_t* monitor) {
+float calculate_horizontal_unit_size(monitor_t *monitor) {
     unsigned int total_border_size = 0;
 
     unsigned int gap_size = get_value_from_key_with_fallback(
@@ -72,7 +72,7 @@ float calculate_horizontal_unit_size(monitor_t* monitor) {
     return unit_size;
 }
 
-float calculate_vertical_unit_size(monitor_t* monitor) {
+float calculate_vertical_unit_size(monitor_t *monitor) {
     unsigned int total_border_size = 0;
 
     unsigned int gap_size = get_value_from_key_with_fallback(
@@ -101,7 +101,7 @@ float calculate_vertical_unit_size(monitor_t* monitor) {
 /* Lower level helpers */
 
 float span_units_over_screen(float unit_size, unsigned int span,
-    monitor_t* monitor) {
+    monitor_t *monitor) {
     unsigned int total_border_size = 0;
     unsigned int gap_size = get_value_from_key_with_fallback(
         monitor->configuration, "grid.margins")->number;
@@ -111,7 +111,7 @@ float span_units_over_screen(float unit_size, unsigned int span,
 }
 
 float get_unit_offset(float unit_size, unsigned int offset,
-    monitor_t* monitor) {
+    monitor_t *monitor) {
     unsigned int total_border_size = 0;
     unsigned int gap_size = get_value_from_key_with_fallback(
         monitor->configuration, "grid.margins")->number;
@@ -122,19 +122,19 @@ float get_unit_offset(float unit_size, unsigned int offset,
 
 /* Abstractions */
 
-float span_width_over_screen(unsigned int span, monitor_t* monitor) {
+float span_width_over_screen(unsigned int span, monitor_t *monitor) {
     float unit_in_pixels = calculate_horizontal_unit_size(monitor);
 
     return span_units_over_screen(unit_in_pixels, span, monitor);
 }
 
-float span_height_over_screen(unsigned int span, monitor_t* monitor) {
+float span_height_over_screen(unsigned int span, monitor_t *monitor) {
     float unit_in_pixels = calculate_vertical_unit_size(monitor);
 
     return span_units_over_screen(unit_in_pixels, span, monitor);
 }
 
-float get_x_offset(unsigned int offset, monitor_t* monitor) {
+float get_x_offset(unsigned int offset, monitor_t *monitor) {
     float unit_in_pixels = calculate_horizontal_unit_size(monitor);
     float left_offset = (float)get_value_from_key_with_fallback(
         monitor->configuration, "grid.margin.left")->number;
@@ -142,7 +142,7 @@ float get_x_offset(unsigned int offset, monitor_t* monitor) {
     return get_unit_offset(unit_in_pixels, offset, monitor) + left_offset;
 }
 
-float get_y_offset(unsigned int offset, monitor_t* monitor) {
+float get_y_offset(unsigned int offset, monitor_t *monitor) {
     float unit_in_pixels = calculate_vertical_unit_size(monitor);
     float top_offset = (float)get_value_from_key_with_fallback(
         monitor->configuration, "grid.margin.top")->number;
