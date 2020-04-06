@@ -33,7 +33,7 @@ void push_to_vector(vector_t *vector, void *data) {
     if (vector->size == vector->memory) {
         vector->memory *= 2;
         vector->elements = realloc(vector->elements,
-            sizeof(void*) * vector->memory);
+            sizeof(void*) * (vector->memory + 1));
     }
 
     vector->elements[vector->size++] = (void*)data;
@@ -53,7 +53,7 @@ void pull_from_vector(vector_t *vector, unsigned int index) {
     if ((vector->size * 2) == vector->memory) {
         vector->memory /= 2;
         vector->elements = realloc(vector->elements,
-            sizeof(void *) * vector->memory);
+            sizeof(void *) * (vector->memory + 1));
     }
 }
 
