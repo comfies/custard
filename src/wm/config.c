@@ -69,10 +69,10 @@ kv_pair_t *create_or_get_kv_pair(vector_t *configuration, char *key) {
 
     kv_pair = (kv_pair_t*)calloc(1, sizeof(kv_pair_t));
 
-    kv_pair->key = (char*)calloc(1, sizeof(char));
+    kv_pair->key = (char*)calloc(strlen(key) + 1, sizeof(char));
     strcpy(kv_pair->key, key);
 
-    kv_pair->value = (kv_value_t*)malloc(sizeof(kv_value_t));
+    kv_pair->value = (kv_value_t*)calloc(1, sizeof(kv_value_t));
     log_debug("New key-value pair created with key(%s)", key);
 
     push_to_vector(configuration, kv_pair);
