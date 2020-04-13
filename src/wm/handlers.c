@@ -125,6 +125,7 @@ void handle_window_click(xcb_generic_event_t *generic_event) {
             if (window->parent == window_id || window->id == window_id) {
                 raise_window(window->parent);
                 focus_on_window(window);
+                apply();
 
                 reset_vector_iterator(windows);
                 return;
@@ -146,6 +147,8 @@ void handle_window_click(xcb_generic_event_t *generic_event) {
     raise_window(window_id);
     focus_window(window_id);
     focused_window = window_id;
+
+    apply();
 }
 
 /* Signal handlers */
