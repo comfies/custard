@@ -116,41 +116,34 @@ void handle_window_click(xcb_generic_event_t *generic_event) {
     event = (xcb_button_press_event_t*)generic_event;
 
     xcb_window_t window_id = event->event;
-    xcb_window_t parent_id = XCB_WINDOW_NONE;
-    xcb_window_t previous_window = focused_window;
+    log_debug("Window(%08x) clicked", window_id);
 
     window_t *window;
     if (windows) {
         while ((window = vector_iterator(windows))) {
             if (window->parent == window_id) {
-                parent_id = window_id;
-                window_id = window->id;
-
+                raise_window(window_id);
+                focus_on_window(window->id);
                 reset_vector_iterator(windows);
-                break;
+                return;
             }
         }
     }
 
-    log_debug("Window(%08x) clicked", window_id);
+    xcb_window_t previous_window = focused_window;
 
-    if (window_is_managed(window_id)) {
-        raise_window(parent_id);
-        focus_on_window(window);
-    } else {
-        focused_window = window_id;
-
-        if (window_is_managed(previous_window)) {
-            xcb_grab_button(xcb_connection, 0, previous_window,
-                XCB_EVENT_MASK_BUTTON_PRESS,
-                XCB_GRAB_MODE_ASYNC, XCB_GRAB_MODE_ASYNC,
-                XCB_NONE, XCB_NONE, XCB_BUTTON_INDEX_ANY, XCB_MOD_MASK_ANY);
-            decorate(get_window_by_id(previous_window));
-        }
-
-        raise_window(window_id);
-        focus_window(window_id);
+    if (window_is_managed(previous_window)) {
+        window = get_window_by_id(previous_window);
+        xcb_grab_button(xcb_connection, 0, previous_window,
+            XCB_EVENT_MASK_BUTTON_PRESS,
+            XCB_GRAB_MODE_ASYNC, XCB_GRAB_MODE_ASYNC,
+            XCB_NONE, XCB_NONE, XCB_BUTTON_INDEX_ANY, XCB_MOD_MASK_ANY);
+        decorate(window);
     }
+
+    raise_window(window_id);
+    focus_window(window_id);
+    focused_window = window_id;
 }
 
 /* Signal handlers */
