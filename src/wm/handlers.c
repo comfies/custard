@@ -121,9 +121,11 @@ void handle_window_click(xcb_generic_event_t *generic_event) {
     window_t *window;
     if (windows) {
         while ((window = vector_iterator(windows))) {
-            if (window->parent == window_id) {
-                raise_window(window_id);
-                focus_on_window(window->id);
+            // Redirect border window click as necessary
+            if (window->parent == window_id || window->id == window_id) {
+                raise_window(window->id);
+                focus_on_window(window);
+
                 reset_vector_iterator(windows);
                 return;
             }
