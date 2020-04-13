@@ -134,6 +134,7 @@ void handle_window_click(xcb_generic_event_t *generic_event) {
     }
 
     xcb_window_t previous_window = focused_window;
+    focused_window = window_id;
 
     if (window_is_managed(previous_window)) {
         window = get_window_by_id(previous_window);
@@ -146,7 +147,6 @@ void handle_window_click(xcb_generic_event_t *generic_event) {
 
     raise_window(window_id);
     focus_window(window_id);
-    focused_window = window_id;
 
     apply();
 }
