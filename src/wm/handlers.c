@@ -154,7 +154,7 @@ void handle_window_click(xcb_generic_event_t *generic_event) {
         window = get_window_by_id(focused_window);
         xcb_ungrab_button(xcb_connection,
             XCB_BUTTON_INDEX_ANY, window_id, XCB_MOD_MASK_ANY);
-        raise_window(window->id);
+        raise_window(window->parent);
         decorate(window);
     } else {
         raise_window(window_id);
