@@ -29,6 +29,5 @@ window_t *manage_window(xcb_window_t);
 void unmanage_window(xcb_window_t);
 
 void set_window_geometry(window_t*, void*);
-void focus_on_window(window_t*);
 
 kv_value_t *get_setting_from_window_rules(window_t*, char*);
