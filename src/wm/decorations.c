@@ -76,9 +76,22 @@ void apply_decoration_to_window_screen_geometry(window_t *window,
 }
 
 void decorate_with_one_border(window_t *window) {
-    char *color_setting = "border.color.unfocused";
-    if (focused_window == window->id)
-        color_setting = "border.color.focused";
+    unsigned short inverted_borders = get_setting_from_window_rules(window,
+        "border.colors.flipped")->boolean;
+
+    char *color_setting;
+
+    if (!inverted_borders) {
+        color_setting = "border.color.unfocused";
+
+        if (focused_window == window->id)
+            color_setting = "border.color.focused";
+    } else {
+        color_setting = "border.color.background";
+
+        if (focused_window == window->id)
+            color_setting = "border.color.focused";
+    }
 
     color_t color = get_setting_from_window_rules(window,
             color_setting)->color;
@@ -107,14 +120,34 @@ void decorate_with_multiple_borders(window_t *window,
 
     unsigned int values[1];
 
-    color_t primary_color = get_setting_from_window_rules(window,
-        "border.color.background")->color;
+    unsigned short inverted_borders = get_setting_from_window_rules(window,
+        "border.colors.flipped")->boolean;
 
-    char *color_setting = "border.color.unfocused";
-    if (focused_window == window->id)
-        color_setting = "border.color.focused";
-    color_t secondary_color = get_setting_from_window_rules(window,
-        color_setting)->color;
+    char *color_setting;
+    color_t primary_color;
+    color_t secondary_color;
+
+    if (!inverted_borders) {
+        primary_color = get_setting_from_window_rules(window,
+            "border.color.background")->color;
+
+        color_setting = "border.color.unfocused";
+        if (focused_window == window->id)
+            color_setting = "border.color.focused";
+
+        secondary_color = get_setting_from_window_rules(window,
+            color_setting)->color;
+    } else {
+        color_setting = "border.color.unfocused";
+
+        if (focused_window == window->id)
+            color_setting = "border.color.focused";
+
+        primary_color = get_setting_from_window_rules(window,
+            color_setting)->color;
+        secondary_color = get_setting_from_window_rules(window,
+            "border.color.background")->color;
+    }
 
     xcb_pixmap_t pixmap = xcb_generate_id(xcb_connection);
     xcb_gcontext_t graphics_context = xcb_generate_id(xcb_connection);
