@@ -332,13 +332,16 @@ void ipc_command_window(vector_t *input, unsigned short *screen_update) {
     } else if (!strcmp(variable, "geometry")) {
         char *label = vector_iterator(input);
 
-        grid_geometry_t *geometry;
+        grid_geometry_t *geometry = (grid_geometry_t *)calloc(1,
+            sizeof(grid_geometry_t));
         monitor_t *monitor = monitor_with_cursor_residence();
 
         log_debug("Looking for geometry(%s) in monitor(%s)",
             label, monitor->name);
 
-        geometry = get_geometry_from_monitor(monitor, label);
+        memcpy(geometry,
+            get_geometry_from_monitor(monitor, label),
+            sizeof(grid_geometry_t));
 
         if (!geometry)
             return;
@@ -347,6 +350,7 @@ void ipc_command_window(vector_t *input, unsigned short *screen_update) {
         if (window) {
             window->floating = 0;
 
+            free(window->geometry);
             set_window_geometry(window, geometry);
             decorate(window);
         }
@@ -379,6 +383,7 @@ void ipc_command_window(vector_t *input, unsigned short *screen_update) {
             screen_geometry_t *geometry = create_screen_geometry(x, y, height,
                 width);
 
+            free(window->geometry);
             set_window_geometry(window, geometry);
             decorate(window);
         }

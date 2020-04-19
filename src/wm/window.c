@@ -133,8 +133,12 @@ window_t *manage_window(xcb_window_t window_id) {
                 monitor = monitor_from_name(value->string);
 
         value = get_value_from_key(window->rule->rules, "geometry");
-        if (value)
-            geometry = get_geometry_from_monitor(monitor, value->string);
+        if (value) {
+            geometry = (grid_geometry_t *)calloc(1, sizeof(grid_geometry_t));
+            memcpy(geometry,
+                get_geometry_from_monitor(monitor, value->string),
+                sizeof(grid_geometry_t));
+        }
 
         value = get_value_from_key(window->rule->rules, "workspace");
         if (value)
