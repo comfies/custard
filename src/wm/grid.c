@@ -139,7 +139,8 @@ float get_x_offset(unsigned int offset, monitor_t *monitor) {
     float left_offset = (float)get_value_from_key_with_fallback(
         monitor->configuration, "grid.margin.left")->number;
 
-    return get_unit_offset(unit_in_pixels, offset, monitor) + left_offset;
+    return get_unit_offset(unit_in_pixels, offset, monitor) + \
+        left_offset + monitor->geometry->x;
 }
 
 float get_y_offset(unsigned int offset, monitor_t *monitor) {
@@ -147,5 +148,6 @@ float get_y_offset(unsigned int offset, monitor_t *monitor) {
     float top_offset = (float)get_value_from_key_with_fallback(
         monitor->configuration, "grid.margin.top")->number;
 
-    return get_unit_offset(unit_in_pixels, offset, monitor) + top_offset;
+    return get_unit_offset(unit_in_pixels, offset, monitor) + \
+        top_offset + monitor->geometry->y;
 }
