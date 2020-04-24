@@ -36,6 +36,8 @@ void ipc_process_input(char *feed) {
         ipc_command_window(input, &update);
     else if (!strcmp(qualifier, "workspace"))
         ipc_command_workspace(input, &update);
+    else if (!strcmp(qualifier, "focus"))
+        ipc_command_focus(input, &update);
 
     if (update) {
         apply();
@@ -401,6 +403,56 @@ void ipc_command_workspace(vector_t *input, unsigned short *screen_update) {
     }
 
     *screen_update = 1;
+}
+
+void ipc_command_focus(vector_t *input, unsigned short *screen_update) {
+    suppress_unused(input);
+
+    unsigned short passed = 0;
+
+    monitor_t *monitor = monitor_with_cursor_residence();
+
+    window_t *window;
+    while ((window = vector_iterator(windows))) {
+        if (window->workspace != monitor->workspace)
+            continue;
+
+        if (window->id == focused_window) {
+            if (passed)
+                return; // only one window
+
+            if (!windows->remaining)
+                reset_vector_iterator(windows);
+
+            passed = 1;
+            continue;
+        }
+
+        if (passed) {
+            reset_vector_iterator(windows);
+            /* Focus on this window */
+            xcb_window_t previous_window = focused_window;
+            focused_window = window->id;
+
+            xcb_ungrab_button(xcb_connection,
+                XCB_BUTTON_INDEX_ANY, window->id, XCB_MOD_MASK_ANY);
+            raise_window(window->parent);
+            decorate(window);
+            focus_window(window->id);
+
+            if (previous_window != XCB_WINDOW_NONE) {
+                window = get_window_by_id(previous_window);
+                xcb_grab_button(xcb_connection, 0, previous_window,
+                    XCB_EVENT_MASK_BUTTON_PRESS,
+                    XCB_GRAB_MODE_ASYNC, XCB_GRAB_MODE_ASYNC,
+                    XCB_NONE, XCB_NONE, XCB_BUTTON_INDEX_ANY, XCB_MOD_MASK_ANY);
+                decorate(window);
+            }
+
+            *screen_update = 1;
+            return;
+        }
+    }
 }
 
 /* Sub-commands */

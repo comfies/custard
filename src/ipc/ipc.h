@@ -12,6 +12,7 @@ void ipc_command_geometry(vector_t*, unsigned short*);
 void ipc_command_match(vector_t*, unsigned short*);
 void ipc_command_window(vector_t*, unsigned short*);
 void ipc_command_workspace(vector_t*, unsigned short*);
+void ipc_command_focus(vector_t*, unsigned short*);
 
 void ipc_sub_command_match_monitor(vector_t *input);
 void ipc_sub_command_match_window(vector_t *input);
