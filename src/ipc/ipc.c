@@ -445,7 +445,10 @@ void ipc_command_focus(vector_t *input, unsigned short *screen_update) {
                 xcb_grab_button(xcb_connection, 0, previous_window,
                     XCB_EVENT_MASK_BUTTON_PRESS,
                     XCB_GRAB_MODE_ASYNC, XCB_GRAB_MODE_ASYNC,
-                    XCB_NONE, XCB_NONE, XCB_BUTTON_INDEX_ANY, XCB_MOD_MASK_ANY);
+                    XCB_NONE, XCB_NONE,
+                    XCB_BUTTON_INDEX_ANY ^ \
+                        XCB_BUTTON_INDEX_4 ^ XCB_BUTTON_INDEX_5,
+                    XCB_MOD_MASK_ANY);
                 decorate(window);
             }
 
