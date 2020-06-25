@@ -7,8 +7,8 @@
 #define SIGUNUSED SIGSYS
 #endif
 
-void (*xcb_events[XCB_NO_OPERATION + 1])(xcb_generic_event_t*);
-void (*signals[SIGUNUSED + 1])(int);
+extern void (*xcb_events[XCB_NO_OPERATION + 1])(xcb_generic_event_t*);
+extern void (*signals[SIGUNUSED + 1])(int);
 
 void handle_map_request(xcb_generic_event_t*);
 void handle_window_close(xcb_generic_event_t*);

@@ -4,7 +4,6 @@
 #include "config.h"
 #include "custard.h"
 
-char *rc_path;
 vector_t *configuration = NULL;
 
 void setup_global_configuration() {
