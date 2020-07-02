@@ -184,7 +184,7 @@ void multi_border(xcb_window_t window,
 
     values[0] = pixmap;
     xcb_change_window_attributes(xcb_connection, window,
-        XCB_CW_BORDER_PIXEL, values);
+        XCB_CW_BORDER_PIXMAP, values);
 
     xcb_free_pixmap(xcb_connection, pixmap);
     xcb_free_gc(xcb_connection, graphics_context);
