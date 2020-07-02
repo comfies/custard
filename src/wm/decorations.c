@@ -141,7 +141,7 @@ void multi_border(xcb_window_t window,
     xcb_pixmap_t pixmap = xcb_generate_id(xcb_connection);
     xcb_gcontext_t graphics_context = xcb_generate_id(xcb_connection);
 
-    unsigned int border_size = (outer_size * (border_type - 2)) + inner_size;
+    unsigned int border_size = (outer_size * (border_type - 1)) + inner_size;
 
     values[0] = border_size;
     configure_window(window, XCB_CONFIG_WINDOW_BORDER_WIDTH, values);
@@ -156,7 +156,6 @@ void multi_border(xcb_window_t window,
     xcb_create_pixmap(xcb_connection, 32, pixmap, xcb_screen->root,
         width, height);
     xcb_create_gc(xcb_connection, graphics_context, pixmap, 0, NULL);
-
 
     values[0] = get_raw_color_value(secondary_color);
     xcb_change_gc(xcb_connection, graphics_context,
