@@ -158,7 +158,7 @@ void multi_border(xcb_window_t window,
     xcb_create_gc(xcb_connection, graphics_context, pixmap, 0, NULL);
 
 
-    values[0] = get_raw_color_value(primary_color);
+    values[0] = get_raw_color_value(secondary_color);
     xcb_change_gc(xcb_connection, graphics_context,
         XCB_GC_FOREGROUND, values);
 
@@ -166,7 +166,7 @@ void multi_border(xcb_window_t window,
     xcb_poly_fill_rectangle(xcb_connection, pixmap, graphics_context,
         4, outer_border);
 
-    values[0] = get_raw_color_value(secondary_color);
+    values[0] = get_raw_color_value(primary_color);
     xcb_change_gc(xcb_connection, graphics_context,
         XCB_GC_FOREGROUND, values);
 
@@ -176,7 +176,7 @@ void multi_border(xcb_window_t window,
     else {
         triple_border_transient(pixmap, graphics_context,
             inner_size, outer_size, border_size, geometry);
-        values[0] = get_raw_color_value(primary_color);
+        values[0] = get_raw_color_value(secondary_color);
     }
 
     xcb_change_window_attributes(xcb_connection, window,
