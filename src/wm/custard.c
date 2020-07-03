@@ -28,6 +28,8 @@ unsigned short loglevel = 1;
 unsigned short custard_is_running = 0;
 
 int custard(int argc, char **argv) {
+    rc_path = (char *)calloc(512, sizeof(char));
+
     /* Process arguments */
 
     char *argument;
@@ -43,7 +45,6 @@ int custard(int argc, char **argv) {
         }
 
         if (!strcmp(argument, "--rc")) {
-            rc_path = (char *)calloc(512, sizeof(char));
             strcpy(rc_path, argv[index]);
         } else if (!strcmp(argument, "--loglevel")) {
             loglevel = (short)string_to_integer(argv[index]);
@@ -62,9 +63,7 @@ int custard(int argc, char **argv) {
     }
 
 
-    if (!rc_path) {
-        rc_path = (char *)calloc(512, sizeof(char));
-
+    if (!strlen(rc_path)) {
         char *xdg_config_home = getenv("XDG_CONFIG_HOME");
         char *home_directory = getenv("HOME");
 
@@ -72,16 +71,13 @@ int custard(int argc, char **argv) {
             sprintf(rc_path, "%s/custard/rc", xdg_config_home);
         else if (home_directory && strlen(home_directory))
             sprintf(rc_path, "%s/.config/custard/rc", home_directory);
-        else {
+        else
             log_debug("%s %s",
                 "Unable to determine default rc path.",
                 "Are $HOME or $XDG_CONFIG_HOME set?");
-            free(rc_path);
-            rc_path = NULL;
-        }
     }
 
-    if (rc_path && access(rc_path, X_OK | F_OK | R_OK) > -1) {
+    if (strlen(rc_path) && access(rc_path, X_OK | F_OK | R_OK) > -1) {
         log_debug("Attempting to execute file at %s", rc_path);
         if (fork() == 0)
             execl(rc_path, rc_path, NULL);
@@ -264,8 +260,7 @@ void finalize() {
     finalize_ewmh();
     finalize_socket();
 
-    if (rc_path)
-        free(rc_path);
+    free(rc_path);
 }
 
 void _log(unsigned short level, const char *file, const char *function,
