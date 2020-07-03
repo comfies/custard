@@ -9,25 +9,31 @@
 void apply_decoration_to_window_screen_geometry(window_t *window,
     screen_geometry_t *geometry) {
 
-    unsigned int number_of_borders = get_setting_from_window_rules(window,
+    unsigned int border_type = get_setting_from_window_rules(window,
         "borders")->number;
 
-    if (!number_of_borders)
+    if (!border_type)
         return;
+
+    if (border_type > 3)
+        border_type = 3;
 
     unsigned int outer_size = get_setting_from_window_rules(window,
         "border.size.outer")->number;
     unsigned int inner_size = get_setting_from_window_rules(window,
         "border.size.inner")->number;
 
-    if (!outer_size) outer_size = 1;
-    if (!inner_size) inner_size = 1;
+    if (!outer_size)
+        outer_size = 1;
+
+    if (!inner_size)
+        inner_size = 1;
 
     unsigned int border_size;
-    if (number_of_borders == 1)
+    if (border_type == 1)
         border_size = outer_size;
     else
-        border_size = (outer_size * (number_of_borders - 2)) +
+        border_size = (outer_size * (border_type - 1)) +
             inner_size;
 
     if (!border_size)
@@ -51,15 +57,15 @@ unsigned int get_raw_color_value(color_t color) {
 void decorate(window_t *window) {
     // Mostly preprocessing
 
-    unsigned int number_of_borders = get_setting_from_window_rules(window,
+    unsigned int border_type = get_setting_from_window_rules(window,
         "borders")->number;
 
-    if (number_of_borders > 3)
-        number_of_borders = 3;
+    if (border_type > 3)
+        border_type = 3;
 
     unsigned int values[1] = { 0 };
 
-    if (!number_of_borders) {
+    if (!border_type) {
         configure_window(window->parent,
             XCB_CONFIG_WINDOW_BORDER_WIDTH, values);
         return;
@@ -99,12 +105,15 @@ void decorate(window_t *window) {
     unsigned int inner_size = get_setting_from_window_rules(window,
         "border.size.inner")->number;
 
-    if (!outer_size) outer_size = 1;
-    if (!inner_size) inner_size = 1;
+    if (!outer_size)
+        outer_size = 1;
+
+    if (!inner_size)
+        inner_size = 1;
 
     /* Which border method? */
 
-    if (number_of_borders == 1) {
+    if (border_type == 1) {
         single_border(window->parent, outer_size, primary_color);
         return;
     }
@@ -112,7 +121,7 @@ void decorate(window_t *window) {
     /* Multiborder */
 
     multi_border(window->parent, inner_size, outer_size,
-        primary_color, secondary_color, number_of_borders);
+        primary_color, secondary_color, border_type);
 
 }
 
